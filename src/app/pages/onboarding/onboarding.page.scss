@@ -4,6 +4,8 @@ $muted-text-color: rgba(255, 255, 255, 0.72);
 $line-color: rgba(255, 255, 255, 0.94);
 $star-color: rgba(255, 255, 255, 0.9);
 
+/* Root */
+
 :host {
   display: block;
   width: 100%;
@@ -14,12 +16,22 @@ $star-color: rgba(255, 255, 255, 0.9);
   position: relative;
   min-height: 100vh;
   overflow: hidden;
+  color: $text-color;
   background:
     radial-gradient(circle at 24% 34%, rgba(100, 155, 255, 0.12), transparent 28%),
     radial-gradient(circle at 68% 68%, rgba(118, 144, 255, 0.08), transparent 32%),
     $background-color;
-  color: $text-color;
 }
+
+.onboarding-layout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Background stars */
 
 .space-layer {
   position: absolute;
@@ -36,47 +48,19 @@ $star-color: rgba(255, 255, 255, 0.9);
   animation: starPulse ease-in-out infinite alternate;
 }
 
-.onboarding-layout {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+/* Panels */
 
 .moon-panel,
 .content-panel {
   position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 .moon-panel {
   min-height: 50vh;
   padding: 3rem 1.5rem 1rem;
-}
-
-.moon-aura {
-  position: absolute;
-  width: min(84vw, 32rem);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(120, 146, 255, 0.08) 28%, rgba(5, 5, 8, 0) 72%);
-  filter: blur(18px);
-}
-
-.moon-scene {
-  position: relative;
-  width: min(100vw, 32rem);
-  height: min(55vw, 19rem);
-}
-
-.moon-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
 }
 
 .content-panel {
@@ -86,21 +70,47 @@ $star-color: rgba(255, 255, 255, 0.9);
   text-align: center;
 }
 
+/* Globe */
+
+.moon-aura {
+  position: absolute;
+  width: min(96vw, 36rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(18px);
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(120, 146, 255, 0.08) 28%, rgba(5, 5, 8, 0) 72%);
+}
+
+.moon-scene {
+  position: relative;
+  width: min(112vw, 36rem);
+  height: min(68vw, 24rem);
+}
+
+.moon-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Text */
+
 .eyebrow {
+  color: rgba(255, 255, 255, 0.8);
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   line-height: 1.35;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .title {
   margin: 0.45rem 0 1rem;
   font-family: 'Outfit', sans-serif;
   font-size: 36px;
-  line-height: 0.95;
   font-weight: 700;
+  line-height: 0.95;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -108,19 +118,21 @@ $star-color: rgba(255, 255, 255, 0.9);
 .description {
   max-width: 28rem;
   margin: 0;
+  color: $muted-text-color;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   line-height: 1.65;
-  color: $muted-text-color;
 }
 
+/* CTA */
+
 .cta-button.mat-mdc-outlined-button {
-  width: 100%;
+  width: 80%;
   max-width: 30rem;
-  min-height: 3.5rem;
+  min-height: 5rem;
   margin-top: 2rem;
   border-color: $line-color;
-  border-radius: 999px;
+  border-radius: 5px;
   color: $text-color;
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
@@ -133,14 +145,16 @@ $star-color: rgba(255, 255, 255, 0.9);
 }
 
 .cta-button.mat-mdc-outlined-button:hover {
-  background: $text-color;
   color: $background-color;
+  background: $text-color;
   box-shadow: 0 0 28px rgba(255, 255, 255, 0.12);
 }
 
 .cta-button.mat-mdc-outlined-button .mdc-button__label {
   letter-spacing: inherit;
 }
+
+/* Tablet */
 
 @media (min-width: 768px) and (max-width: 1024px) {
   .moon-panel {
@@ -171,10 +185,12 @@ $star-color: rgba(255, 255, 255, 0.9);
 
   .cta-button.mat-mdc-outlined-button {
     width: 80%;
-    max-width: 26rem;
+    max-width: 28rem;
     margin-top: 2.4rem;
   }
 }
+
+/* Desktop */
 
 @media (min-width: 1025px) {
   .onboarding-layout {
@@ -186,6 +202,7 @@ $star-color: rgba(255, 255, 255, 0.9);
   .content-panel {
     width: 50%;
     min-height: 100vh;
+    margin-left: 5rem;
   }
 
   .moon-panel {
@@ -221,11 +238,13 @@ $star-color: rgba(255, 255, 255, 0.9);
   }
 
   .cta-button.mat-mdc-outlined-button {
-    width: 280px;
+    width: 300px;
     max-width: none;
     margin-top: 2.5rem;
   }
 }
+
+/* Animations */
 
 @keyframes starPulse {
   from {
