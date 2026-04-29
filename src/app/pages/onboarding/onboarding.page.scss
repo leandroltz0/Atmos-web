@@ -1,216 +1,240 @@
+$background-color: #050508;
+$text-color: #ffffff;
+$muted-text-color: rgba(255, 255, 255, 0.72);
+$line-color: rgba(255, 255, 255, 0.94);
+$star-color: rgba(255, 255, 255, 0.9);
+
 :host {
-    display: block;
-    width: 100%;
-    min-height: 100dvh;
+  display: block;
+  width: 100%;
+  min-height: 100vh;
 }
 
-.main-container {
-    width: 100%;
-    min-height: 100dvh;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--brand-bg);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+.onboarding-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 24% 34%, rgba(100, 155, 255, 0.12), transparent 28%),
+    radial-gradient(circle at 68% 68%, rgba(118, 144, 255, 0.08), transparent 32%),
+    $background-color;
+  color: $text-color;
 }
 
-.noise-bg {
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.025;
-    pointer-events: none;
-}
-
-.gradient-bg {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.2), rgba(15, 23, 42, 0.8), #0F172A);
-    pointer-events: none;
+.space-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .star {
-    position: absolute;
-    background-color: white;
-    border-radius: 50%;
-    opacity: 0.8;
-}
-.star-container {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: $star-color;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  animation: starPulse ease-in-out infinite alternate;
 }
 
-.header {
-    width: 100%;
-    padding: 1rem 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    padding-top: 3rem;
-}
-.header-title {
-    font-size: 1.5rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    color: white;
-    text-transform: uppercase;
-    font-family: 'Outfit', sans-serif;
+.onboarding-layout {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.content-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0 var(--spacing-container);
-    z-index: 10;
-    position: relative;
+.moon-panel,
+.content-panel {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.hero-graphic {
-    position: relative;
-    width: 12rem;
-    height: 12rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 3rem;
+.moon-panel {
+  min-height: 50vh;
+  padding: 3rem 1.5rem 1rem;
 }
 
-.halo-svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    fill: none;
-    stroke: currentColor;
-    color: rgba(56, 189, 248, 0.4);
-}
-.halo-svg-inner {
-    position: absolute;
-    inset: 1rem;
-    width: calc(100% - 2rem);
-    height: calc(100% - 2rem);
-    fill: none;
-    stroke: currentColor;
-    color: rgba(196, 231, 255, 0.3);
+.moon-aura {
+  position: absolute;
+  width: min(84vw, 32rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(120, 146, 255, 0.08) 28%, rgba(5, 5, 8, 0) 72%);
+  filter: blur(18px);
 }
 
-.core-pin {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 6rem;
-    height: 6rem;
-    border-radius: 9999px;
-    background-color: rgba(15, 20, 24, 0.4);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 40px rgba(56, 189, 248, 0.3);
-}
-.core-pin-icon {
-    font-size: 48px;
-    color: var(--primary-container);
-    font-variation-settings: 'FILL' 1;
-}
-.core-pin-glow {
-    position: absolute;
-    inset: 0;
-    border-radius: 9999px;
-    background-color: rgba(56, 189, 248, 0.2);
-    filter: blur(12px);
-    z-index: -1;
+.moon-scene {
+  position: relative;
+  width: min(100vw, 32rem);
+  height: min(55vw, 19rem);
 }
 
-.text-structure {
-    text-align: center;
-    width: 100%;
-    max-width: 320px;
-    margin-bottom: 4rem;
-    position: relative;
+.moon-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-.heading {
-    font-family: 'Outfit', sans-serif;
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -0.02em;
-    font-weight: 700;
-    color: white;
-    margin-bottom: var(--spacing-sm);
+.content-panel {
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem 1.5rem 2.5rem;
+  text-align: center;
 }
 
-.subheading {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    line-height: 18px;
-    font-weight: 400;
-    color: var(--on-surface-variant);
-    padding: 0 var(--spacing-sm);
+.eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  line-height: 1.35;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.action-area {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-    padding: 0 var(--spacing-xs);
+.title {
+  margin: 0.45rem 0 1rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 36px;
+  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.btn-primary {
-    width: 100%;
-    background-color: var(--primary-container);
-    color: var(--on-primary-container);
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    padding: 14px 0;
-    border-radius: 9999px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
-    transition: background-color 0.2s;
-}
-.btn-primary:hover {
-    background-color: var(--primary-fixed);
+.description {
+  max-width: 28rem;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: $muted-text-color;
 }
 
-.btn-secondary {
-    width: 100%;
-    background-color: transparent;
-    color: white;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    padding: 14px 0;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(4px);
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-.btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+.cta-button.mat-mdc-outlined-button {
+  width: 100%;
+  max-width: 30rem;
+  min-height: 3.5rem;
+  margin-top: 2rem;
+  border-color: $line-color;
+  border-radius: 999px;
+  color: $text-color;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
 }
 
-.footer {
-    width: 100%;
-    padding-bottom: 2rem;
-    padding-top: 1rem;
-    padding-left: var(--spacing-container);
-    padding-right: var(--spacing-container);
-    display: flex;
-    justify-content: center;
-    z-index: 10;
+.cta-button.mat-mdc-outlined-button:hover {
+  background: $text-color;
+  color: $background-color;
+  box-shadow: 0 0 28px rgba(255, 255, 255, 0.12);
 }
-.footer-text {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    color: rgba(189, 200, 209, 0.6);
+
+.cta-button.mat-mdc-outlined-button .mdc-button__label {
+  letter-spacing: inherit;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .moon-panel {
+    min-height: 54vh;
+    padding-top: 3.75rem;
+  }
+
+  .moon-aura {
+    width: min(72vw, 40rem);
+  }
+
+  .moon-scene {
+    width: min(78vw, 40rem);
+    height: min(62vw, 31rem);
+  }
+
+  .content-panel {
+    padding: 0.5rem 3rem 3rem;
+  }
+
+  .title {
+    font-size: 52px;
+  }
+
+  .description {
+    font-size: 1.08rem;
+  }
+
+  .cta-button.mat-mdc-outlined-button {
+    width: 80%;
+    max-width: 26rem;
+    margin-top: 2.4rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .onboarding-layout {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .moon-panel,
+  .content-panel {
+    width: 50%;
+    min-height: 100vh;
+  }
+
+  .moon-panel {
+    padding: 3rem;
+  }
+
+  .moon-aura {
+    width: min(46vw, 40rem);
+  }
+
+  .moon-scene {
+    width: min(50vw, 42rem);
+    height: min(50vw, 42rem);
+  }
+
+  .content-panel {
+    align-items: flex-start;
+    padding: 0 5.5rem 0 1rem;
+    text-align: left;
+  }
+
+  .eyebrow {
+    font-size: 1.02rem;
+  }
+
+  .title {
+    font-size: 64px;
+  }
+
+  .description {
+    max-width: 27rem;
+    font-size: 1.05rem;
+  }
+
+  .cta-button.mat-mdc-outlined-button {
+    width: 280px;
+    max-width: none;
+    margin-top: 2.5rem;
+  }
+}
+
+@keyframes starPulse {
+  from {
+    transform: scale(0.9);
+    opacity: 0.35;
+  }
+
+  to {
+    transform: scale(1.18);
+    opacity: 1;
+  }
 }

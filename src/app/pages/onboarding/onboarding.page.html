@@ -1,79 +1,37 @@
-<main class="main-container">
-    <!-- Background Effects -->
-    <div class="noise-bg"></div>
-    <div class="gradient-bg"></div>
+<main class="onboarding-shell">
+  <div class="space-layer" aria-hidden="true">
+    <span
+      *ngFor="let star of stars"
+      class="star"
+      [style.top]="star.top"
+      [style.left]="star.left"
+      [style.width]="star.size"
+      [style.height]="star.size"
+      [style.opacity]="star.opacity"
+      [style.animation-duration]="star.duration"
+      [style.animation-delay]="star.delay"
+    ></span>
+  </div>
 
-    <!-- Simple Starry Background -->
-    <div class="star-container">
-        <div class="star" style="width: 4px; height: 4px; top: 10%; left: 20%; opacity: 0.4;"></div>
-        <div class="star" style="width: 2px; height: 2px; top: 15%; left: 80%; opacity: 0.6;"></div>
-        <div class="star" style="width: 6px; height: 6px; top: 25%; left: 10%; opacity: 0.3;"></div>
-        <div class="star" style="width: 3px; height: 3px; top: 30%; left: 70%; opacity: 0.8;"></div>
-        <div class="star" style="width: 4px; height: 4px; top: 45%; left: 85%; opacity: 0.5;"></div>
-        <div class="star" style="width: 2px; height: 2px; top: 50%; left: 15%; opacity: 0.7;"></div>
-        <div class="star" style="width: 3px; height: 3px; top: 60%; left: 60%; opacity: 0.4;"></div>
-        <div class="star" style="width: 4px; height: 4px; top: 70%; left: 30%; opacity: 0.6;"></div>
-        <div class="star" style="width: 2px; height: 2px; top: 80%; left: 80%; opacity: 0.3;"></div>
-        <div class="star" style="width: 3px; height: 3px; top: 85%; left: 20%; opacity: 0.5;"></div>
+  <section class="onboarding-layout">
+    <div class="moon-panel">
+      <div class="moon-aura" aria-hidden="true"></div>
+      <div #moonScene class="moon-scene">
+        <canvas #moonCanvas class="moon-canvas" aria-label="Rotating moon"></canvas>
+      </div>
     </div>
 
-    <!-- TopAppBar -->
-    <header class="header">
-        <span class="header-title">ATMOS</span>
-    </header>
+    <div class="content-panel">
+      <p class="eyebrow">Welcome to</p>
+      <h1 class="title">ATMOS</h1>
+      <p class="description">
+        We're here to keep you updated on the weather,
+        so you can plan your day without surprises.
+      </p>
 
-    <!-- Main Content Area -->
-    <div class="content-area">
-        <!-- Hero Graphic: Hand-crafted Navigation Artifact -->
-        <div class="hero-graphic">
-            <!-- Broken Halo Rings -->
-            <svg class="halo-svg" viewBox="0 0 100 100" stroke-width="1.5">
-                <path d="M 50,5 A 45,45 0 0,1 90,30" />
-                <path d="M 95,50 A 45,45 0 0,1 60,92" />
-                <path d="M 40,94 A 45,45 0 0,1 5,60" />
-                <path d="M 8,30 A 45,45 0 0,1 30,10" />
-            </svg>
-            <svg class="halo-svg-inner" viewBox="0 0 100 100" stroke-width="1">
-                <path d="M 50,15 A 35,35 0 0,0 20,30" />
-                <path d="M 12,50 A 35,35 0 0,0 35,80" />
-                <path d="M 70,82 A 35,35 0 0,0 85,50" />
-                <path d="M 82,30 A 35,35 0 0,0 60,18" />
-            </svg>
-            
-            <!-- Core Pin -->
-            <div class="core-pin">
-                <span class="material-symbols-outlined core-pin-icon">
-                    location_on
-                </span>
-                <div class="core-pin-glow"></div>
-            </div>
-        </div>
-
-        <!-- Typography Structure -->
-        <div class="text-structure">
-            <h1 class="heading">
-                Know your sky, instantly
-            </h1>
-            <p class="subheading">
-                ATMOS uses your location to deliver real-time, hyper-local weather.
-            </p>
-        </div>
-
-        <!-- Action Area -->
-        <div class="action-area">
-            <button class="btn-primary">
-                Allow location access
-            </button>
-            <button class="btn-secondary">
-                Search for a city instead
-            </button>
-        </div>
+      <button mat-stroked-button type="button" class="cta-button">
+        GET STARTED
+      </button>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p class="footer-text">
-            Location is used only for weather data.
-        </p>
-    </footer>
+  </section>
 </main>
