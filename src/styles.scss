@@ -1,1 +1,81 @@
 /* You can add global styles to this file, and also import other style files */
+:root {
+  --surface-tint: #7bd0ff;
+  --tertiary-container: #f1a02b;
+  --on-primary-fixed: #001e2c;
+  --secondary-container: #3e495d;
+  --background: #0f1418;
+  --on-tertiary: #472a00;
+  --outline: #87929a;
+  --on-error-container: #ffdad6;
+  --inverse-primary: #00668a;
+  --surface-container-highest: #303539;
+  --primary-fixed: #c4e7ff;
+  --outline-variant: #3e484f;
+  --secondary-fixed-dim: #bcc7de;
+  --on-background: #dee3e8;
+  --surface-container: #1b2024;
+  --on-error: #690005;
+  --on-primary-fixed-variant: #004c69;
+  --surface-variant: #303539;
+  --surface-container-lowest: #0a0f12;
+  --on-secondary-fixed-variant: #3c475a;
+  --tertiary-fixed-dim: #ffb960;
+  --secondary: #bcc7de;
+  --inverse-surface: #dee3e8;
+  --error-container: #93000a;
+  --surface: #0f1418;
+  --on-tertiary-fixed: #2a1700;
+  --on-primary: #00354a;
+  --surface-bright: #343a3e;
+  --on-tertiary-fixed-variant: #653e00;
+  --on-surface: #dee3e8;
+  --tertiary: #ffc176;
+  --on-surface-variant: #bdc8d1;
+  --on-secondary-fixed: #111c2d;
+  --on-tertiary-container: #613b00;
+  --on-secondary: #263143;
+  --error: #ffb4ab;
+  --inverse-on-surface: #2c3135;
+  --on-primary-container: #004965;
+  --secondary-fixed: #d8e3fb;
+  --primary-container: #38bdf8;
+  --surface-dim: #0f1418;
+  --surface-container-high: #252b2e;
+  --on-secondary-container: #aeb9d0;
+  --primary-fixed-dim: #7bd0ff;
+  --surface-container-low: #171c20;
+  --tertiary-fixed: #ffddb8;
+  --primary: #8ed5ff;
+  --brand-bg: #0F172A;
+  
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-container: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--on-background);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+  margin: 0;
+  width: 100%;
+}
+
+app-root {
+  display: block;
+  width: 100%;
+  min-height: 100dvh;
+}
