@@ -12,6 +12,10 @@ export const routes: Routes = [
   },
   {
     path: 'home',
+    loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent)
+  },
+  {
+    path: 'onboarding',
     loadComponent: () => import('./pages/onboarding/onboarding.page').then((m) => m.OnboardingPage)
   }
 ];

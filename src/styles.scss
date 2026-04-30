@@ -80,6 +80,15 @@ html {
   --atmos-shell-gradient: linear-gradient(180deg, rgba(4, 8, 15, 0.8), rgba(4, 8, 15, 0.98));
   --atmos-font-body: 'Inter', sans-serif;
   --atmos-font-display: 'Outfit', sans-serif;
+  --color-bg-primary: #0d1b2a;
+  --color-bg-card: #1b3a5c;
+  --color-accent: #3a86ff;
+  --color-info: #48cae4;
+  --color-sun: #ffd166;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #8baec8;
+  --color-danger: #ef4444;
+  --color-success: #10b981;
   
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -162,4 +171,143 @@ html, body {
 
 .atmos-glass-button.mat-mdc-button-base .mdc-button__label {
   letter-spacing: inherit;
+}
+
+.font-display {
+  font-family: 'DM Serif Display', serif;
+}
+
+.font-body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.glass-card {
+  background: rgba(27, 58, 92, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.condition-icon {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.condition-icon::before,
+.condition-icon::after {
+  content: '';
+  position: absolute;
+}
+
+.condition-icon--hero {
+  width: 96px;
+  height: 96px;
+}
+
+.condition-icon--sunny::before,
+.condition-icon--partly-cloudy::before {
+  inset: 20%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe39b 20%, #ffd166 60%, rgba(255, 209, 102, 0.3) 100%);
+  box-shadow: 0 0 0 12px rgba(255, 209, 102, 0.12);
+}
+
+.condition-icon--cloudy::before,
+.condition-icon--rainy::before,
+.condition-icon--stormy::before,
+.condition-icon--snowy::before,
+.condition-icon--partly-cloudy::after {
+  left: 14%;
+  right: 14%;
+  bottom: 24%;
+  height: 42%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #d6e4f0, #9fb3c8);
+  box-shadow:
+    -12px 2px 0 -2px #c7d7e3,
+    12px -4px 0 -2px #b5c7d7;
+}
+
+.condition-icon--partly-cloudy::after {
+  bottom: 16%;
+}
+
+.condition-icon--rainy::after,
+.condition-icon--stormy::after,
+.condition-icon--snowy::after {
+  left: 30%;
+  top: 62%;
+  width: 40%;
+  height: 26%;
+  background: none;
+}
+
+.condition-icon--rainy::after {
+  box-shadow:
+    -10px 0 0 0 #48cae4,
+    0 6px 0 0 #48cae4,
+    10px 0 0 0 #48cae4;
+  border-radius: 999px;
+}
+
+.condition-icon--stormy::after {
+  width: 0;
+  height: 0;
+  left: 38%;
+  top: 60%;
+  border-left: 10px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 22px solid #ffd166;
+  transform: skewX(-12deg);
+}
+
+.condition-icon--snowy::after {
+  box-shadow:
+    -10px 0 0 0 #f8fbff,
+    0 8px 0 0 #f8fbff,
+    10px 0 0 0 #f8fbff;
+  border-radius: 50%;
+}
+
+.condition-icon--sm {
+  width: 32px;
+  height: 32px;
+}
+
+.condition-icon--sm.condition-icon--sunny::before,
+.condition-icon--sm.condition-icon--partly-cloudy::before {
+  box-shadow: 0 0 0 5px rgba(255, 209, 102, 0.12);
+}
+
+.condition-icon--sm.condition-icon--cloudy::before,
+.condition-icon--sm.condition-icon--rainy::before,
+.condition-icon--sm.condition-icon--stormy::before,
+.condition-icon--sm.condition-icon--snowy::before,
+.condition-icon--sm.condition-icon--partly-cloudy::after {
+  box-shadow:
+    -6px 2px 0 -2px #c7d7e3,
+    6px -2px 0 -2px #b5c7d7;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.pulse {
+  animation: pulse 1.5s ease-in-out infinite;
 }

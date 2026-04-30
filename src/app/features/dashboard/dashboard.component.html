@@ -1,0 +1,227 @@
+<main class="dashboard-shell font-body" role="main" [attr.aria-busy]="isLoading()">
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb--blue"></div>
+    <div class="orb orb--teal"></div>
+    <div class="orb orb--accent"></div>
+  </div>
+
+  <div class="dashboard-container">
+    @if (isLoading()) {
+      <div class="skeleton-stack" aria-busy="true">
+        <div class="skeleton-hero glass-card pulse"></div>
+        <div class="skeleton-row">
+          @for (item of [1, 2, 3, 4]; track item) {
+            <div class="skeleton-card glass-card pulse"></div>
+          }
+        </div>
+        <div class="skeleton-section glass-card pulse"></div>
+        <div class="skeleton-section glass-card pulse"></div>
+      </div>
+    } @else {
+      <div #dashboardRoot class="dashboard-content">
+        <header class="dashboard-header">
+          <div>
+            <h1 class="city-name">{{ currentWeather().cityName }}, {{ currentWeather().country }}</h1>
+            <p class="current-date">{{ formattedDate() }}</p>
+          </div>
+
+          <div class="header-actions">
+            <span class="last-updated font-mono">{{ updatedLabel() }}</span>
+            <button
+              mat-icon-button
+              type="button"
+              (click)="onRefresh()"
+              matTooltip="Actualizar"
+              aria-label="Actualizar clima"
+            >
+              <mat-icon>refresh</mat-icon>
+            </button>
+          </div>
+        </header>
+
+        @if (isOffline()) {
+          <div class="offline-banner" role="alert" aria-live="assertive">
+            <mat-icon aria-hidden="true">wifi_off</mat-icon>
+            Sin conexión — mostrando datos cacheados de hace {{ minutesAgo() }} min
+          </div>
+        }
+
+        <section
+          class="hero-card glass-card"
+          #weatherCard
+          [attr.aria-label]="'Temperatura actual: ' + currentWeather().temp + ' grados Celsius'"
+        >
+          <div class="hero-left">
+            <div
+              class="condition-icon condition-icon--hero"
+              [ngClass]="'condition-icon--' + currentWeather().condition"
+              aria-hidden="true"
+            ></div>
+            <p class="condition-label">{{ currentWeather().conditionLabel }}</p>
+          </div>
+
+          <div class="hero-center">
+            <div class="hero-temp-wrapper">
+              <span #heroTemp class="hero-temp font-display">{{ currentWeather().temp }}°</span>
+            </div>
+            <p class="feels-like">
+              Sensación:
+              <span class="font-mono">{{ currentWeather().feelsLike }}°C</span>
+            </p>
+          </div>
+
+          <div class="hero-right">
+            <div class="quick-stat">
+              <mat-icon class="stat-icon" aria-hidden="true">water_drop</mat-icon>
+              <span class="stat-value font-mono">{{ currentWeather().humidity }}%</span>
+              <span class="stat-label">Humedad</span>
+            </div>
+
+            <div class="quick-stat">
+              <mat-icon class="stat-icon" aria-hidden="true">air</mat-icon>
+              <span class="stat-value font-mono">{{ currentWeather().windSpeed }} km/h</span>
+              <span class="stat-meta">
+                <mat-icon
+                  class="wind-arrow"
+                  aria-hidden="true"
+                  [style.transform]="windArrowTransform(currentWeather().windDirection)"
+                >
+                  navigation
+                </mat-icon>
+                <span class="stat-label">{{ currentWeather().windDirection }}</span>
+              </span>
+            </div>
+
+            <div class="quick-stat">
+              <mat-icon class="stat-icon" aria-hidden="true">compress</mat-icon>
+              <span class="stat-value font-mono">{{ currentWeather().pressure }} hPa</span>
+              <span class="stat-label">Presión</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="data-row">
+          <article
+            class="data-card glass-card"
+            #weatherCard
+            aria-label="Calidad del aire actual"
+          >
+            <mat-icon class="data-card__icon" [style.color]="aqiColor()" aria-hidden="true">air</mat-icon>
+            <span class="data-card__value font-mono">{{ currentWeather().aqi }}</span>
+            <span class="data-card__label">AQI · {{ currentWeather().aqiLabel }}</span>
+
+            <div class="aqi-bar" aria-hidden="true">
+              @for (segment of aqiSegments; track segment) {
+                <div
+                  class="aqi-segment"
+                  [class.active]="segment <= currentWeather().aqi"
+                  [style.background]="segment <= currentWeather().aqi ? aqiColor() : 'rgba(255,255,255,0.1)'"
+                ></div>
+              }
+            </div>
+          </article>
+
+          <article
+            class="data-card glass-card"
+            #weatherCard
+            aria-label="Índice ultravioleta actual"
+          >
+            <mat-icon class="data-card__icon data-card__icon--sun" aria-hidden="true">wb_sunny</mat-icon>
+            <span class="data-card__value font-mono data-card__value--sun">{{ currentWeather().uvIndex }}</span>
+            <span class="data-card__label">Índice UV</span>
+            <span class="data-card__sublabel">{{ uvLabel() }}</span>
+          </article>
+
+          <article
+            class="data-card glass-card"
+            #weatherCard
+            aria-label="Horario de amanecer y atardecer"
+          >
+            <div class="sun-times">
+              <div class="sun-time">
+                <mat-icon class="data-card__icon data-card__icon--sun" aria-hidden="true">wb_twilight</mat-icon>
+                <span class="font-mono">{{ currentWeather().sunrise }}</span>
+                <span class="data-card__label">Amanecer</span>
+              </div>
+              <div class="sun-time">
+                <mat-icon class="data-card__icon data-card__icon--sunset" aria-hidden="true">nightlight_round</mat-icon>
+                <span class="font-mono">{{ currentWeather().sunset }}</span>
+                <span class="data-card__label">Atardecer</span>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="data-card glass-card"
+            #weatherCard
+            aria-label="Visibilidad actual"
+          >
+            <mat-icon class="data-card__icon data-card__icon--info" aria-hidden="true">visibility</mat-icon>
+            <span class="data-card__value font-mono">{{ currentWeather().visibility }} km</span>
+            <span class="data-card__label">Visibilidad</span>
+          </article>
+        </section>
+
+        <section class="section-block glass-card" #weatherCard aria-label="Pronóstico para las próximas 24 horas">
+          <h2 class="section-title">Próximas 24 horas</h2>
+
+          <cdk-virtual-scroll-viewport
+            #hourlyScroll
+            orientation="horizontal"
+            itemSize="92"
+            class="hourly-scroll"
+            role="list"
+          >
+            <div
+              *cdkVirtualFor="let item of hourlyForecast(); trackBy: trackByHour"
+              class="hourly-item glass-card"
+              role="listitem"
+              [attr.aria-label]="'Pronóstico ' + item.hour + ': ' + item.temp + ' grados'"
+              tabindex="0"
+            >
+              <span class="hourly-hour">{{ item.hour }}</span>
+              <div class="condition-icon condition-icon--sm" [ngClass]="'condition-icon--' + item.condition" aria-hidden="true"></div>
+              <span class="hourly-temp font-mono">{{ item.temp }}°</span>
+              @if (item.precipChance > 20) {
+                <span class="hourly-precip font-mono">{{ item.precipChance }}%</span>
+              }
+            </div>
+          </cdk-virtual-scroll-viewport>
+        </section>
+
+        <section class="section-block glass-card" #weatherCard aria-label="Pronóstico para los próximos siete días">
+          <h2 class="section-title">Próximos 7 días</h2>
+
+          <div class="daily-list">
+            @for (day of dailyForecast(); track day.date) {
+              <div class="daily-row glass-card" tabindex="0">
+                <span class="daily-day">{{ day.day }}</span>
+                <span class="daily-date">{{ day.date }}</span>
+
+                <div class="condition-icon condition-icon--sm" [ngClass]="'condition-icon--' + day.condition" aria-hidden="true"></div>
+
+                @if (day.precipChance > 10) {
+                  <span class="daily-precip font-mono">{{ day.precipChance }}%</span>
+                } @else {
+                  <span class="daily-precip daily-precip--empty"></span>
+                }
+
+                <div class="temp-range">
+                  <span class="temp-min font-mono">{{ day.tempMin }}°</span>
+                  <div class="temp-bar">
+                    <div
+                      class="temp-bar__fill"
+                      [style.left.%]="getTempBarOffset(day)"
+                      [style.width.%]="getTempBarWidth(day)"
+                    ></div>
+                  </div>
+                  <span class="temp-max font-mono">{{ day.tempMax }}°</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    }
+  </div>
+</main>
