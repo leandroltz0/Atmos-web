@@ -11,6 +11,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import * as THREE from 'three';
 
+type StarConfig = {
+  top: string;
+  left: string;
+  size: string;
+  opacity: number;
+  duration: string;
+  delay: string;
+};
+
+const STAR_COUNT = 30;
+const GLOBE_TEXTURE_PATH = 'assets/textures/earth-texture.jpg';
+const GLOBE_ROTATION_SPEED_Y = 0.0018;
+const GLOBE_ROTATION_SPEED_X = 0.0002;
+
 @Component({
   selector: 'app-onboarding',
   standalone: true,
@@ -19,24 +33,21 @@ import * as THREE from 'three';
   styleUrls: ['./onboarding.page.scss']
 })
 export class OnboardingPage implements AfterViewInit, OnDestroy {
+  @ViewChild('globeCanvas', { static: true })
+  private readonly globeCanvasRef?: ElementRef<HTMLCanvasElement>;
 
+  @ViewChild('globeScene', { static: true })
+  private readonly globeSceneRef?: ElementRef<HTMLDivElement>;
 
-
-  @ViewChild('moonCanvas', { static: true })
-  private readonly moonCanvasRef?: ElementRef<HTMLCanvasElement>;
-
-  @ViewChild('moonScene', { static: true })
-  private readonly moonSceneRef?: ElementRef<HTMLDivElement>;
-
-  protected readonly stars = this.createStars(30);
+  protected readonly stars = this.createStars(STAR_COUNT);
 
   private renderer?: any;
   private scene?: any;
   private camera?: any;
-  private moon?: any;
-  private moonTexture?: any;
+  private globeMesh?: any;
+  private globeTexture?: any;
   private animationFrameId?: number;
-  private resizeHandler = () => this.updateRendererSize();
+  private readonly resizeHandler = () => this.updateRendererSize();
 
   constructor(
     private readonly ngZone: NgZone,
@@ -44,7 +55,7 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
   ) {}
 
   ngAfterViewInit(): void {
-    this.initThreeScene();
+    this.setupGlobeScene();
   }
 
   ngOnDestroy(): void {
@@ -54,15 +65,19 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
       cancelAnimationFrame(this.animationFrameId);
     }
 
-    this.moon?.geometry.dispose();
-    this.moon?.material.dispose();
-    this.moonTexture?.dispose();
-    this.renderer?.dispose();
+    this.globeMesh?.geometry?.dispose?.();
+    this.globeMesh?.material?.dispose?.();
+    this.globeTexture?.dispose?.();
+    this.renderer?.dispose?.();
   }
 
-  // Sets up the moon scene once the canvas exists in the view.
-  private initThreeScene(): void {
-    const canvas = this.moonCanvasRef?.nativeElement;
+  protected onGetStarted(): void {
+    void this.router.navigate(['/allow-location']);
+  }
+
+  // Creates the standalone Three.js scene used by the hero globe.
+  private setupGlobeScene(): void {
+    const canvas = this.globeCanvasRef?.nativeElement;
 
     if (!canvas) {
       return;
@@ -77,29 +92,28 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
       alpha: true,
       antialias: true
     });
-
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
 
     const textureLoader = new THREE.TextureLoader();
-    const moonTexture = textureLoader.load('assets/textures/earth-texture.jpg', () => {
+    const globeTexture = textureLoader.load(GLOBE_TEXTURE_PATH, () => {
       this.updateRendererSize();
     });
-    moonTexture.colorSpace = THREE.SRGBColorSpace;
+    globeTexture.colorSpace = THREE.SRGBColorSpace;
 
-    const moonGeometry = new THREE.SphereGeometry(1, 64, 64);
-    const moonMaterial = new THREE.MeshStandardMaterial({
-      map: moonTexture,
-      roughness: 1,
-      metalness: 0
-    });
-    const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+    const globeMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 64, 64),
+      new THREE.MeshStandardMaterial({
+        map: globeTexture,
+        roughness: 1,
+        metalness: 0
+      })
+    );
+    scene.add(globeMesh);
 
-    scene.add(moon);
-
-    const sunlight = new THREE.DirectionalLight(0xddeeff, 2.2);
-    sunlight.position.set(4, 1.5, 3);
-    scene.add(sunlight);
+    const keyLight = new THREE.DirectionalLight(0xddeeff, 2.2);
+    keyLight.position.set(4, 1.5, 3);
+    scene.add(keyLight);
 
     const ambientLight = new THREE.AmbientLight(0x223355, 0.35);
     scene.add(ambientLight);
@@ -107,20 +121,20 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
     this.scene = scene;
     this.camera = camera;
     this.renderer = renderer;
-    this.moon = moon;
-    this.moonTexture = moonTexture;
+    this.globeMesh = globeMesh;
+    this.globeTexture = globeTexture;
 
     this.updateRendererSize();
     window.addEventListener('resize', this.resizeHandler);
 
-    this.ngZone.runOutsideAngular(() => this.animateMoon());
+    this.ngZone.runOutsideAngular(() => this.startRenderLoop());
   }
 
-  // Keeps the renderer in sync with the responsive container dimensions.
+  // Keeps the canvas renderer synced with the responsive scene container.
   private updateRendererSize(): void {
     const renderer = this.renderer;
     const camera = this.camera;
-    const container = this.moonSceneRef?.nativeElement;
+    const container = this.globeSceneRef?.nativeElement;
 
     if (!renderer || !camera || !container) {
       return;
@@ -134,32 +148,25 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
     camera.updateProjectionMatrix();
   }
 
-  // Runs the slow moon rotation loop requested by the design brief.
-  private animateMoon(): void {
+  // Runs the subtle hero rotation continuously outside Angular change detection.
+  private startRenderLoop(): void {
     const renderer = this.renderer;
     const scene = this.scene;
     const camera = this.camera;
-    const moon = this.moon;
+    const globeMesh = this.globeMesh;
 
-    if (!renderer || !scene || !camera || !moon) {
+    if (!renderer || !scene || !camera || !globeMesh) {
       return;
     }
 
-    moon.rotation.y += 0.0018;
-    moon.rotation.x += 0.0002;
+    globeMesh.rotation.y += GLOBE_ROTATION_SPEED_Y;
+    globeMesh.rotation.x += GLOBE_ROTATION_SPEED_X;
 
     renderer.render(scene, camera);
-    this.animationFrameId = requestAnimationFrame(() => this.animateMoon());
+    this.animationFrameId = requestAnimationFrame(() => this.startRenderLoop());
   }
 
-  private createStars(count: number): Array<{
-    top: string;
-    left: string;
-    size: string;
-    opacity: number;
-    duration: string;
-    delay: string;
-  }> {
+  private createStars(count: number): StarConfig[] {
     return Array.from({ length: count }, (_, index) => ({
       top: `${(index * 17) % 100}%`,
       left: `${(index * 29 + 11) % 100}%`,
@@ -168,9 +175,5 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
       duration: `${5 + (index % 4) * 1.2}s`,
       delay: `${(index % 5) * 0.6}s`
     }));
-  }
-
-  protected onGetStarted(): void {
-    void this.router.navigate(['/allow-location']);
   }
 }

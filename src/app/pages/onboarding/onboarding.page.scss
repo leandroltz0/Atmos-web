@@ -1,5 +1,5 @@
-$background-color: #0f172a;
-$surface-color: rgba(30, 41, 59, 0.45);
+$background-color: #04080f;
+$surface-color: #06101e;
 $surface-border: rgba(255, 255, 255, 0.06);
 $text-color: #f8fafc;
 $secondary-text-color: #94a3b8;
@@ -22,9 +22,7 @@ $star-color: rgba(220, 235, 255, 0.88);
   overflow: hidden;
   color: $text-color;
   background:
-    radial-gradient(circle at 24% 34%, rgba(56, 189, 248, 0.14), transparent 24%),
-    radial-gradient(circle at 68% 68%, rgba(56, 189, 248, 0.08), transparent 30%),
-    linear-gradient(160deg, #1a3a5c, #0f172a 58%),
+    linear-gradient(180deg, rgba(4, 8, 15, 0.8), rgba(4, 8, 15, 0.98)),
     $background-color;
 }
 
@@ -66,7 +64,7 @@ $star-color: rgba(220, 235, 255, 0.88);
 
 /* Panels */
 
-.moon-panel,
+.globe-panel,
 .content-panel {
   position: relative;
   display: flex;
@@ -74,7 +72,7 @@ $star-color: rgba(220, 235, 255, 0.88);
   justify-content: center;
 }
 
-.moon-panel {
+.globe-panel {
   min-height: 50vh;
   padding: 3rem 1.5rem 1rem;
 }
@@ -88,23 +86,23 @@ $star-color: rgba(220, 235, 255, 0.88);
 
 /* Globe */
 
-.moon-aura {
+.globe-aura {
   position: absolute;
   width: min(96vw, 36rem);
   aspect-ratio: 1;
   border-radius: 50%;
   filter: blur(18px);
   background:
-    radial-gradient(circle, rgba(56, 189, 248, 0.16) 0%, rgba(56, 189, 248, 0.1) 26%, rgba(15, 23, 42, 0) 72%);
+    radial-gradient(circle, rgba(56, 189, 248, 0.16) 0%, rgba(56, 189, 248, 0.1) 26%, rgba(4, 8, 15, 0) 72%);
 }
 
-.moon-scene {
+.globe-scene {
   position: relative;
   width: min(112vw, 36rem);
   height: min(68vw, 24rem);
 }
 
-.moon-canvas {
+.globe-canvas {
   display: block;
   width: 100%;
   height: 100%;
@@ -152,8 +150,8 @@ $star-color: rgba(220, 235, 255, 0.88);
   margin-top: 2rem;
   border-color: $surface-border;
   border-radius: 14px;
-  background: $surface-color;
-  backdrop-filter: blur(20px);
+  background: rgba(6, 16, 30, 0.72);
+  backdrop-filter: blur(12px);
   color: $text-color;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   font-family: 'Outfit', sans-serif;
@@ -183,16 +181,16 @@ $star-color: rgba(220, 235, 255, 0.88);
 /* Tablet */
 
 @media (min-width: 768px) and (max-width: 1024px) {
-  .moon-panel {
+  .globe-panel {
     min-height: 54vh;
     padding-top: 3.75rem;
   }
 
-  .moon-aura {
+  .globe-aura {
     width: min(72vw, 40rem);
   }
 
-  .moon-scene {
+  .globe-scene {
     width: min(78vw, 40rem);
     height: min(62vw, 31rem);
   }
@@ -224,22 +222,22 @@ $star-color: rgba(220, 235, 255, 0.88);
     align-items: stretch;
   }
 
-  .moon-panel,
+  .globe-panel,
   .content-panel {
     width: 50%;
     min-height: 100vh;
     margin-left: 5rem;
   }
 
-  .moon-panel {
+  .globe-panel {
     padding: 3rem;
   }
 
-  .moon-aura {
+  .globe-aura {
     width: min(46vw, 40rem);
   }
 
-  .moon-scene {
+  .globe-scene {
     width: min(50vw, 42rem);
     height: min(50vw, 42rem);
   }
