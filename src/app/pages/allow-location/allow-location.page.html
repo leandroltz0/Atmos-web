@@ -15,20 +15,22 @@
     </div>
 
     <div class="content-panel" #contentPanel>
+      <p class="eyebrow atmos-kicker">Location Access</p>
+
       <h1 class="headline" #headline>
         Know your sky,<br />
         <span class="accent">wherever</span> you are.
       </h1>
 
-      <p class="description" #description>
+      <p class="description atmos-body-copy" #description>
         ATMOS delivers hyperlocal weather — real-time conditions, precise forecasts,
         and smart alerts built around you.
       </p>
 
       <button
-        mat-flat-button
+        mat-stroked-button
         type="button"
-        class="allow-btn"
+        class="allow-btn atmos-glass-button"
         #allowBtn
         (click)="onAllowLocation()"
       >

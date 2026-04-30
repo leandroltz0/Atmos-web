@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   NgZone,
   OnDestroy,
   ViewChild
@@ -11,17 +12,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import * as THREE from 'three';
 
-type StarConfig = {
-  top: string;
-  left: string;
-  size: string;
-  opacity: number;
-  duration: string;
-  delay: string;
+type SpaceStar = {
+  x: number;
+  y: number;
+  r: number;
+  speed: number;
+  phase: number;
 };
 
-const STAR_COUNT = 30;
-const GLOBE_TEXTURE_PATH = 'assets/textures/earth-texture.jpg';
+const STAR_COUNT = 90;
+const GLOBE_TEXTURE_PATH = 'assets/textures/earth.jpg';
+
 const GLOBE_ROTATION_SPEED_Y = 0.0018;
 const GLOBE_ROTATION_SPEED_X = 0.0002;
 
@@ -33,21 +34,27 @@ const GLOBE_ROTATION_SPEED_X = 0.0002;
   styleUrls: ['./onboarding.page.scss']
 })
 export class OnboardingPage implements AfterViewInit, OnDestroy {
+  @ViewChild('bgCanvas', { static: true })
+  private readonly bgCanvasRef?: ElementRef<HTMLCanvasElement>;
+
   @ViewChild('globeCanvas', { static: true })
   private readonly globeCanvasRef?: ElementRef<HTMLCanvasElement>;
 
   @ViewChild('globeScene', { static: true })
   private readonly globeSceneRef?: ElementRef<HTMLDivElement>;
 
-  protected readonly stars = this.createStars(STAR_COUNT);
-
   private renderer?: any;
   private scene?: any;
   private camera?: any;
   private globeMesh?: any;
   private globeTexture?: any;
+  private backgroundContext?: CanvasRenderingContext2D;
+  private backgroundAnimationFrameId?: number;
+  private backgroundStartTime?: number;
+  private nebulaPrimary?: CanvasGradient;
+  private nebulaSecondary?: CanvasGradient;
+  private stars: SpaceStar[] = [];
   private animationFrameId?: number;
-  private readonly resizeHandler = () => this.updateRendererSize();
 
   constructor(
     private readonly ngZone: NgZone,
@@ -55,11 +62,14 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
   ) {}
 
   ngAfterViewInit(): void {
+    this.setupBackground();
     this.setupGlobeScene();
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('resize', this.resizeHandler);
+    if (this.backgroundAnimationFrameId !== undefined) {
+      cancelAnimationFrame(this.backgroundAnimationFrameId);
+    }
 
     if (this.animationFrameId !== undefined) {
       cancelAnimationFrame(this.animationFrameId);
@@ -71,8 +81,119 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
     this.renderer?.dispose?.();
   }
 
+  @HostListener('window:resize')
+  protected onResize(): void {
+    this.resizeBackground();
+    this.updateRendererSize();
+  }
+
   protected onGetStarted(): void {
     void this.router.navigate(['/allow-location']);
+  }
+
+  // Reuses the premium canvas starfield from allow-location.
+  private setupBackground(): void {
+    this.resizeBackground();
+
+    this.ngZone.runOutsideAngular(() => {
+      const tick = (timestamp: number) => {
+        if (!this.backgroundStartTime) {
+          this.backgroundStartTime = timestamp;
+        }
+
+        if (!this.backgroundContext) {
+          return;
+        }
+
+        const canvas = this.bgCanvasRef?.nativeElement;
+        if (!canvas) {
+          return;
+        }
+
+        const elapsedSeconds = (timestamp - this.backgroundStartTime) / 1000;
+        this.drawBackgroundFrame(canvas.width, canvas.height, elapsedSeconds);
+        this.backgroundAnimationFrameId = requestAnimationFrame(tick);
+      };
+
+      this.backgroundAnimationFrameId = requestAnimationFrame(tick);
+    });
+  }
+
+  private resizeBackground(): void {
+    const canvas = this.bgCanvasRef?.nativeElement;
+    if (!canvas) {
+      return;
+    }
+
+    const width = canvas.offsetWidth || window.innerWidth;
+    const height = canvas.offsetHeight || window.innerHeight;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    this.backgroundContext = canvas.getContext('2d') ?? undefined;
+    if (!this.backgroundContext) {
+      return;
+    }
+
+    this.nebulaPrimary = this.backgroundContext.createRadialGradient(
+      width * 0.35,
+      height * 0.38,
+      0,
+      width * 0.35,
+      height * 0.38,
+      width * 0.55
+    );
+    this.nebulaPrimary.addColorStop(0, 'rgba(14,30,60,0.6)');
+    this.nebulaPrimary.addColorStop(0.4, 'rgba(8,18,38,0.5)');
+    this.nebulaPrimary.addColorStop(1, 'rgba(4,8,15,0)');
+
+    this.nebulaSecondary = this.backgroundContext.createRadialGradient(
+      width * 0.7,
+      height * 0.6,
+      0,
+      width * 0.7,
+      height * 0.6,
+      width * 0.4
+    );
+    this.nebulaSecondary.addColorStop(0, 'rgba(10,25,50,0.4)');
+    this.nebulaSecondary.addColorStop(1, 'rgba(4,8,15,0)');
+
+    this.stars = this.createBackgroundStars(width, height);
+  }
+
+  private drawBackgroundFrame(width: number, height: number, elapsedSeconds: number): void {
+    if (!this.backgroundContext) {
+      return;
+    }
+
+    this.backgroundContext.fillStyle = '#04080f';
+    this.backgroundContext.fillRect(0, 0, width, height);
+
+    if (this.nebulaPrimary && this.nebulaSecondary) {
+      this.backgroundContext.fillStyle = this.nebulaPrimary;
+      this.backgroundContext.fillRect(0, 0, width, height);
+      this.backgroundContext.fillStyle = this.nebulaSecondary;
+      this.backgroundContext.fillRect(0, 0, width, height);
+    }
+
+    this.stars.forEach((star) => {
+      const alpha = 0.12 + 0.45 * Math.abs(Math.sin(elapsedSeconds * star.speed + star.phase));
+      this.backgroundContext?.beginPath();
+      this.backgroundContext?.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+      this.backgroundContext!.fillStyle = `rgba(220,235,255,${alpha})`;
+      this.backgroundContext?.fill();
+    });
+  }
+
+  private createBackgroundStars(width: number, height: number): SpaceStar[] {
+    return Array.from({ length: STAR_COUNT }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 1 + 0.2,
+      speed: Math.random() * 0.003 + 0.001,
+      phase: Math.random() * Math.PI * 2
+    }));
   }
 
   // Creates the standalone Three.js scene used by the hero globe.
@@ -125,7 +246,6 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
     this.globeTexture = globeTexture;
 
     this.updateRendererSize();
-    window.addEventListener('resize', this.resizeHandler);
 
     this.ngZone.runOutsideAngular(() => this.startRenderLoop());
   }
@@ -164,16 +284,5 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
 
     renderer.render(scene, camera);
     this.animationFrameId = requestAnimationFrame(() => this.startRenderLoop());
-  }
-
-  private createStars(count: number): StarConfig[] {
-    return Array.from({ length: count }, (_, index) => ({
-      top: `${(index * 17) % 100}%`,
-      left: `${(index * 29 + 11) % 100}%`,
-      size: `${index % 4 === 0 ? 3 : 2}px`,
-      opacity: index % 3 === 0 ? 0.85 : 0.45,
-      duration: `${5 + (index % 4) * 1.2}s`,
-      delay: `${(index % 5) * 0.6}s`
-    }));
   }
 }

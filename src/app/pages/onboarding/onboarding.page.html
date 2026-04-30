@@ -1,17 +1,5 @@
 <main class="onboarding-shell">
-  <div class="space-layer" aria-hidden="true">
-    <span
-      *ngFor="let star of stars"
-      class="star"
-      [style.top]="star.top"
-      [style.left]="star.left"
-      [style.width]="star.size"
-      [style.height]="star.size"
-      [style.opacity]="star.opacity"
-      [style.animation-duration]="star.duration"
-      [style.animation-delay]="star.delay"
-    ></span>
-  </div>
+  <canvas #bgCanvas class="bg-canvas" aria-hidden="true"></canvas>
 
   <section class="onboarding-layout">
     <div class="globe-panel">
@@ -22,15 +10,20 @@
     </div>
 
     <div class="content-panel">
-      <p class="eyebrow">Welcome to</p>
+      <p class="eyebrow atmos-kicker">Welcome to</p>
       <h1 class="title">ATMOS</h1>
-      <p class="description">
+      <p class="description atmos-body-copy">
         We're here to keep you updated on the weather,
         so you can plan your day without surprises.
       </p>
 
-      <button mat-stroked-button type="button" class="cta-button" (click)="onGetStarted()">
-        GET STARTED
+      <button
+        mat-stroked-button
+        type="button"
+        class="cta-button atmos-glass-button"
+        (click)="onGetStarted()"
+      >
+        Get Started
       </button>
     </div>
   </section>

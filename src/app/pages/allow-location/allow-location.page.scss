@@ -1,13 +1,4 @@
 :host {
-  --atmos-bg: #04080f;
-  --atmos-surface: #06101e;
-  --atmos-accent: #38bdf8;
-  --atmos-accent-dark: #0f172a;
-  --atmos-text-primary: #f8fafc;
-  --atmos-text-secondary: #94a3b8;
-  --atmos-text-muted: #475569;
-  --atmos-border: rgba(255, 255, 255, 0.06);
-
   display: block;
   width: 100%;
   min-height: 100dvh;
@@ -19,7 +10,7 @@
   min-height: 100dvh;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(4, 8, 15, 0.8), rgba(4, 8, 15, 0.98)),
+    var(--atmos-shell-gradient),
     var(--atmos-bg);
   display: flex;
   flex-direction: column;
@@ -157,7 +148,6 @@
   transform: translateX(-50%);
   padding: 0 28px 44px;
   max-width: none;
-  margin-left: 10rem;
 
   @media (min-width: 768px) {
     width: min(calc(100% - 72px), 560px);
@@ -182,23 +172,27 @@
   }
 }
 
+.eyebrow {
+  margin: 0 0 0.9rem;
+}
+
 .headline {
-  margin: 0 0 12px;
-  font-family: 'Outfit', sans-serif;
+  margin: 0 0 14px;
+  font-family: var(--atmos-font-display);
   font-size: 36px;
   font-weight: 700;
-  line-height: 1.06;
-  letter-spacing: -0.02em;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
   color: var(--atmos-text-primary);
   text-wrap: balance;
 
   @media (min-width: 768px) {
-    font-size: 44px;
+    font-size: 48px;
   }
 
   @media (min-width: 1024px) {
-    margin-bottom: 16px;
-    font-size: 52px;
+    margin-bottom: 18px;
+    font-size: 56px;
   }
 }
 
@@ -208,11 +202,9 @@
 
 .description {
   margin: 0 0 28px;
-  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 400;
-  line-height: 1.72;
-  color: var(--atmos-text-secondary);
+  text-wrap: balance;
 
   @media (min-width: 768px) {
     margin-bottom: 34px;
@@ -226,10 +218,10 @@
   }
 }
 
-.allow-btn.mat-mdc-unelevated-button {
+.allow-btn.mat-mdc-outlined-button {
   position: relative;
   width: 100%;
-  height: 50px;
+  min-height: 4.5rem;
   display: flex !important;
   align-items: center;
   justify-content: center;
@@ -237,36 +229,23 @@
   overflow: hidden;
   margin-bottom: 12px;
   padding-inline: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  border-radius: 14px !important;
-  background: rgba(6, 16, 30, 0.72) !important;
-  color: var(--atmos-text-primary) !important;
-  box-shadow: none !important;
-  backdrop-filter: blur(12px);
-  font-family: 'Outfit', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
-    color 180ms ease;
+  border-width: 1px;
+  letter-spacing: 0.04em;
 
   @media (min-width: 768px) {
-    width: 90%;
-    height: 54px;
-    border-radius: 16px !important;
+    min-height: 4.75rem;
     font-size: 16px;
   }
 
   @media (min-width: 1024px) {
-    height: 5rem;
-    border-radius: 13px !important;
+    min-height: 5rem;
+    max-width: 24rem;
+    margin-bottom: 14px;
     font-size: 16px;
   }
 }
 
-.allow-btn.mat-mdc-unelevated-button::before {
+.allow-btn.mat-mdc-outlined-button::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -274,7 +253,7 @@
   pointer-events: none;
 }
 
-.allow-btn.mat-mdc-unelevated-button::after {
+.allow-btn.mat-mdc-outlined-button::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -284,10 +263,17 @@
   pointer-events: none;
 }
 
-.allow-btn.mat-mdc-unelevated-button.allow-btn--granted {
+.allow-btn.mat-mdc-outlined-button.allow-btn--granted {
   background: #22c55e !important;
   border-color: transparent !important;
   color: var(--atmos-accent-dark) !important;
+  box-shadow: 0 14px 30px rgba(34, 197, 94, 0.18) !important;
+}
+
+.allow-btn.mat-mdc-outlined-button.allow-btn--granted:hover {
+  background: #22c55e !important;
+  color: var(--atmos-accent-dark) !important;
+  transform: translateY(-1px);
 }
 
 .allow-btn .mdc-button__label {
@@ -308,11 +294,15 @@
 .skip-link {
   display: block;
   text-align: center;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--atmos-font-body);
   font-size: 12px;
   color: var(--atmos-text-muted);
   cursor: pointer;
   transition: color 180ms ease;
+
+  @media (min-width: 1024px) {
+    text-align: left;
+  }
 }
 
 .skip-link:hover {

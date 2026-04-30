@@ -324,7 +324,10 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
   }
 
   private addGlobeMeshes(): void {
-    this.globeSurfaceTexture = this.createSurfaceTexture();
+    const textureLoader = new THREE.TextureLoader();
+    this.globeSurfaceTexture = textureLoader.load('assets/textures/earth.jpg');
+    this.globeSurfaceTexture.colorSpace = THREE.SRGBColorSpace;
+    
     this.globeGridTexture = this.createGridTexture();
 
     const globe = new THREE.Mesh(

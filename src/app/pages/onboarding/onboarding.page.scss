@@ -1,12 +1,4 @@
-$background-color: #04080f;
-$surface-color: #06101e;
-$surface-border: rgba(255, 255, 255, 0.06);
-$text-color: #f8fafc;
-$secondary-text-color: #94a3b8;
-$muted-text-color: #475569;
-$accent-color: #38bdf8;
 $separator-color: rgba(255, 255, 255, 0.04);
-$star-color: rgba(220, 235, 255, 0.88);
 
 /* Root */
 
@@ -20,10 +12,8 @@ $star-color: rgba(220, 235, 255, 0.88);
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  color: $text-color;
-  background:
-    linear-gradient(180deg, rgba(4, 8, 15, 0.8), rgba(4, 8, 15, 0.98)),
-    $background-color;
+  color: var(--atmos-text-primary);
+  background: var(--atmos-shell-gradient), var(--atmos-bg);
 }
 
 .onboarding-shell::after {
@@ -45,21 +35,13 @@ $star-color: rgba(220, 235, 255, 0.88);
   min-height: 100vh;
 }
 
-/* Background stars */
-
-.space-layer {
+.bg-canvas {
   position: absolute;
   inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-}
-
-.star {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-  background: $star-color;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.24);
-  animation: starPulse ease-in-out infinite alternate;
 }
 
 /* Panels */
@@ -111,34 +93,25 @@ $star-color: rgba(220, 235, 255, 0.88);
 /* Text */
 
 .eyebrow {
-  color: $accent-color;
-  font-family: 'Inter', sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  margin: 0;
 }
 
 .title {
-  margin: 0.45rem 0 1rem;
-  font-family: 'Outfit', sans-serif;
-  font-size: 36px;
+  margin: 0.55rem 0 1rem;
+  font-family: var(--atmos-font-display);
+  font-size: clamp(3rem, 8vw, 4.5rem);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: $text-color;
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  color: var(--atmos-text-primary);
   text-shadow: 0 8px 32px rgba(15, 23, 42, 0.35);
 }
 
 .description {
   max-width: 28rem;
   margin: 0;
-  color: $secondary-text-color;
-  font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  line-height: 1.65;
+  text-wrap: balance;
 }
 
 /* CTA */
@@ -146,36 +119,13 @@ $star-color: rgba(220, 235, 255, 0.88);
 .cta-button.mat-mdc-outlined-button {
   width: 80%;
   max-width: 30rem;
-  min-height: 5rem;
+  min-height: 4.5rem;
   margin-top: 2rem;
-  border-color: $surface-border;
-  border-radius: 14px;
-  background: rgba(6, 16, 30, 0.72);
-  backdrop-filter: blur(12px);
-  color: $text-color;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  transition:
-    background-color 180ms ease,
-    color 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
-}
-
-.cta-button.mat-mdc-outlined-button:hover {
-  color: $background-color;
-  background: $accent-color;
-  border-color: transparent;
-  box-shadow: 0 12px 34px rgba(56, 189, 248, 0.2);
-  transform: translateY(-1px);
+  padding-inline: 1.25rem;
 }
 
 .cta-button.mat-mdc-outlined-button .mdc-button__label {
-  letter-spacing: inherit;
+  font-size: 0.96rem;
 }
 
 /* Tablet */
@@ -200,7 +150,7 @@ $star-color: rgba(220, 235, 255, 0.88);
   }
 
   .title {
-    font-size: 52px;
+    font-size: clamp(3.4rem, 8vw, 4.8rem);
   }
 
   .description {
@@ -253,7 +203,7 @@ $star-color: rgba(220, 235, 255, 0.88);
   }
 
   .title {
-    font-size: 64px;
+    font-size: clamp(4rem, 5vw, 5.2rem);
   }
 
   .description {
@@ -265,19 +215,5 @@ $star-color: rgba(220, 235, 255, 0.88);
     width: 300px;
     max-width: none;
     margin-top: 2.5rem;
-  }
-}
-
-/* Animations */
-
-@keyframes starPulse {
-  from {
-    transform: scale(0.9);
-    opacity: 0.35;
-  }
-
-  to {
-    transform: scale(1.18);
-    opacity: 1;
   }
 }
