@@ -84,6 +84,15 @@
   position: relative;
   flex: 1;
   min-height: 100dvh;
+  width: 100%;
+
+  @media (max-width: 1023px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding: clamp(220px, 40dvh, 320px) 0 0;
+  }
 
   @media (min-width: 1024px) {
     width: min(100%, 1180px);
@@ -141,14 +150,16 @@
   position: absolute;
   z-index: 10;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 50%;
+  right: auto;
+  width: min(calc(100% - 56px), 480px);
+  transform: translateX(-50%);
   padding: 0 28px 44px;
-  max-width: 480px;
+  max-width: none;
 
   @media (min-width: 768px) {
+    width: min(calc(100% - 72px), 560px);
     padding: 0 36px 52px;
-    max-width: 560px;
   }
 
   @media (min-width: 1024px) {
@@ -159,6 +170,7 @@
     width: auto;
     max-width: 28rem;
     min-width: 0;
+    transform: none;
     padding: 0;
     display: flex;
     flex-direction: column;

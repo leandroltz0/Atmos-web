@@ -587,6 +587,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     const { globeSize, layout } = this.getBreakpointConfig();
     const wrap = this.globeWrap.nativeElement;
     const stageWidth = this.heroStage.nativeElement.clientWidth || this.rootRef.nativeElement.clientWidth || window.innerWidth;
+    const stageHeight = this.heroStage.nativeElement.clientHeight || this.rootRef.nativeElement.clientHeight || window.innerHeight;
 
     wrap.style.width = `${globeSize}px`;
     wrap.style.height = `${globeSize}px`;
@@ -597,8 +598,12 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       wrap.style.left = `${stageCenter - 288}px`;
       wrap.style.transform = 'translate(-50%, -50%)';
     } else {
-      wrap.style.top = layout === 'tablet' ? '78px' : '36px';
+      const preferredTop = layout === 'tablet' ? stageHeight * 0.18 : stageHeight * 0.2;
+      const maxTop = layout === 'tablet' ? 132 : 168;
+      const minTop = layout === 'tablet' ? 56 : 72;
+      const topOffset = Math.max(minTop, Math.min(preferredTop, maxTop));
       wrap.style.left = '50%';
+      wrap.style.top = `${topOffset}px`;
       wrap.style.transform = 'translateX(-50%)';
     }
 

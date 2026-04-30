@@ -1,8 +1,12 @@
-$background-color: #050508;
-$text-color: #ffffff;
-$muted-text-color: rgba(255, 255, 255, 0.72);
-$line-color: rgba(255, 255, 255, 0.94);
-$star-color: rgba(255, 255, 255, 0.9);
+$background-color: #0f172a;
+$surface-color: rgba(30, 41, 59, 0.45);
+$surface-border: rgba(255, 255, 255, 0.06);
+$text-color: #f8fafc;
+$secondary-text-color: #94a3b8;
+$muted-text-color: #475569;
+$accent-color: #38bdf8;
+$separator-color: rgba(255, 255, 255, 0.04);
+$star-color: rgba(220, 235, 255, 0.88);
 
 /* Root */
 
@@ -18,9 +22,21 @@ $star-color: rgba(255, 255, 255, 0.9);
   overflow: hidden;
   color: $text-color;
   background:
-    radial-gradient(circle at 24% 34%, rgba(100, 155, 255, 0.12), transparent 28%),
-    radial-gradient(circle at 68% 68%, rgba(118, 144, 255, 0.08), transparent 32%),
+    radial-gradient(circle at 24% 34%, rgba(56, 189, 248, 0.14), transparent 24%),
+    radial-gradient(circle at 68% 68%, rgba(56, 189, 248, 0.08), transparent 30%),
+    linear-gradient(160deg, #1a3a5c, #0f172a 58%),
     $background-color;
+}
+
+.onboarding-shell::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, $separator-color, transparent);
+  pointer-events: none;
 }
 
 .onboarding-layout {
@@ -44,7 +60,7 @@ $star-color: rgba(255, 255, 255, 0.9);
   display: block;
   border-radius: 50%;
   background: $star-color;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.24);
   animation: starPulse ease-in-out infinite alternate;
 }
 
@@ -79,7 +95,7 @@ $star-color: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   filter: blur(18px);
   background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(120, 146, 255, 0.08) 28%, rgba(5, 5, 8, 0) 72%);
+    radial-gradient(circle, rgba(56, 189, 248, 0.16) 0%, rgba(56, 189, 248, 0.1) 26%, rgba(15, 23, 42, 0) 72%);
 }
 
 .moon-scene {
@@ -97,9 +113,10 @@ $star-color: rgba(255, 255, 255, 0.9);
 /* Text */
 
 .eyebrow {
-  color: rgba(255, 255, 255, 0.8);
+  color: $accent-color;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
+  font-weight: 500;
   line-height: 1.35;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -113,12 +130,14 @@ $star-color: rgba(255, 255, 255, 0.9);
   line-height: 0.95;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: $text-color;
+  text-shadow: 0 8px 32px rgba(15, 23, 42, 0.35);
 }
 
 .description {
   max-width: 28rem;
   margin: 0;
-  color: $muted-text-color;
+  color: $secondary-text-color;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   line-height: 1.65;
@@ -131,23 +150,30 @@ $star-color: rgba(255, 255, 255, 0.9);
   max-width: 30rem;
   min-height: 5rem;
   margin-top: 2rem;
-  border-color: $line-color;
-  border-radius: 5px;
+  border-color: $surface-border;
+  border-radius: 14px;
+  background: $surface-color;
+  backdrop-filter: blur(20px);
   color: $text-color;
-  font-family: 'Inter', sans-serif;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  font-family: 'Outfit', sans-serif;
   font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   transition:
     background-color 180ms ease,
     color 180ms ease,
-    box-shadow 180ms ease;
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 .cta-button.mat-mdc-outlined-button:hover {
   color: $background-color;
-  background: $text-color;
-  box-shadow: 0 0 28px rgba(255, 255, 255, 0.12);
+  background: $accent-color;
+  border-color: transparent;
+  box-shadow: 0 12px 34px rgba(56, 189, 248, 0.2);
+  transform: translateY(-1px);
 }
 
 .cta-button.mat-mdc-outlined-button .mdc-button__label {
