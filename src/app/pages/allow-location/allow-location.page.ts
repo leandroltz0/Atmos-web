@@ -175,7 +175,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     const viewportWidth = window.innerWidth;
 
     if (viewportWidth >= DESKTOP_BREAKPOINT) {
-      return { globeSize: 520, layout: 'desktop' };
+      return { globeSize: 600, layout: 'desktop' };
     }
 
     if (viewportWidth >= TABLET_BREAKPOINT) {
@@ -626,7 +626,8 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
 
     if (layout === 'desktop') {
       const stageCenter = stageWidth / 2;
-      wrap.style.left = `${stageCenter - 288}px`;
+      // Subtracting 64px (4rem) to move it further left
+      wrap.style.left = `${stageCenter - 352}px`;
       wrap.style.top = '50%';
       wrap.style.transform = 'translate(-50%, -50%)';
     } else {

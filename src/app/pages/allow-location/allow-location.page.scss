@@ -112,6 +112,7 @@
   position: absolute;
   z-index: 5;
   pointer-events: none;
+  transform: translateX(-3rem);
   filter:
     drop-shadow(0 0 48px rgba(7, 18, 34, 0.68))
     drop-shadow(0 0 82px rgba(56, 189, 248, 0.08));
@@ -156,6 +157,7 @@
   transform: translateX(-50%);
   padding: 0 28px 44px;
   max-width: none;
+  margin-left: 10rem;
 
   @media (min-width: 768px) {
     width: min(calc(100% - 72px), 560px);
@@ -251,13 +253,14 @@
     color 180ms ease;
 
   @media (min-width: 768px) {
+    width: 90%;
     height: 54px;
     border-radius: 16px !important;
     font-size: 16px;
   }
 
   @media (min-width: 1024px) {
-    height: 54px;
+    height: 5rem;
     border-radius: 13px !important;
     font-size: 16px;
   }
