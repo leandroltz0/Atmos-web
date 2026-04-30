@@ -22,6 +22,7 @@ type SpaceStar = {
 
 const STAR_COUNT = 90;
 const GLOBE_TEXTURE_PATH = 'assets/textures/earth.jpg';
+const GLOBE_EMISSIVE_COLOR = 0x273a6b;
 
 const GLOBE_ROTATION_SPEED_Y = 0.0018;
 const GLOBE_ROTATION_SPEED_X = 0.0002;
@@ -226,8 +227,12 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
       new THREE.SphereGeometry(1, 64, 64),
       new THREE.MeshStandardMaterial({
         map: globeTexture,
-        roughness: 1,
-        metalness: 0
+        color: 0xf4f8ff,
+        emissive: GLOBE_EMISSIVE_COLOR,
+        emissiveMap: globeTexture,
+        emissiveIntensity: 0.82,
+        roughness: 0.94,
+        metalness: 0.02
       })
     );
     scene.add(globeMesh);
@@ -236,7 +241,7 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
     keyLight.position.set(4, 1.5, 3);
     scene.add(keyLight);
 
-    const ambientLight = new THREE.AmbientLight(0x223355, 0.35);
+    const ambientLight = new THREE.AmbientLight(0x223355, 0.72);
     scene.add(ambientLight);
 
     this.scene = scene;

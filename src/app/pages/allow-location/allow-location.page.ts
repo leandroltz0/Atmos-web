@@ -34,6 +34,8 @@ const HOME_NAVIGATION_DELAY_MS = 1200;
 const PARTICLE_COUNT = 12;
 const STAR_COUNT = 90;
 const GLOBE_RADIUS = 1;
+const GLOBE_TEXTURE_PATH = 'assets/textures/earth.jpg';
+const GLOBE_EMISSIVE_COLOR = 0x273a6b;
 
 const CITY_POINTS: ReadonlyArray<readonly [number, number]> = [
   [40.7, -74], [51.5, -0.1], [35.7, 139.7], [-33.9, 151.2], [48.9, 2.3],
@@ -325,7 +327,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
 
   private addGlobeMeshes(): void {
     const textureLoader = new THREE.TextureLoader();
-    this.globeSurfaceTexture = textureLoader.load('assets/textures/earth.jpg');
+    this.globeSurfaceTexture = textureLoader.load(GLOBE_TEXTURE_PATH);
     this.globeSurfaceTexture.colorSpace = THREE.SRGBColorSpace;
     
     this.globeGridTexture = this.createGridTexture();
@@ -335,8 +337,9 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       new THREE.MeshStandardMaterial({
         map: this.globeSurfaceTexture,
         color: 0xf8fafc,
-        emissive: 0x071220,
+        emissive: GLOBE_EMISSIVE_COLOR,
         emissiveMap: this.globeSurfaceTexture,
+        emissiveIntensity: 0.82,
         roughness: 0.92,
         metalness: 0.05
       })
@@ -584,7 +587,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       const particle = this.createParticleElement();
       container.appendChild(particle);
       this.particleElements.push(particle);
-
+ 
       gsap.to(particle, {
         y: -window.innerHeight * 1.1,
         scale: 0.2,
@@ -703,7 +706,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       duration: 0.4,
       ease: 'power2.out'
     }, '-=0.2');
-    this.entryTimeline.add(() => {
+    this.entryTimeline.add(() => { 
       gsap.to(this.globeWrap.nativeElement, {
         y: -10,
         duration: 3.5,
