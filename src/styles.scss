@@ -1050,29 +1050,59 @@ app-detail {
     position: sticky;
     top: var(--detail-header-height);
     z-index: 18;
-    background: rgba(13, 27, 42, 0.78);
+    margin: 0 -0.2rem;
+    padding: 0.15rem 0.2rem 0.55rem;
+    background: linear-gradient(180deg, rgba(13, 27, 42, 0.92), rgba(13, 27, 42, 0.78));
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 0;
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
   }
 
   .detail-tabs .mat-mdc-tab-label-container {
-    padding: 0 0.15rem;
+    padding: 0 0.2rem;
+  }
+
+  .detail-tabs .mat-mdc-tab-labels {
+    gap: 0.45rem;
+    justify-content: center;
   }
 
   .detail-tabs .mdc-tab {
+    height: 42px !important;
     min-width: 0 !important;
-    padding: 0 16px !important;
+    padding: 0 15px !important;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     letter-spacing: 0.04em !important;
     text-transform: uppercase !important;
-    color: var(--color-text-secondary) !important;
+    color: rgba(139, 174, 200, 0.78) !important;
+    transition:
+      color 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .detail-tabs .mdc-tab:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .detail-tabs .mdc-tab__content,
+  .detail-tabs .mdc-tab__text-label {
+    color: inherit !important;
+    opacity: 1 !important;
   }
 
   .detail-tabs .mdc-tab--active {
     color: var(--color-text-primary) !important;
+    background: rgba(58, 134, 255, 0.1);
+    border-color: rgba(58, 134, 255, 0.14);
   }
 
   .detail-tabs .mdc-tab-indicator__content--underline {
@@ -1081,16 +1111,33 @@ app-detail {
     border-radius: 2px !important;
   }
 
+  .detail-tabs .mdc-tab-indicator {
+    display: flex;
+    justify-content: center;
+  }
+
+  .detail-tabs .mdc-tab-indicator__content {
+    width: calc(100% - 24px);
+  }
+
+  .detail-tabs .mat-mdc-tab-body-wrapper,
+  .detail-tabs .mat-mdc-tab-body-content,
+  .detail-tabs .mat-mdc-tab-body,
+  .detail-tabs .mat-mdc-tab-body-active {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
   .detail-tabs .mat-mdc-tab-body-wrapper,
   .detail-tabs .mat-mdc-tab-body-content {
-    overflow: visible;
+    min-height: auto;
   }
 
   .detail-tab-panel {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding: 1rem 0 0;
+    padding: 1.1rem 0 0;
   }
 
   .detail-card {
@@ -1176,13 +1223,14 @@ app-detail {
     position: absolute;
     top: 0;
     left: 0;
+    z-index: 2;
     min-width: 132px;
     padding: 0.75rem 0.8rem;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
     pointer-events: none;
-    transform: translate(-50%, calc(-100% - 14px));
+    transform: translate(-50%, calc(-100% + 18px));
   }
 
   .temp-chart__tooltip-hour,
@@ -1646,6 +1694,20 @@ app-detail {
 
     .detail-header__temp {
       font-size: 1.25rem;
+    }
+
+    .detail-tabs .mat-mdc-tab-header {
+      padding-bottom: 0.45rem;
+    }
+
+    .detail-tabs .mat-mdc-tab-labels {
+      gap: 0.25rem;
+      justify-content: space-between;
+    }
+
+    .detail-tabs .mdc-tab {
+      padding: 0 10px !important;
+      flex: 1 1 0;
     }
 
     .temp-chart__tooltip {

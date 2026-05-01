@@ -209,8 +209,8 @@ export class DetailPage implements AfterViewInit, OnDestroy {
     }
 
     return {
-      left: (point.x / TEMP_CHART_WIDTH) * 100,
-      top: (point.y / TEMP_CHART_HEIGHT) * 100
+      left: clamp((point.x / TEMP_CHART_WIDTH) * 100, 12, 88),
+      top: clamp((point.y / TEMP_CHART_HEIGHT) * 100, 22, 84)
     };
   });
 

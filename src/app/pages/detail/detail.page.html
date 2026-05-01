@@ -49,6 +49,8 @@
       [selectedIndex]="activeTab()"
       (selectedIndexChange)="onTabChange($event)"
       dynamicHeight="false"
+      mat-stretch-tabs="false"
+      mat-align-tabs="center"
     >
       <mat-tab label="Hoy">
         <div class="detail-tab-panel" data-tab-index="0">
