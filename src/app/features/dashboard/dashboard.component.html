@@ -1,0 +1,369 @@
+<main class="dashboard-shell font-body" role="main" [attr.aria-busy]="isLoading()">
+  <div class="dashboard-bg" aria-hidden="true">
+    <div class="dashboard-bg__orb dashboard-bg__orb--1"></div>
+    <div class="dashboard-bg__orb dashboard-bg__orb--2"></div>
+    <div class="dashboard-bg__orb dashboard-bg__orb--3"></div>
+  </div>
+
+  <div class="dashboard-container dashboard-scroll-container">
+    @if (isLoading()) {
+      <div class="skeleton-stack" aria-busy="true">
+        <div class="skeleton-hero glass-card pulse"></div>
+        <div class="skeleton-row">
+          @for (item of [1, 2, 3, 4]; track item) {
+            <div class="skeleton-card glass-card pulse"></div>
+          }
+        </div>
+        <div class="skeleton-section glass-card pulse"></div>
+        <div class="skeleton-section glass-card pulse"></div>
+      </div>
+    } @else {
+      <div #dashboardRoot class="dashboard-content">
+        <header class="dashboard-header">
+          <div class="header-meta">
+            <h1 class="city-name">
+              <svg class="ui-icon ui-icon--place" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z"
+                  fill="currentColor"
+                  fill-opacity="0.18"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="10" r="2.4" fill="currentColor" />
+              </svg>
+              <span>{{ currentWeather().cityName }}, {{ currentWeather().country }}</span>
+            </h1>
+            <p class="current-date">{{ formattedDate() }}</p>
+          </div>
+
+          <div class="update-status">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span class="font-mono update-text">Actualizado hace {{ minutesAgo() }} min</span>
+          </div>
+        </header>
+
+        @if (isOffline()) {
+          <div class="offline-banner" role="alert" aria-live="assertive">
+            <svg class="ui-icon ui-icon--offline" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M3 8.5C8.6 4.2 15.4 4.2 21 8.5"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M6.5 12.3C10.1 9.6 13.9 9.6 17.5 12.3"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <path
+                d="M10.2 16.1C11.4 15.2 12.6 15.2 13.8 16.1"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+              />
+              <circle cx="12" cy="19" r="1.4" fill="currentColor" />
+              <path d="M4 4L20 20" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+            </svg>
+            Sin conexión — mostrando datos cacheados de hace {{ minutesAgo() }} min
+          </div>
+        }
+
+        <section
+          class="hero-card glass-card"
+          [attr.aria-label]="'Temperatura actual: ' + currentWeather().temp + ' grados Celsius'"
+        >
+          <div class="hero-card__top">
+            <span class="condition-pill">
+              <app-weather-icon [condition]="currentWeather().condition" [size]="16" [decorative]="true" />
+              {{ currentWeather().conditionLabel }}
+            </span>
+
+            <button
+              mat-icon-button
+              type="button"
+              class="refresh-btn"
+              [class.spinning]="isLoading()"
+              (click)="onRefresh()"
+              matTooltip="Actualizar"
+              aria-label="Actualizar datos del clima"
+            >
+              <svg class="refresh-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M20 12A8 8 0 1 1 17.7 6.3"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M20 4.5V10H14.5"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div class="hero-card__main">
+            <app-weather-icon
+              [condition]="currentWeather().condition"
+              [size]="weatherIconSize()"
+              [decorative]="true"
+            />
+
+            <div class="hero-temp-block">
+              <div class="hero-temp-row">
+                <span #heroTemp class="hero-temp font-display" [attr.aria-label]="currentWeather().temp + ' grados celsius'">
+                  {{ currentWeather().temp }}
+                </span>
+                <span class="hero-temp-unit font-display">°</span>
+              </div>
+              <p class="feels-like">
+                Sensación <span class="font-mono">{{ currentWeather().feelsLike }}°C</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="hero-card__divider" aria-hidden="true"></div>
+
+          <div class="hero-card__stats" role="list" aria-label="Datos meteorológicos actuales">
+            <div class="quick-stat" role="listitem">
+              <span class="quick-stat__icon" aria-hidden="true">💧</span>
+              <span class="quick-stat__value font-mono">{{ currentWeather().humidity }}%</span>
+              <span class="quick-stat__label">Humedad</span>
+            </div>
+
+            <div class="quick-stat__separator" aria-hidden="true"></div>
+
+            <div class="quick-stat" role="listitem">
+              <span class="quick-stat__icon" aria-hidden="true">💨</span>
+              <span class="quick-stat__value font-mono">{{ currentWeather().windSpeed }} km/h</span>
+              <div class="wind-direction" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 12 12" [style.transform]="'rotate(' + currentWeather().windDegrees + 'deg)'">
+                  <path d="M6 1L10 9H6V11H6L2 9L6 1Z" fill="currentColor" opacity="0.8"></path>
+                </svg>
+                <span>{{ currentWeather().windDirection }}</span>
+              </div>
+            </div>
+
+            <div class="quick-stat__separator" aria-hidden="true"></div>
+
+            <div class="quick-stat" role="listitem">
+              <span class="quick-stat__icon" aria-hidden="true">🌡️</span>
+              <span class="quick-stat__value font-mono">{{ currentWeather().pressure }} hPa</span>
+              <span class="quick-stat__label">Presión</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="data-row">
+          <article
+            class="data-card glass-card"
+            [attr.aria-label]="'Calidad del aire: AQI ' + currentWeather().aqi + ', ' + currentWeather().aqiLabel"
+          >
+            <div class="data-card__header">
+              <div class="data-card__icon-wrap" [style.background]="aqiBg()">
+                <svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" [style.color]="aqiColor()">
+                  <path
+                    d="M4 9.5C5.2 8.2 6.5 8 7.6 8C9.4 8 10.8 9.2 10.8 10.9C10.8 12.4 9.7 13.4 8.2 13.4H4.7"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M4 13.2H13.5C15.4 13.2 17 14.5 17 16.3C17 18 15.6 19.2 13.9 19.2C12.8 19.2 11.9 18.7 11.3 17.9"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path d="M14.2 8.4H18.8C20 8.4 21 9.4 21 10.6C21 11.8 20 12.8 18.8 12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                </svg>
+              </div>
+              <span class="data-card__title">Calidad del aire</span>
+            </div>
+
+            <div class="data-card__body">
+              <span class="data-card__value font-mono" [style.color]="aqiColor()">{{ currentWeather().aqi }}</span>
+              <span class="data-card__sublabel">{{ currentWeather().aqiLabel }}</span>
+            </div>
+
+            <div class="aqi-bar" aria-hidden="true">
+              @for (segment of segments; track segment) {
+                <div
+                  class="aqi-bar__segment"
+                  [style.background]="segment <= currentWeather().aqi ? aqiColor() : 'rgba(255,255,255,0.08)'"
+                ></div>
+              }
+            </div>
+          </article>
+
+          <article
+            class="data-card glass-card"
+            [attr.aria-label]="'Índice UV: ' + currentWeather().uvIndex + ', ' + uvLabel()"
+          >
+            <div class="data-card__header">
+              <div class="data-card__icon-wrap data-card__icon-wrap--sun">
+                <svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="3.4" fill="currentColor" />
+                  <path d="M12 3V5.2M12 18.8V21M3 12H5.2M18.8 12H21M5.6 5.6L7.2 7.2M16.8 16.8L18.4 18.4M18.4 5.6L16.8 7.2M7.2 16.8L5.6 18.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                </svg>
+              </div>
+              <span class="data-card__title">Índice UV</span>
+            </div>
+
+            <div class="data-card__body">
+              <span class="data-card__value font-mono data-card__value--sun">{{ currentWeather().uvIndex }}</span>
+              <span class="data-card__sublabel" [style.color]="uvColor()">{{ uvLabel() }}</span>
+            </div>
+
+            <div class="uv-bar" aria-hidden="true">
+              <div class="uv-bar__fill" [style.width.%]="(currentWeather().uvIndex / 11) * 100"></div>
+            </div>
+          </article>
+
+          <article
+            class="data-card glass-card data-card--sun"
+            [attr.aria-label]="'Amanecer ' + currentWeather().sunrise + ', Atardecer ' + currentWeather().sunset"
+          >
+            <div class="sun-times">
+              <div class="sun-time">
+                <div class="data-card__icon-wrap data-card__icon-wrap--sun">
+                  <svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 15.5H20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    <path d="M7 15.5A5 5 0 0 1 17 15.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    <path d="M12 18.8V10.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    <path d="M9.5 12.7L12 10.2L14.5 12.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div>
+                  <span class="sun-time__value font-mono">{{ currentWeather().sunrise }}</span>
+                  <span class="sun-time__label">Amanecer</span>
+                </div>
+              </div>
+
+              <div class="sun-divider" aria-hidden="true"></div>
+
+              <div class="sun-time">
+                <div class="data-card__icon-wrap data-card__icon-wrap--sunset">
+                  <svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 15.5H20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    <path d="M7 15.5A5 5 0 0 1 17 15.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    <path d="M12 10.2V18.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    <path d="M9.5 16.3L12 18.8L14.5 16.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div>
+                  <span class="sun-time__value font-mono">{{ currentWeather().sunset }}</span>
+                  <span class="sun-time__label">Atardecer</span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="data-card glass-card"
+            [attr.aria-label]="'Visibilidad: ' + currentWeather().visibility + ' kilómetros'"
+          >
+            <div class="data-card__header">
+              <div class="data-card__icon-wrap data-card__icon-wrap--info">
+                <svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M2.5 12C4.9 8.1 8.1 6.2 12 6.2C15.9 6.2 19.1 8.1 21.5 12C19.1 15.9 15.9 17.8 12 17.8C8.1 17.8 4.9 15.9 2.5 12Z"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"
+                  />
+                  <circle cx="12" cy="12" r="2.5" fill="currentColor" />
+                </svg>
+              </div>
+              <span class="data-card__title">Visibilidad</span>
+            </div>
+
+            <div class="data-card__body">
+              <span class="data-card__value font-mono data-card__value--info">{{ currentWeather().visibility }}</span>
+              <span class="data-card__sublabel">kilómetros</span>
+            </div>
+
+            <div class="visibility-dots" aria-hidden="true">
+              @for (segment of visibilityMarkers; track segment) {
+                <div
+                  class="visibility-dot"
+                  [class.active]="visibilityActive(segment)"
+                  [style.opacity]="visibilityActive(segment) ? 1 : 0.15"
+                ></div>
+              }
+            </div>
+          </article>
+        </section>
+
+        <section class="section-block glass-card" aria-label="Pronóstico para las próximas 24 horas">
+          <h2 class="section-title">
+            <span class="section-title__accent" aria-hidden="true"></span>
+            Próximas 24 horas
+          </h2>
+
+          <cdk-virtual-scroll-viewport
+            orientation="horizontal"
+            [itemSize]="hourlyItemSize()"
+            class="hourly-scroll"
+            role="list"
+          >
+            <div
+              *cdkVirtualFor="let item of hourlyForecast(); trackBy: trackByHour"
+              class="hourly-item glass-card"
+              [class.active]="isCurrentHour(item.hour)"
+              role="listitem"
+              [attr.aria-label]="'Pronóstico ' + item.hour + ': ' + item.temp + ' grados'"
+              tabindex="0"
+            >
+              <span class="hourly-hour">{{ item.hour }}</span>
+              <app-weather-icon [condition]="item.condition" [size]="32" [decorative]="true" />
+              <span class="hourly-temp font-mono">{{ item.temp }}°</span>
+              @if (item.precipChance > 20) {
+                <span class="hourly-precip font-mono">{{ item.precipChance }}%</span>
+              }
+            </div>
+          </cdk-virtual-scroll-viewport>
+        </section>
+
+        <section class="section-block glass-card" aria-label="Pronóstico para los próximos siete días">
+          <h2 class="section-title">
+            <span class="section-title__accent" aria-hidden="true"></span>
+            Próximos 7 días
+          </h2>
+
+          <div class="daily-list">
+            @for (day of dailyForecast(); track day.date) {
+              <div class="daily-row glass-card" tabindex="0">
+                <span class="daily-day">{{ day.day }}</span>
+                <span class="daily-date">{{ day.date }}</span>
+                <app-weather-icon [condition]="day.condition" [size]="28" [decorative]="true" />
+
+                @if (day.precipChance > 10) {
+                  <span class="daily-precip font-mono">{{ day.precipChance }}%</span>
+                } @else {
+                  <span class="daily-precip daily-precip--empty">0%</span>
+                }
+
+                <div class="temp-range">
+                  <span class="temp-min font-mono">{{ day.tempMin }}°</span>
+                  <div class="temp-bar">
+                    <div class="temp-bar__fill" [style.width.%]="getTempBarWidth(day)"></div>
+                  </div>
+                  <span class="temp-max font-mono">{{ day.tempMax }}°</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    }
+  </div>
+</main>
