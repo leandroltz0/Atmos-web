@@ -18,8 +18,16 @@ $star-color: rgba(255, 255, 255, 0.9);
   overflow: hidden;
   color: $text-color;
   background:
-    radial-gradient(circle at 24% 34%, rgba(100, 155, 255, 0.12), transparent 28%),
-    radial-gradient(circle at 68% 68%, rgba(118, 144, 255, 0.08), transparent 32%),
+    radial-gradient(
+      circle at 24% 34%,
+      rgba(100, 155, 255, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 68% 68%,
+      rgba(118, 144, 255, 0.08),
+      transparent 32%
+    ),
     $background-color;
 }
 
@@ -78,8 +86,12 @@ $star-color: rgba(255, 255, 255, 0.9);
   aspect-ratio: 1;
   border-radius: 50%;
   filter: blur(18px);
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(120, 146, 255, 0.08) 28%, rgba(5, 5, 8, 0) 72%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(120, 146, 255, 0.08) 28%,
+    rgba(5, 5, 8, 0) 72%
+  );
 }
 
 .moon-scene {
@@ -98,7 +110,7 @@ $star-color: rgba(255, 255, 255, 0.9);
 
 .eyebrow {
   color: rgba(255, 255, 255, 0.8);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 1rem;
   line-height: 1.35;
   letter-spacing: 0.18em;
@@ -107,7 +119,7 @@ $star-color: rgba(255, 255, 255, 0.9);
 
 .title {
   margin: 0.45rem 0 1rem;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   font-size: 36px;
   font-weight: 700;
   line-height: 0.95;
@@ -119,7 +131,7 @@ $star-color: rgba(255, 255, 255, 0.9);
   max-width: 28rem;
   margin: 0;
   color: $muted-text-color;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 1rem;
   line-height: 1.65;
 }
@@ -134,7 +146,7 @@ $star-color: rgba(255, 255, 255, 0.9);
   border-color: $line-color;
   border-radius: 5px;
   color: $text-color;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.18em;
