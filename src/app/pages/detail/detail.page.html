@@ -1,0 +1,448 @@
+<main class="detail-shell font-body" role="main">
+  <div class="dashboard-bg" aria-hidden="true">
+    <div class="dashboard-bg__orb dashboard-bg__orb--1"></div>
+    <div class="dashboard-bg__orb dashboard-bg__orb--2"></div>
+    <div class="dashboard-bg__orb dashboard-bg__orb--3"></div>
+  </div>
+
+  <div #detailRoot class="detail-container">
+    <header class="detail-header">
+      <button
+        mat-icon-button
+        type="button"
+        class="detail-header__action"
+        (click)="onGoBack()"
+        aria-label="Volver al dashboard"
+      >
+        <svg class="detail-header__icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="M14.5 5L8 12L14.5 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+
+      <div class="detail-header__center">
+        <h1 class="detail-header__city font-body">{{ weather().cityName }}, {{ weather().country }}</h1>
+        <div class="detail-header__summary">
+          <span class="detail-header__temp font-display">{{ weather().temp }}°</span>
+          <app-weather-icon [condition]="weather().condition" [size]="28" [decorative]="true" />
+          <span class="condition-pill">{{ weather().conditionLabel }}</span>
+        </div>
+      </div>
+
+      <button
+        mat-icon-button
+        type="button"
+        class="detail-header__action"
+        (click)="onShare()"
+        [attr.aria-label]="'Compartir clima de ' + weather().cityName"
+      >
+        <svg class="detail-header__icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="M15 8L9 11.5M15 16L9 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="17.5" cy="7" r="2.5" stroke="currentColor" stroke-width="1.6" />
+          <circle cx="17.5" cy="17" r="2.5" stroke="currentColor" stroke-width="1.6" />
+          <circle cx="6.5" cy="12" r="2.5" stroke="currentColor" stroke-width="1.6" />
+        </svg>
+      </button>
+    </header>
+
+    <mat-tab-group
+      class="detail-tabs"
+      [selectedIndex]="activeTab()"
+      (selectedIndexChange)="onTabChange($event)"
+      dynamicHeight="false"
+    >
+      <mat-tab label="Hoy">
+        <div class="detail-tab-panel" data-tab-index="0">
+          <section class="detail-card detail-section glass-card">
+            <div class="section-title">
+              <span class="section-title__accent" aria-hidden="true"></span>
+              Temperatura 24 horas
+            </div>
+
+            <div class="temp-chart">
+              @if (activeTooltipHour(); as tooltipHour) {
+                <div
+                  class="temp-chart__tooltip glass-card"
+                  [style.left.%]="temperatureTooltipPosition().left"
+                  [style.top.%]="temperatureTooltipPosition().top"
+                >
+                  <span class="temp-chart__tooltip-hour font-mono">{{ tooltipHour.hour }}</span>
+                  <strong class="temp-chart__tooltip-temp font-display">{{ tooltipHour.temp }}°</strong>
+                  <span class="temp-chart__tooltip-meta">Sensación {{ tooltipHour.feelsLike }}°</span>
+                  <span class="temp-chart__tooltip-meta">{{ tooltipHour.precipChance }}% lluvia</span>
+                </div>
+              }
+
+              <div class="chart-scroll">
+                <svg
+                  class="temp-chart__svg"
+                  [attr.viewBox]="'0 0 ' + tempChartWidth + ' ' + tempChartHeight"
+                  role="img"
+                  aria-label="Gráfica horaria de temperatura en Buenos Aires para las próximas 24 horas"
+                >
+                  <defs>
+                    <linearGradient id="tempAreaGradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stop-color="rgba(58, 134, 255, 0.25)" />
+                      <stop offset="100%" stop-color="rgba(58, 134, 255, 0)" />
+                    </linearGradient>
+                  </defs>
+
+                  @for (guide of tempGuideLines(); track guide) {
+                    <line
+                      class="temp-chart__guide"
+                      x1="40"
+                      [attr.y1]="guide"
+                      x2="740"
+                      [attr.y2]="guide"
+                    />
+                  }
+
+                  <path class="temp-chart__area" [attr.d]="tempAreaPath()" fill="url(#tempAreaGradient)"></path>
+                  <path class="temp-chart__line" [attr.d]="tempLinePath()"></path>
+
+                  @if (observedPoint(); as currentPoint) {
+                    <line
+                      class="temp-chart__current-line"
+                      [attr.x1]="currentPoint.x"
+                      [attr.x2]="currentPoint.x"
+                      y1="24"
+                      y2="190"
+                    />
+                  }
+
+                  @for (point of tempChartPoints(); track point.item.hour) {
+                    <g
+                      class="temp-chart__point-group"
+                      tabindex="0"
+                      (mouseenter)="onShowTooltip(point.index)"
+                      (focus)="onShowTooltip(point.index)"
+                      (mouseleave)="onHideTooltip()"
+                      (blur)="onHideTooltip()"
+                      (click)="onShowTooltip(point.index)"
+                    >
+                      <circle
+                        class="temp-dot"
+                        [attr.cx]="point.x"
+                        [attr.cy]="point.y"
+                        r="3"
+                      ></circle>
+
+                      @if (point.index === observedHourIndex()) {
+                        <circle
+                          class="temp-dot temp-dot--current"
+                          [attr.cx]="point.x"
+                          [attr.cy]="point.y"
+                          r="5"
+                        ></circle>
+                      }
+                    </g>
+                  }
+
+                  @for (label of xAxisLabels(); track label.item.hour) {
+                    <text
+                      class="temp-chart__label font-mono"
+                      [attr.x]="label.x"
+                      y="206"
+                      text-anchor="middle"
+                    >
+                      {{ label.item.hour.slice(0, 2) }}
+                    </text>
+                  }
+                </svg>
+              </div>
+            </div>
+          </section>
+
+          <section class="detail-card detail-section glass-card">
+            <div class="section-title">
+              <span class="section-title__accent" aria-hidden="true"></span>
+              Probabilidad de lluvia
+            </div>
+
+            <div class="metric-scroll">
+              <div class="metric-strip">
+                @for (item of weather().hourly; track trackByHour($index, item)) {
+                  <div class="precip-bar">
+                    <div class="precip-bar__chart">
+                      @if (item.precipChance > 0) {
+                        <div class="precip-bar__fill" [style.height.%]="getPrecipBarHeight(item)"></div>
+                      } @else {
+                        <div class="precip-bar__fill precip-bar__fill--empty"></div>
+                      }
+                    </div>
+                    <span class="precip-bar__value font-mono">{{ item.precipChance }}%</span>
+                    <span class="precip-bar__label font-mono">{{ item.hour.slice(0, 2) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </section>
+
+          <section class="detail-card detail-section glass-card">
+            <div class="section-title">
+              <span class="section-title__accent" aria-hidden="true"></span>
+              Índice UV
+            </div>
+
+            <div class="metric-scroll">
+              <div class="metric-strip metric-strip--uv">
+                @for (item of weather().hourly; track trackByHour($index, item)) {
+                  <div class="uv-column">
+                    <div class="uv-column__chart">
+                      <div
+                        class="uv-column__fill"
+                        [style.height.%]="getUvBarHeight(item)"
+                        [style.background]="getUvColor(item.uvIndex)"
+                      ></div>
+                    </div>
+                    <span class="uv-column__value font-mono">{{ item.uvIndex }}</span>
+                    <span class="uv-column__label font-mono">{{ item.hour.slice(0, 2) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </section>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Esta semana">
+        <div class="detail-tab-panel" data-tab-index="1">
+          <section class="detail-section weekly-list">
+            @for (day of weather().daily; track trackByDay($index, day)) {
+              <article class="weekly-row glass-card">
+                <div class="weekly-row__headline">
+                  <div class="weekly-row__day-group">
+                    <span class="weekly-row__day">{{ day.day }}</span>
+                    <span class="weekly-row__date">{{ day.date }}</span>
+                  </div>
+
+                  <app-weather-icon [condition]="day.condition" [size]="32" [decorative]="true" />
+
+                  <div class="weekly-row__precip">
+                    <svg class="weekly-row__drop" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 3C9 7 7 9.7 7 13A5 5 0 1 0 17 13C17 9.7 15 7 12 3Z" fill="currentColor" />
+                    </svg>
+                    <span class="font-mono">{{ day.precipChance }}%</span>
+                  </div>
+
+                  <div class="weekly-row__temps">
+                    <span class="weekly-row__temp-min font-mono">Min {{ day.tempMin }}°</span>
+                    <div class="weekly-row__range">
+                      <div
+                        class="weekly-row__range-fill"
+                        [style.width.%]="getDailyTempBarWidth(day)"
+                        [style.marginLeft.%]="getDailyTempBarOffset(day)"
+                      ></div>
+                    </div>
+                    <span class="weekly-row__temp-max font-mono">Max {{ day.tempMax }}°</span>
+                  </div>
+                </div>
+
+                <div class="weekly-row__wind">
+                  <svg class="weekly-row__wind-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 10H15C16.9 10 18.5 8.5 18.5 6.8C18.5 5.3 17.4 4 15.8 4C14.6 4 13.5 4.8 13.2 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    <path d="M5 14H18C19.7 14 21 15.2 21 16.7C21 18.4 19.7 19.7 18 19.7C16.7 19.7 15.6 18.9 15.2 17.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  </svg>
+                  <span class="font-mono">{{ day.windSpeed }} km/h</span>
+                  <span>{{ day.windDirection }}</span>
+                </div>
+              </article>
+            }
+          </section>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Detalle">
+        <div class="detail-tab-panel detail-tab-panel--detail" data-tab-index="2">
+          <div class="detail-grid">
+            <section class="detail-card detail-section glass-card wind-card">
+              <div class="section-title">
+                <span class="section-title__accent" aria-hidden="true"></span>
+                Viento
+              </div>
+
+              <svg
+                class="wind-rose"
+                [attr.viewBox]="'0 0 ' + windRoseSize + ' ' + windRoseSize"
+                role="img"
+                [attr.aria-label]="'Rosa de los vientos. Dirección actual ' + currentWindDirectionLabel()"
+              >
+                <circle cx="100" cy="100" r="74" class="wind-rose__ring"></circle>
+                <circle cx="100" cy="100" r="50" class="wind-rose__ring"></circle>
+                <circle cx="100" cy="100" r="28" class="wind-rose__ring"></circle>
+
+                <path class="wind-rose__wedge" [attr.d]="activeWindWedgePath()"></path>
+
+                @for (direction of windRoseDirections(); track direction.label) {
+                  <g>
+                    <line
+                      [attr.x1]="direction.x1"
+                      [attr.y1]="direction.y1"
+                      [attr.x2]="direction.x2"
+                      [attr.y2]="direction.y2"
+                      [class.wind-rose__spoke--active]="direction.active"
+                      class="wind-rose__spoke"
+                    ></line>
+                    <text
+                      [attr.x]="direction.labelX"
+                      [attr.y]="direction.labelY"
+                      [class.wind-rose__label--active]="direction.active"
+                      class="wind-rose__label"
+                      text-anchor="middle"
+                      dominant-baseline="middle"
+                    >
+                      {{ direction.label }}
+                    </text>
+                  </g>
+                }
+
+                <circle cx="100" cy="100" r="24" class="wind-rose__center"></circle>
+                <text x="100" y="96" class="wind-rose__speed font-mono" text-anchor="middle">{{ weather().windSpeed }}</text>
+                <text x="100" y="114" class="wind-rose__speed-label font-mono" text-anchor="middle">km/h</text>
+              </svg>
+
+              <div class="wind-card__footer">
+                <span class="wind-card__direction">{{ weather().windDirection }} sostenido</span>
+                <span class="wind-card__meta font-mono">{{ weather().windDeg }}° · {{ currentWindDirectionLabel() }}</span>
+              </div>
+            </section>
+
+            <section class="detail-card detail-section glass-card aqi-card">
+              <div class="section-title">
+                <span class="section-title__accent" aria-hidden="true"></span>
+                Calidad del aire
+              </div>
+
+              <div class="aqi-card__summary">
+                <div class="aqi-card__badge" [style.color]="aqiColor()">
+                  <span class="aqi-card__value font-mono">{{ weather().airQuality.aqi }}</span>
+                  <span class="aqi-card__label">{{ weather().airQuality.aqiLabel }}</span>
+                </div>
+                <span class="aqi-card__copy">Condiciones urbanas estables con baja carga de contaminantes.</span>
+              </div>
+
+              <div class="aqi-pollutants">
+                @for (item of pollutantRows(); track trackByPollutant($index, item)) {
+                  <div class="aqi-pollutant">
+                    <div class="aqi-pollutant__head">
+                      <span class="aqi-pollutant__label">{{ item.label }}</span>
+                      <span class="aqi-pollutant__value font-mono">{{ item.value }} {{ item.unit }}</span>
+                    </div>
+                    <div class="aqi-pollutant__rail">
+                      <div
+                        class="aqi-pollutant__fill"
+                        [style.width.%]="item.width"
+                        [style.background]="item.color"
+                      ></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+
+            <section class="detail-card detail-section glass-card sun-moon-card">
+              <div class="section-title">
+                <span class="section-title__accent" aria-hidden="true"></span>
+                Sol
+              </div>
+
+              <svg class="solar-arc" viewBox="0 0 320 190" role="img" aria-label="Arco solar con amanecer y atardecer">
+                <defs>
+                  <linearGradient id="solarArcGradient" x1="0" x2="1">
+                    <stop offset="0%" stop-color="#FFD166" />
+                    <stop offset="100%" stop-color="#F97316" />
+                  </linearGradient>
+                </defs>
+
+                <path d="M36 140 A124 124 0 0 1 284 140" class="solar-arc__track"></path>
+                <path
+                  d="M36 140 A124 124 0 0 1 284 140"
+                  class="solar-arc__path"
+                  [class.solar-arc__path--muted]="!isDaytime()"
+                ></path>
+                <line x1="32" y1="140" x2="288" y2="140" class="solar-arc__horizon"></line>
+                <circle
+                  class="solar-arc__sun"
+                  [attr.cx]="sunCoordinates().x"
+                  [attr.cy]="sunCoordinates().y"
+                  r="10"
+                ></circle>
+                <text x="36" y="165" class="solar-arc__label font-mono">{{ weather().sunMoon.sunrise }}</text>
+                <text x="284" y="165" class="solar-arc__label font-mono" text-anchor="end">{{ weather().sunMoon.sunset }}</text>
+              </svg>
+
+              <div class="sun-moon-card__copy">
+                <span class="sun-moon-card__meta">Luz útil estimada</span>
+                <strong class="sun-moon-card__value font-mono">10h 40m</strong>
+              </div>
+            </section>
+
+            <section class="detail-card detail-section glass-card sun-moon-card">
+              <div class="section-title">
+                <span class="section-title__accent" aria-hidden="true"></span>
+                Luna
+              </div>
+
+              <div class="moon-card">
+                <svg class="moon-card__svg" viewBox="0 0 80 80" role="img" aria-label="Fase lunar actual">
+                  <defs>
+                    <clipPath id="moonClip">
+                      <circle cx="40" cy="40" r="34"></circle>
+                    </clipPath>
+                    <radialGradient id="moonGradient" cx="35%" cy="30%">
+                      <stop offset="0%" stop-color="#F8FAFC" />
+                      <stop offset="100%" stop-color="#CBD5E1" />
+                    </radialGradient>
+                  </defs>
+
+                  <circle cx="40" cy="40" r="34" fill="url(#moonGradient)"></circle>
+                  <g clip-path="url(#moonClip)">
+                    <ellipse
+                      [attr.cx]="moonShadow().cx"
+                      cy="40"
+                      [attr.rx]="moonShadow().rx"
+                      ry="34"
+                      fill="rgba(13, 27, 42, 0.95)"
+                    ></ellipse>
+                  </g>
+                  <circle cx="40" cy="40" r="34" class="moon-card__rim"></circle>
+                </svg>
+
+                <div class="moon-card__meta">
+                  <strong class="moon-card__name">{{ weather().sunMoon.moonPhaseName }}</strong>
+                  <span class="moon-card__illumination font-mono">{{ weather().sunMoon.moonIllumination }}% iluminada</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="detail-section detail-mini-grid">
+              <article class="detail-mini-card glass-card">
+                <span class="detail-mini-card__label">Presión</span>
+                <strong class="detail-mini-card__value font-mono">{{ weather().pressure }} hPa</strong>
+                <span class="detail-mini-card__meta">{{ pressureTrend() }}</span>
+              </article>
+
+              <article class="detail-mini-card glass-card">
+                <span class="detail-mini-card__label">Punto de rocío</span>
+                <strong class="detail-mini-card__value font-mono">{{ weather().dewPoint }}°C</strong>
+                <span class="detail-mini-card__meta">Aire templado al anochecer</span>
+              </article>
+
+              <article class="detail-mini-card glass-card">
+                <span class="detail-mini-card__label">Visibilidad</span>
+                <strong class="detail-mini-card__value font-mono">{{ weather().visibility }} km</strong>
+                <div class="detail-mini-card__visibility">
+                  @for (segment of visibilitySegments; track segment) {
+                    <div
+                      class="detail-mini-card__visibility-dot"
+                      [class.active]="getVisibilityActive(segment)"
+                    ></div>
+                  }
+                </div>
+              </article>
+            </section>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</main>

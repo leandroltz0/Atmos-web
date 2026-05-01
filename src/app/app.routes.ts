@@ -4,7 +4,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'home'
+    redirectTo: 'detail'
   },
   {
     path: 'allow-location',
@@ -13,6 +13,10 @@ export const routes: Routes = [
   {
     path: 'home',
     loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent)
+  },
+  {
+    path: 'detail',
+    loadComponent: () => import('./pages/detail/detail.page').then((m) => m.DetailPage)
   },
   {
     path: 'onboarding',
