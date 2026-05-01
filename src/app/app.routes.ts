@@ -2,8 +2,9 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: "**",
-    redirectTo: "allow-location"
+    path: '',
+    redirectTo: 'onboarding',
+    pathMatch: 'full'
   },
   {
     path: 'onboarding',
@@ -12,5 +13,9 @@ export const routes: Routes = [
   {
     path: 'allow-location',
     loadComponent: () => import('./pages/allow-location/allow-location.page').then(m => m.AllowLocationPage)
+  },
+  {
+    path: '**',
+    redirectTo: 'onboarding'
   }
 ];
