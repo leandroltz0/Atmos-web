@@ -1,10 +1,14 @@
 export type WeatherCondition =
   | 'sunny'
+  | 'clear-night'
   | 'cloudy'
+  | 'overcast'
+  | 'drizzle'
   | 'rainy'
   | 'stormy'
   | 'snowy'
-  | 'partly-cloudy';
+  | 'partly-cloudy'
+  | 'foggy';
 
 export interface CurrentWeather {
   cityName: string;
@@ -16,6 +20,7 @@ export interface CurrentWeather {
   humidity: number;
   windSpeed: number;
   windDirection: string;
+  windDegrees: number;
   pressure: number;
   aqi: number;
   aqiLabel: string;
@@ -52,6 +57,7 @@ export const MOCK_CURRENT: CurrentWeather = {
   humidity: 68,
   windSpeed: 16,
   windDirection: 'SE',
+  windDegrees: 135,
   pressure: 1016,
   aqi: 2,
   aqiLabel: 'Buena',
