@@ -1,29 +1,30 @@
 import { Routes } from '@angular/router';
+import { APP_ROUTE_PATHS, DEFAULT_APP_ROUTE } from './shared/constants/app-routes';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'onboarding'
+    redirectTo: DEFAULT_APP_ROUTE
   },
   {
-    path: 'allow-location',
+    path: APP_ROUTE_PATHS.allowLocation,
     loadComponent: () => import('./pages/allow-location/allow-location.page').then((m) => m.AllowLocationPage)
   },
   {
-    path: 'home',
+    path: APP_ROUTE_PATHS.home,
     loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent)
   },
   {
-    path: 'dashboard',
+    path: APP_ROUTE_PATHS.dashboard,
     loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent)
   },
   {
-    path: 'onboarding',
+    path: APP_ROUTE_PATHS.onboarding,
     loadComponent: () => import('./pages/onboarding/onboarding.page').then((m) => m.OnboardingPage)
   },
   {
     path: '**',
-    redirectTo: 'onboarding'
+    redirectTo: DEFAULT_APP_ROUTE
   }
 ];

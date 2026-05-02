@@ -12,15 +12,37 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import * as THREE from 'three';
 
-type SpaceStar = {
-  x: number;
-  y: number;
-  r: number;
-  speed: number;
-  phase: number;
+import { APP_ROUTE_PATHS } from '../../shared/constants/app-routes';
+import { createStarfieldState, drawStarfieldFrame, StarfieldState } from '../../shared/utils/canvas-starfield';
+import { DisposableResource, disposeMaterial } from '../../shared/utils/three-disposal';
+
+type CameraLike = {
+  aspect: number;
+  position: { set: (x: number, y: number, z: number) => void };
+  updateProjectionMatrix: () => void;
 };
 
-const STAR_COUNT = 90;
+type GlobeMeshLike = {
+  geometry: DisposableResource;
+  material: DisposableResource | DisposableResource[];
+  rotation: { x: number; y: number };
+};
+
+type RendererLike = DisposableResource & {
+  render: (scene: unknown, camera: unknown) => void;
+  setClearColor: (color: number, alpha?: number) => void;
+  setPixelRatio: (value: number) => void;
+  setSize: (width: number, height: number, updateStyle?: boolean) => void;
+};
+
+type SceneLike = {
+  add: (object: unknown) => void;
+};
+
+type TextureLike = DisposableResource & {
+  colorSpace?: unknown;
+};
+
 const GLOBE_TEXTURE_PATH = 'assets/textures/earth.jpg';
 const GLOBE_EMISSIVE_COLOR = 0x273a6b;
 
@@ -44,17 +66,14 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
   @ViewChild('globeScene', { static: true })
   private readonly globeSceneRef?: ElementRef<HTMLDivElement>;
 
-  private renderer?: any;
-  private scene?: any;
-  private camera?: any;
-  private globeMesh?: any;
-  private globeTexture?: any;
-  private backgroundContext?: CanvasRenderingContext2D;
+  private renderer?: RendererLike;
+  private scene?: SceneLike;
+  private camera?: CameraLike;
+  private globeMesh?: GlobeMeshLike;
+  private globeTexture?: TextureLike;
+  private starfield?: StarfieldState;
   private backgroundAnimationFrameId?: number;
   private backgroundStartTime?: number;
-  private nebulaPrimary?: CanvasGradient;
-  private nebulaSecondary?: CanvasGradient;
-  private stars: SpaceStar[] = [];
   private animationFrameId?: number;
 
   constructor(
@@ -76,8 +95,8 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
       cancelAnimationFrame(this.animationFrameId);
     }
 
-    this.globeMesh?.geometry?.dispose?.();
-    this.globeMesh?.material?.dispose?.();
+    this.globeMesh?.geometry.dispose?.();
+    disposeMaterial(this.globeMesh?.material);
     this.globeTexture?.dispose?.();
     this.renderer?.dispose?.();
   }
@@ -89,7 +108,7 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
   }
 
   protected onGetStarted(): void {
-    void this.router.navigate(['/allow-location']);
+    void this.router.navigate([`/${APP_ROUTE_PATHS.allowLocation}`]);
   }
 
   // Reuses the premium canvas starfield from allow-location.
@@ -102,17 +121,12 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
           this.backgroundStartTime = timestamp;
         }
 
-        if (!this.backgroundContext) {
-          return;
-        }
-
-        const canvas = this.bgCanvasRef?.nativeElement;
-        if (!canvas) {
+        if (!this.starfield) {
           return;
         }
 
         const elapsedSeconds = (timestamp - this.backgroundStartTime) / 1000;
-        this.drawBackgroundFrame(canvas.width, canvas.height, elapsedSeconds);
+        drawStarfieldFrame(this.starfield, elapsedSeconds);
         this.backgroundAnimationFrameId = requestAnimationFrame(tick);
       };
 
@@ -126,75 +140,7 @@ export class OnboardingPage implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const width = canvas.offsetWidth || window.innerWidth;
-    const height = canvas.offsetHeight || window.innerHeight;
-
-    canvas.width = width;
-    canvas.height = height;
-
-    this.backgroundContext = canvas.getContext('2d') ?? undefined;
-    if (!this.backgroundContext) {
-      return;
-    }
-
-    this.nebulaPrimary = this.backgroundContext.createRadialGradient(
-      width * 0.35,
-      height * 0.38,
-      0,
-      width * 0.35,
-      height * 0.38,
-      width * 0.55
-    );
-    this.nebulaPrimary.addColorStop(0, 'rgba(14,30,60,0.6)');
-    this.nebulaPrimary.addColorStop(0.4, 'rgba(8,18,38,0.5)');
-    this.nebulaPrimary.addColorStop(1, 'rgba(4,8,15,0)');
-
-    this.nebulaSecondary = this.backgroundContext.createRadialGradient(
-      width * 0.7,
-      height * 0.6,
-      0,
-      width * 0.7,
-      height * 0.6,
-      width * 0.4
-    );
-    this.nebulaSecondary.addColorStop(0, 'rgba(10,25,50,0.4)');
-    this.nebulaSecondary.addColorStop(1, 'rgba(4,8,15,0)');
-
-    this.stars = this.createBackgroundStars(width, height);
-  }
-
-  private drawBackgroundFrame(width: number, height: number, elapsedSeconds: number): void {
-    if (!this.backgroundContext) {
-      return;
-    }
-
-    this.backgroundContext.fillStyle = '#04080f';
-    this.backgroundContext.fillRect(0, 0, width, height);
-
-    if (this.nebulaPrimary && this.nebulaSecondary) {
-      this.backgroundContext.fillStyle = this.nebulaPrimary;
-      this.backgroundContext.fillRect(0, 0, width, height);
-      this.backgroundContext.fillStyle = this.nebulaSecondary;
-      this.backgroundContext.fillRect(0, 0, width, height);
-    }
-
-    this.stars.forEach((star) => {
-      const alpha = 0.12 + 0.45 * Math.abs(Math.sin(elapsedSeconds * star.speed + star.phase));
-      this.backgroundContext?.beginPath();
-      this.backgroundContext?.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-      this.backgroundContext!.fillStyle = `rgba(220,235,255,${alpha})`;
-      this.backgroundContext?.fill();
-    });
-  }
-
-  private createBackgroundStars(width: number, height: number): SpaceStar[] {
-    return Array.from({ length: STAR_COUNT }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      r: Math.random() * 1 + 0.2,
-      speed: Math.random() * 0.003 + 0.001,
-      phase: Math.random() * Math.PI * 2
-    }));
+    this.starfield = createStarfieldState(canvas) ?? undefined;
   }
 
   // Creates the standalone Three.js scene used by the hero globe.

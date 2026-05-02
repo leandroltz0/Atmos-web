@@ -13,6 +13,10 @@ import { Router } from '@angular/router';
 import { gsap } from 'gsap';
 import * as THREE from 'three';
 
+import { APP_ROUTE_PATHS } from '../../shared/constants/app-routes';
+import { createStarfieldState, drawStarfieldFrame, StarfieldState } from '../../shared/utils/canvas-starfield';
+import { DisposableResource, disposeSceneResources, SceneResourceRoot } from '../../shared/utils/three-disposal';
+
 type LayoutMode = 'mobile' | 'tablet' | 'desktop';
 
 type BreakpointConfig = {
@@ -20,19 +24,42 @@ type BreakpointConfig = {
   layout: LayoutMode;
 };
 
-type SpaceStar = {
+type CameraLike = {
+  position: { z: number };
+  updateProjectionMatrix: () => void;
+};
+
+type GlobeGroupLike = {
+  add: (object: unknown) => void;
+  rotation: { x: number; y: number; z: number };
+};
+
+type RendererLike = DisposableResource & {
+  render: (scene: unknown, camera: unknown) => void;
+  setClearColor: (color: number, alpha?: number) => void;
+  setPixelRatio: (value: number) => void;
+  setSize: (width: number, height: number) => void;
+};
+
+type SceneLike = SceneResourceRoot & {
+  add: (object: unknown) => void;
+};
+
+type TextureLike = DisposableResource & {
+  colorSpace?: unknown;
+  needsUpdate?: boolean;
+};
+
+type Vector3Like = {
   x: number;
   y: number;
-  r: number;
-  speed: number;
-  phase: number;
+  z: number;
 };
 
 const TABLET_BREAKPOINT = 768;
 const DESKTOP_BREAKPOINT = 1024;
 const HOME_NAVIGATION_DELAY_MS = 1200;
 const PARTICLE_COUNT = 12;
-const STAR_COUNT = 90;
 const GLOBE_RADIUS = 1;
 const GLOBE_TEXTURE_PATH = 'assets/textures/earth.jpg';
 const GLOBE_EMISSIVE_COLOR = 0x273a6b;
@@ -74,20 +101,17 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
 
   protected isLocationGranted = false;
 
-  private renderer?: any;
-  private scene?: any;
-  private camera?: any;
-  private globeGroup?: any;
-  private backgroundContext?: CanvasRenderingContext2D;
+  private renderer?: RendererLike;
+  private scene?: SceneLike;
+  private camera?: CameraLike;
+  private globeGroup?: GlobeGroupLike;
+  private starfield?: StarfieldState;
   private backgroundAnimationId?: number;
   private globeAnimationId?: number;
   private backgroundStartTime?: number;
   private entryTimeline?: gsap.core.Timeline;
-  private globeSurfaceTexture?: any;
-  private globeGridTexture?: any;
-  private stars: SpaceStar[] = [];
-  private nebulaPrimary?: CanvasGradient;
-  private nebulaSecondary?: CanvasGradient;
+  private globeSurfaceTexture?: TextureLike;
+  private globeGridTexture?: TextureLike;
   private particleElements: HTMLElement[] = [];
 
   constructor(
@@ -104,8 +128,13 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.backgroundAnimationId && cancelAnimationFrame(this.backgroundAnimationId);
-    this.globeAnimationId && cancelAnimationFrame(this.globeAnimationId);
+    if (this.backgroundAnimationId !== undefined) {
+      cancelAnimationFrame(this.backgroundAnimationId);
+    }
+
+    if (this.globeAnimationId !== undefined) {
+      cancelAnimationFrame(this.globeAnimationId);
+    }
 
     this.entryTimeline?.kill();
     gsap.killTweensOf(this.globeWrap.nativeElement);
@@ -113,16 +142,9 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
 
     this.globeSurfaceTexture?.dispose?.();
     this.globeGridTexture?.dispose?.();
-
-    this.scene?.traverse((object: any) => {
-      object.geometry?.dispose?.();
-      if (Array.isArray(object.material)) {
-        object.material.forEach((material: any) => material?.dispose?.());
-      } else {
-        object.material?.dispose?.();
-      }
-    });
-
+    if (this.scene) {
+      disposeSceneResources(this.scene);
+    }
     this.renderer?.dispose?.();
     this.particlesLayer.nativeElement.innerHTML = '';
   }
@@ -159,12 +181,16 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       y: -20,
       duration: 0.4,
       ease: 'power2.in',
-      onComplete: () => void this.router.navigate(['/home'])
+      onComplete: () => void this.navigateHome()
     });
   }
 
   private navigateHomeAfterDelay(): void {
-    window.setTimeout(() => void this.router.navigate(['/home']), HOME_NAVIGATION_DELAY_MS);
+    window.setTimeout(() => void this.navigateHome(), HOME_NAVIGATION_DELAY_MS);
+  }
+
+  private navigateHome(): Promise<boolean> {
+    return this.router.navigate([`/${APP_ROUTE_PATHS.home}`]);
   }
 
   private playGrantedButtonAnimation(): void {
@@ -197,14 +223,12 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
           this.backgroundStartTime = timestamp;
         }
 
-        if (!this.backgroundContext) {
+        if (!this.starfield) {
           return;
         }
 
-        const canvas = this.bgCanvas.nativeElement;
         const elapsedSeconds = (timestamp - this.backgroundStartTime) / 1000;
-
-        this.drawBackgroundFrame(canvas.width, canvas.height, elapsedSeconds);
+        drawStarfieldFrame(this.starfield, elapsedSeconds);
         this.backgroundAnimationId = requestAnimationFrame(tick);
       };
 
@@ -214,61 +238,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
 
   private resizeBackground(): void {
     const canvas = this.bgCanvas.nativeElement;
-    const width = canvas.offsetWidth || window.innerWidth;
-    const height = canvas.offsetHeight || window.innerHeight;
-
-    canvas.width = width;
-    canvas.height = height;
-
-    this.backgroundContext = canvas.getContext('2d') ?? undefined;
-    if (!this.backgroundContext) {
-      return;
-    }
-
-    this.nebulaPrimary = this.backgroundContext.createRadialGradient(width * 0.35, height * 0.38, 0, width * 0.35, height * 0.38, width * 0.55);
-    this.nebulaPrimary.addColorStop(0, 'rgba(14,30,60,0.6)');
-    this.nebulaPrimary.addColorStop(0.4, 'rgba(8,18,38,0.5)');
-    this.nebulaPrimary.addColorStop(1, 'rgba(4,8,15,0)');
-
-    this.nebulaSecondary = this.backgroundContext.createRadialGradient(width * 0.7, height * 0.6, 0, width * 0.7, height * 0.6, width * 0.4);
-    this.nebulaSecondary.addColorStop(0, 'rgba(10,25,50,0.4)');
-    this.nebulaSecondary.addColorStop(1, 'rgba(4,8,15,0)');
-
-    this.stars = this.createBackgroundStars(width, height);
-  }
-
-  private drawBackgroundFrame(width: number, height: number, elapsedSeconds: number): void {
-    if (!this.backgroundContext) {
-      return;
-    }
-
-    this.backgroundContext.fillStyle = '#04080f';
-    this.backgroundContext.fillRect(0, 0, width, height);
-
-    if (this.nebulaPrimary && this.nebulaSecondary) {
-      this.backgroundContext.fillStyle = this.nebulaPrimary;
-      this.backgroundContext.fillRect(0, 0, width, height);
-      this.backgroundContext.fillStyle = this.nebulaSecondary;
-      this.backgroundContext.fillRect(0, 0, width, height);
-    }
-
-    this.stars.forEach((star) => {
-      const alpha = 0.12 + 0.45 * Math.abs(Math.sin(elapsedSeconds * star.speed + star.phase));
-      this.backgroundContext?.beginPath();
-      this.backgroundContext?.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-      this.backgroundContext!.fillStyle = `rgba(220,235,255,${alpha})`;
-      this.backgroundContext?.fill();
-    });
-  }
-
-  private createBackgroundStars(width: number, height: number): SpaceStar[] {
-    return Array.from({ length: STAR_COUNT }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      r: Math.random() * 1 + 0.2,
-      speed: Math.random() * 0.003 + 0.001,
-      phase: Math.random() * Math.PI * 2
-    }));
+    this.starfield = createStarfieldState(canvas) ?? undefined;
   }
 
   // Globe: procedural surface + Three.js lighting + slow drift.
@@ -276,32 +246,46 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     const { globeSize } = this.getBreakpointConfig();
     const canvas = this.globeCanvas.nativeElement;
 
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-    this.camera.position.z = 2.25;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    camera.position.z = 2.25;
 
-    this.renderer = new THREE.WebGLRenderer({
+    const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
       antialias: true
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setSize(globeSize, globeSize);
-    this.renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(globeSize, globeSize);
+    renderer.setClearColor(0x000000, 0);
 
-    this.globeGroup = new THREE.Group();
-    this.globeGroup.rotation.y = 1.08;
-    this.globeGroup.rotation.z = -0.28;
-    this.scene.add(this.globeGroup);
+    const globeGroup = new THREE.Group();
+    globeGroup.rotation.y = 1.08;
+    globeGroup.rotation.z = -0.28;
+    scene.add(globeGroup);
+
+    this.scene = scene;
+    this.camera = camera;
+    this.renderer = renderer;
+    this.globeGroup = globeGroup;
 
     this.addGlobeLights();
     this.addGlobeMeshes();
 
     this.ngZone.runOutsideAngular(() => {
       const tick = () => {
-        this.globeGroup!.rotation.y += 0.003;
-        this.globeGroup!.rotation.x = Math.sin(performance.now() * 0.00035) * 0.025;
-        this.renderer?.render(this.scene!, this.camera!);
+        const globeGroup = this.globeGroup;
+        const renderer = this.renderer;
+        const scene = this.scene;
+        const camera = this.camera;
+
+        if (!globeGroup || !renderer || !scene || !camera) {
+          return;
+        }
+
+        globeGroup.rotation.y += 0.003;
+        globeGroup.rotation.x = Math.sin(performance.now() * 0.00035) * 0.025;
+        renderer.render(scene, camera);
         this.globeAnimationId = requestAnimationFrame(tick);
       };
 
@@ -310,25 +294,37 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
   }
 
   private addGlobeLights(): void {
-    this.scene.add(new THREE.AmbientLight(0x0a1628, 2.8));
+    const scene = this.scene;
+    if (!scene) {
+      return;
+    }
+
+    scene.add(new THREE.AmbientLight(0x0a1628, 2.8));
 
     const directionalLight = new THREE.DirectionalLight(0x38bdf8, 0.48);
     directionalLight.position.set(-1.4, 1.1, 1.6);
-    this.scene.add(directionalLight);
+    scene.add(directionalLight);
 
     const pointLight = new THREE.PointLight(0x38bdf8, 0.22);
     pointLight.position.set(-1.2, 1.1, 2.2);
-    this.scene.add(pointLight);
+    scene.add(pointLight);
 
     const rimLight = new THREE.PointLight(0xf8fafc, 0.22);
     rimLight.position.set(1.7, -0.4, 2.4);
-    this.scene.add(rimLight);
+    scene.add(rimLight);
   }
 
   private addGlobeMeshes(): void {
+    const globeGroup = this.globeGroup;
+    if (!globeGroup) {
+      return;
+    }
+
     const textureLoader = new THREE.TextureLoader();
     this.globeSurfaceTexture = textureLoader.load(GLOBE_TEXTURE_PATH);
-    this.globeSurfaceTexture.colorSpace = THREE.SRGBColorSpace;
+    if (this.globeSurfaceTexture) {
+      this.globeSurfaceTexture.colorSpace = THREE.SRGBColorSpace;
+    }
     
     this.globeGridTexture = this.createGridTexture();
 
@@ -344,9 +340,9 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
         metalness: 0.05
       })
     );
-    this.globeGroup.add(globe);
+    globeGroup.add(globe);
 
-    this.globeGroup.add(new THREE.Mesh(
+    globeGroup.add(new THREE.Mesh(
       new THREE.SphereGeometry(GLOBE_RADIUS + 0.006, 64, 64),
       new THREE.MeshBasicMaterial({
         map: this.globeGridTexture,
@@ -356,7 +352,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       })
     ));
 
-    this.globeGroup.add(new THREE.Mesh(
+    globeGroup.add(new THREE.Mesh(
       new THREE.SphereGeometry(GLOBE_RADIUS + 0.001, 24, 24),
       new THREE.MeshBasicMaterial({
         color: 0x38bdf8,
@@ -366,7 +362,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       })
     ));
 
-    this.globeGroup.add(new THREE.Mesh(
+    globeGroup.add(new THREE.Mesh(
       new THREE.SphereGeometry(GLOBE_RADIUS + 0.01, 64, 64),
       new THREE.MeshPhongMaterial({
         color: 0xffffff,
@@ -377,7 +373,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       })
     ));
 
-    this.globeGroup.add(new THREE.Mesh(
+    globeGroup.add(new THREE.Mesh(
       new THREE.SphereGeometry(GLOBE_RADIUS * 1.065, 48, 48),
       new THREE.MeshBasicMaterial({
         color: 0x38bdf8,
@@ -392,7 +388,8 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
   }
 
   private addCityDots(): void {
-    if (!this.globeGroup) {
+    const globeGroup = this.globeGroup;
+    if (!globeGroup) {
       return;
     }
 
@@ -404,7 +401,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
-    this.globeGroup.add(new THREE.Points(
+    globeGroup.add(new THREE.Points(
       geometry,
       new THREE.PointsMaterial({
         color: 0x38bdf8,
@@ -416,7 +413,8 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
   }
 
   private addContinentLines(): void {
-    if (!this.globeGroup) {
+    const globeGroup = this.globeGroup;
+    if (!globeGroup) {
       return;
     }
 
@@ -424,7 +422,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       const points = continent.map(([lat, lon]) => this.latLonToVector3(lat, lon, GLOBE_RADIUS + 0.012));
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
-      this.globeGroup.add(new THREE.LineLoop(
+      globeGroup.add(new THREE.LineLoop(
         geometry,
         new THREE.LineBasicMaterial({
           color: 0x38bdf8,
@@ -435,100 +433,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     });
   }
 
-  private createSurfaceTexture(): any {
-    const canvas = document.createElement('canvas');
-    canvas.width = 2048;
-    canvas.height = 1024;
-
-    const context = canvas.getContext('2d');
-    if (!context) {
-      return undefined;
-    }
-
-    const width = canvas.width;
-    const height = canvas.height;
-
-    const oceanGradient = context.createLinearGradient(0, 0, 0, height);
-    oceanGradient.addColorStop(0, '#0b1524');
-    oceanGradient.addColorStop(0.45, '#07111f');
-    oceanGradient.addColorStop(1, '#030810');
-    context.fillStyle = oceanGradient;
-    context.fillRect(0, 0, width, height);
-
-    const glow = context.createRadialGradient(width * 0.34, height * 0.38, 0, width * 0.34, height * 0.38, width * 0.2);
-    glow.addColorStop(0, 'rgba(56, 189, 248, 0.22)');
-    glow.addColorStop(0.55, 'rgba(56, 189, 248, 0.06)');
-    glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
-    context.fillStyle = glow;
-    context.fillRect(0, 0, width, height);
-
-    context.strokeStyle = 'rgba(56, 189, 248, 0.06)';
-    context.lineWidth = 1;
-    for (let lat = 1; lat < 9; lat += 1) {
-      const y = (lat / 9) * height;
-      context.beginPath();
-      context.moveTo(0, y);
-      context.lineTo(width, y);
-      context.stroke();
-    }
-
-    for (let lon = 1; lon < 18; lon += 1) {
-      const x = (lon / 18) * width;
-      context.beginPath();
-      context.moveTo(x, 0);
-      context.lineTo(x, height);
-      context.stroke();
-    }
-
-    CONTINENT_OUTLINES.forEach((continent) => {
-      context.beginPath();
-
-      continent.forEach(([lat, lon], index) => {
-        const x = ((lon + 180) / 360) * width;
-        const y = ((90 - lat) / 180) * height;
-
-        if (index === 0) {
-          context.moveTo(x, y);
-        } else {
-          context.lineTo(x, y);
-        }
-      });
-
-      context.closePath();
-
-      const landGradient = context.createLinearGradient(0, 0, 0, height);
-      landGradient.addColorStop(0, 'rgba(18, 38, 68, 0.95)');
-      landGradient.addColorStop(1, 'rgba(7, 18, 34, 0.98)');
-      context.fillStyle = landGradient;
-      context.fill();
-
-      context.strokeStyle = 'rgba(56, 189, 248, 0.2)';
-      context.lineWidth = 1.35;
-      context.stroke();
-    });
-
-    CITY_POINTS.forEach(([lat, lon]) => {
-      const x = ((lon + 180) / 360) * width;
-      const y = ((90 - lat) / 180) * height;
-
-      const cityGlow = context.createRadialGradient(x, y, 0, x, y, 12);
-      cityGlow.addColorStop(0, 'rgba(56, 189, 248, 0.9)');
-      cityGlow.addColorStop(0.4, 'rgba(56, 189, 248, 0.3)');
-      cityGlow.addColorStop(1, 'rgba(56, 189, 248, 0)');
-      context.fillStyle = cityGlow;
-      context.beginPath();
-      context.arc(x, y, 12, 0, Math.PI * 2);
-      context.fill();
-    });
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.needsUpdate = true;
-
-    return texture;
-  }
-
-  private createGridTexture(): any {
+  private createGridTexture(): TextureLike | undefined {
     const canvas = document.createElement('canvas');
     canvas.width = 2048;
     canvas.height = 1024;
@@ -568,7 +473,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     return texture;
   }
 
-  private latLonToVector3(lat: number, lon: number, radius: number): any {
+  private latLonToVector3(lat: number, lon: number, radius: number): Vector3Like {
     const phi = (90 - lat) * Math.PI / 180;
     const theta = (lon + 180) * Math.PI / 180;
 

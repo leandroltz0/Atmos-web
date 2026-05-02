@@ -24,9 +24,20 @@ import {
   MOCK_DAILY,
   MOCK_HOURLY
 } from './mock-weather.data';
+import {
+  getAqiAppearance,
+  getRefreshedWeatherSnapshot,
+  getTempRange,
+  getUvAppearance
+} from './dashboard.utils';
 
 const INITIAL_LOADING_MS = 800;
 const REFRESH_LOADING_MS = 600;
+const DATE_FORMATTER = new Intl.DateTimeFormat('es-AR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long'
+});
 
 @Component({
   selector: 'app-dashboard',
@@ -47,81 +58,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   protected readonly segments = [1, 2, 3, 4, 5];
   protected readonly visibilityMarkers = [1, 2, 3];
 
-  protected readonly formattedDate = computed(() =>
-    new Intl.DateTimeFormat('es-AR', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long'
-    }).format(this.now())
-  );
+  protected readonly formattedDate = computed(() => DATE_FORMATTER.format(this.now()));
 
   protected readonly minutesAgo = computed(() =>
     Math.max(0, Math.round((this.now().getTime() - this.currentWeather().lastUpdated.getTime()) / 60000))
   );
 
-  protected readonly aqiColor = computed(() => {
-    const aqi = this.currentWeather().aqi;
-    const colors = ['', '#10B981', '#FFD166', '#F97316', '#EF4444', '#7C3AED'];
-    return colors[aqi] ?? '#10B981';
-  });
+  protected readonly aqiAppearance = computed(() => getAqiAppearance(this.currentWeather().aqi));
+  protected readonly aqiColor = computed(() => this.aqiAppearance().color);
+  protected readonly aqiBg = computed(() => this.aqiAppearance().background);
 
-  protected readonly aqiBg = computed(() => {
-    const aqi = this.currentWeather().aqi;
-    const colors = ['', 'rgba(16, 185, 129, 0.14)', 'rgba(255, 209, 102, 0.14)', 'rgba(249, 115, 22, 0.14)', 'rgba(239, 68, 68, 0.14)', 'rgba(124, 58, 237, 0.14)'];
-    return colors[aqi] ?? 'rgba(16, 185, 129, 0.14)';
-  });
+  protected readonly uvAppearance = computed(() => getUvAppearance(this.currentWeather().uvIndex));
+  protected readonly uvLabel = computed(() => this.uvAppearance().label);
+  protected readonly uvColor = computed(() => this.uvAppearance().color);
 
-  protected readonly uvLabel = computed(() => {
-    const uv = this.currentWeather().uvIndex;
-
-    if (uv <= 2) {
-      return 'Bajo';
-    }
-
-    if (uv <= 5) {
-      return 'Moderado';
-    }
-
-    if (uv <= 7) {
-      return 'Alto';
-    }
-
-    if (uv <= 10) {
-      return 'Muy alto';
-    }
-
-    return 'Extremo';
-  });
-
-  protected readonly uvColor = computed(() => {
-    const uv = this.currentWeather().uvIndex;
-
-    if (uv <= 2) {
-      return '#10B981';
-    }
-
-    if (uv <= 5) {
-      return '#FFD166';
-    }
-
-    if (uv <= 7) {
-      return '#F59E0B';
-    }
-
-    if (uv <= 10) {
-      return '#F97316';
-    }
-
-    return '#EF4444';
-  });
-
-  protected readonly tempRange = computed(() => {
-    const values = this.dailyForecast().flatMap((day) => [day.tempMin, day.tempMax]);
-    return {
-      min: Math.min(...values),
-      max: Math.max(...values)
-    };
-  });
+  protected readonly tempRange = computed(() => getTempRange(this.dailyForecast()));
 
   protected readonly weatherIconSize = computed(() => this.isMobile() ? 96 : 120);
   protected readonly hourlyItemSize = computed(() => this.isDesktop() ? 84 : 80);
@@ -281,29 +232,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private applyRefreshSnapshot(): void {
-    const current = this.currentWeather();
-    const tempDelta = current.temp >= 20 ? -1 : 1;
-    const now = new Date();
-
-    this.currentWeather.set({
-      ...current,
-      temp: this.clamp(current.temp + tempDelta, 7, 33),
-      feelsLike: this.clamp(current.feelsLike + tempDelta, 6, 35),
-      humidity: this.clamp(current.humidity - 2, 42, 92),
-      windSpeed: this.clamp(current.windSpeed + 1, 4, 40),
-      pressure: this.clamp(current.pressure - 1, 995, 1035),
-      lastUpdated: now
-    });
-
-    this.hourlyForecast.set(
-      this.hourlyForecast().map((item, index) => ({
-        ...item,
-        temp: index < 8 ? this.clamp(item.temp + tempDelta, 6, 34) : item.temp
-      }))
+    const snapshot = getRefreshedWeatherSnapshot(
+      this.currentWeather(),
+      this.hourlyForecast(),
+      new Date()
     );
-  }
 
-  private clamp(value: number, min: number, max: number): number {
-    return Math.min(max, Math.max(min, value));
+    this.currentWeather.set(snapshot.current);
+    this.hourlyForecast.set(snapshot.hourlyForecast);
   }
 }
