@@ -1,0 +1,9 @@
+<div class="aqi-dot">
+  <div
+    class="aqi-dot__marker"
+    [style.backgroundColor]="getColor(value)"
+    aria-hidden="true"
+  ></div>
+  <span class="aqi-dot__label">{{ label }}</span>
+  <strong class="aqi-dot__value">{{ value }}</strong>
+</div>

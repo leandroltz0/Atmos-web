@@ -10,7 +10,7 @@ type UvLevel = 'low' | 'moderate' | 'high' | 'extreme';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UvBadgeComponent {
-  @Input() level: UvLevel = 'low';
+  @Input() level: UvLevel = 'high';
 
   protected get label(): string {
     switch (this.level) {

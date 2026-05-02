@@ -1,0 +1,27 @@
+.aqi-dot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aqi-dot__marker {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.aqi-dot__label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  color: #8baec8;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.aqi-dot__value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #f0f9ff;
+}

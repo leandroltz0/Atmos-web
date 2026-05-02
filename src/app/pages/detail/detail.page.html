@@ -18,10 +18,7 @@
     <app-section-card title="Overview">
       <div class="metrics-grid">
         @for (item of highlights; track item.label) {
-          <article class="metric-tile">
-            <span class="metric-tile__label">{{ item.label }}</span>
-            <strong class="metric-tile__value">{{ item.value }}</strong>
-          </article>
+          <app-stat-cell [label]="item.label" [value]="item.value" [unit]="item.unit" />
         }
       </div>
     </app-section-card>
@@ -58,6 +55,16 @@
           <span>Lluvia</span>
           <strong>0 mm</strong>
         </div>
+      </div>
+    </app-section-card>
+
+    <app-section-card title="Air Quality">
+      <div class="aqi-grid">
+        @for (item of airQualityItems; track item.label) {
+          <div class="aqi-grid__item">
+            <app-aqi-dot [label]="item.label" [value]="item.value" />
+          </div>
+        }
       </div>
     </app-section-card>
   </section>

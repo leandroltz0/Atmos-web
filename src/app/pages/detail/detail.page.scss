@@ -70,7 +70,8 @@
 }
 
 .metrics-grid,
-.conditions-grid {
+.conditions-grid,
+.aqi-grid {
   display: grid;
   gap: 12px;
 }
@@ -79,15 +80,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.metric-tile,
 .condition-chip {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.05);
-}
-
-.metric-tile {
-  padding: 14px 12px;
 }
 
 .metric-tile__label,
@@ -102,14 +98,6 @@
 .condition-chip span {
   color: #8baec8;
   font-size: 0.78rem;
-}
-
-.metric-tile__value {
-  display: block;
-  margin-top: 8px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 700;
 }
 
 .forecast-list {
@@ -153,8 +141,19 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.aqi-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .condition-chip {
   padding: 14px;
+}
+
+.aqi-grid__item {
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .condition-chip strong {
@@ -181,7 +180,8 @@
   }
 
   .metrics-grid,
-  .conditions-grid {
+  .conditions-grid,
+  .aqi-grid {
     grid-template-columns: 1fr;
   }
 }
