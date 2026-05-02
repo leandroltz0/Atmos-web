@@ -1,0 +1,134 @@
+<app-section-card title="VIENTO">
+  <div class="wind-rose">
+    <div class="wind-rose__graphic">
+      <svg
+        class="wind-rose__svg"
+        [attr.viewBox]="'0 0 ' + roseSize + ' ' + roseSize"
+        role="img"
+        aria-label="Rosa de los vientos"
+      >
+        <defs>
+          <radialGradient id="windRoseGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#3A86FF" stop-opacity="0.08" />
+            <stop offset="100%" stop-color="#3A86FF" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+
+        <circle
+          class="wind-rose__glow"
+          [attr.cx]="center"
+          [attr.cy]="center"
+          [attr.r]="radius + 10"
+        />
+
+        @for (ring of innerRings; track ring) {
+          <circle
+            class="wind-rose__ring wind-rose__ring--inner"
+            [attr.cx]="center"
+            [attr.cy]="center"
+            [attr.r]="ring"
+          />
+        }
+
+        @for (spoke of spokes; track spoke.x2 + '-' + spoke.y2) {
+          <line
+            class="wind-rose__spoke"
+            [attr.x1]="center"
+            [attr.y1]="center"
+            [attr.x2]="spoke.x2"
+            [attr.y2]="spoke.y2"
+          />
+        }
+
+        <circle
+          class="wind-rose__ring wind-rose__ring--outer"
+          [attr.cx]="center"
+          [attr.cy]="center"
+          [attr.r]="radius"
+        />
+
+        @for (item of compassLabels; track item.label) {
+          <text
+            class="wind-rose__label"
+            [attr.x]="item.x"
+            [attr.y]="item.y"
+            text-anchor="middle"
+            dominant-baseline="middle"
+          >
+            {{ item.label }}
+          </text>
+        }
+
+        <g
+          class="wind-rose__arrow"
+          [style.transform]="arrowTransform"
+          [style.transform-origin]="center + 'px ' + center + 'px'"
+        >
+          <path
+            class="wind-rose__arrow-tail"
+            d="M 80 102 C 73 97, 70 88, 72 78 C 74 69, 77 63, 80 58 C 83 63, 86 69, 88 78 C 90 88, 87 97, 80 102 Z"
+          />
+          <path
+            class="wind-rose__arrow-tip"
+            d="M 80 24 C 85 34, 88 47, 86 60 C 84 57, 82 55, 80 53 C 78 55, 76 57, 74 60 C 72 47, 75 34, 80 24 Z"
+          />
+        </g>
+
+        <circle
+          class="wind-rose__hub"
+          [attr.cx]="center"
+          [attr.cy]="center"
+          r="4"
+        />
+      </svg>
+    </div>
+
+    <div class="wind-rose__hero">
+      <div class="wind-rose__hero-block">
+        <span class="wind-rose__stat-label">Velocidad</span>
+        <div class="wind-rose__hero-speed">
+          {{ speedKmh }}<span class="wind-rose__hero-unit">km/h</span>
+        </div>
+      </div>
+
+      <div class="wind-rose__hero-divider"></div>
+
+      <div class="wind-rose__hero-block">
+        <span class="wind-rose__stat-label">Ráfagas</span>
+        <div class="wind-rose__hero-gust">
+          {{ gustKmh }}<span class="wind-rose__hero-unit">km/h</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wind-rose__stats">
+      <div class="wind-rose__stat">
+        <span class="wind-rose__stat-label">Dirección</span>
+        <div class="wind-rose__stat-value wind-rose__stat-value--direction">
+          {{ directionLabel }}
+        </div>
+      </div>
+
+      <div class="wind-rose__stat">
+        <span class="wind-rose__stat-label">Sensación</span>
+        <div class="wind-rose__stat-value wind-rose__stat-value--feeling">
+          {{ sensationLabel }}
+        </div>
+      </div>
+
+      <div class="wind-rose__stat">
+        <span class="wind-rose__stat-label">Humedad</span>
+        <div class="wind-rose__stat-value wind-rose__stat-value--detail">
+          {{ humidity }}%
+        </div>
+      </div>
+
+      <div class="wind-rose__stat">
+        <span class="wind-rose__stat-label">Presión</span>
+        <div class="wind-rose__stat-value wind-rose__stat-value--pressure">
+          {{ pressureHpa }} hPa
+        </div>
+      </div>
+    </div>
+  </div>
+</app-section-card>

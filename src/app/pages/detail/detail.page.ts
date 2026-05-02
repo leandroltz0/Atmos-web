@@ -7,6 +7,7 @@ import { SectionCardComponent } from '../../shared/components/section-card';
 import { StatCellComponent } from '../../shared/components/stat-cell';
 import { UvBadgeComponent } from '../../shared/components/uv-badge';
 import { WeatherTabsComponent } from '../../shared/components/weather-tabs';
+import { WindRoseComponent } from '../../shared/components/wind-rose';
 
 @Component({
   selector: 'app-detail-page',
@@ -18,7 +19,8 @@ import { WeatherTabsComponent } from '../../shared/components/weather-tabs';
     UvBadgeComponent,
     AqiDotComponent,
     StatCellComponent,
-    RainBarsChartComponent
+    RainBarsChartComponent,
+    WindRoseComponent
   ],
   templateUrl: './detail.page.html',
   styleUrl: './detail.page.scss',
