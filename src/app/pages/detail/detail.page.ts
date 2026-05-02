@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { AqiDotComponent } from '../../shared/components/aqi-dot';
+import { AqiPanelComponent } from '../../shared/components/aqi-panel';
 import { MoonPhaseComponent } from '../../shared/components/moon-phase';
 import { RainBarsChartComponent } from '../../shared/components/rain-bars-chart';
 import { SectionCardComponent } from '../../shared/components/section-card';
 import { StatCellComponent } from '../../shared/components/stat-cell';
 import { SunTimelineComponent } from '../../shared/components/sun-timeline';
+import { TemperatureChartComponent } from '../../shared/components/temperature-chart';
 import { UvBadgeComponent } from '../../shared/components/uv-badge';
 import { UvTimelineComponent } from '../../shared/components/uv-timeline';
 import { WeatherTabsComponent } from '../../shared/components/weather-tabs';
@@ -21,9 +22,10 @@ import { WindRoseComponent } from '../../shared/components/wind-rose';
     WeatherTabsComponent,
     SunTimelineComponent,
     MoonPhaseComponent,
+    TemperatureChartComponent,
     UvBadgeComponent,
     UvTimelineComponent,
-    AqiDotComponent,
+    AqiPanelComponent,
     StatCellComponent,
     RainBarsChartComponent,
     WindRoseComponent
@@ -46,10 +48,11 @@ export class DetailPage {
     { hour: '17:00', temp: '24°', state: 'Cielo cubierto' }
   ];
 
-  protected readonly airQualityItems = [
-    { label: 'PM2.5', value: 42 },
-    { label: 'PM10', value: 78 },
-    { label: 'NO2', value: 118 },
-    { label: 'O3', value: 162 }
-  ];
+  protected readonly airQuality = {
+    aqi: 42,
+    pm25: 12,
+    pm10: 18,
+    o3: 31,
+    no2: 8
+  };
 }

@@ -17,6 +17,7 @@
 
     <app-sun-timeline />
     <app-moon-phase />
+    <app-temperature-chart />
     <app-uv-timeline />
     <app-rain-bars-chart />
     <app-wind-rose />
@@ -64,14 +65,12 @@
       </div>
     </app-section-card>
 
-    <app-section-card title="Air Quality">
-      <div class="aqi-grid">
-        @for (item of airQualityItems; track item.label) {
-          <div class="aqi-grid__item">
-            <app-aqi-dot [label]="item.label" [value]="item.value" />
-          </div>
-        }
-      </div>
-    </app-section-card>
+    <app-aqi-panel
+      [aqi]="airQuality.aqi"
+      [pm25]="airQuality.pm25"
+      [pm10]="airQuality.pm10"
+      [o3]="airQuality.o3"
+      [no2]="airQuality.no2"
+    />
   </section>
 </main>

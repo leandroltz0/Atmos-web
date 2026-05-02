@@ -1,0 +1,31 @@
+<app-section-card title="CALIDAD DEL AIRE">
+  <div class="aqi-panel__summary">
+    <strong class="aqi-panel__value">{{ aqi }}</strong>
+    <span
+      class="aqi-panel__dot"
+      [style.backgroundColor]="aqiStatus.color"
+      aria-hidden="true"
+    ></span>
+    <span class="aqi-panel__status">{{ aqiStatus.label }}</span>
+  </div>
+
+  <div class="aqi-panel__divider" aria-hidden="true"></div>
+
+  <div class="aqi-panel__grid">
+    <div class="aqi-panel__cell">
+      <app-aqi-dot label="PM2.5" [value]="pm25" />
+    </div>
+
+    <div class="aqi-panel__cell">
+      <app-aqi-dot label="PM10" [value]="pm10" />
+    </div>
+
+    <div class="aqi-panel__cell">
+      <app-aqi-dot label="O3" [value]="o3" />
+    </div>
+
+    <div class="aqi-panel__cell">
+      <app-aqi-dot label="NO2" [value]="no2" />
+    </div>
+  </div>
+</app-section-card>
