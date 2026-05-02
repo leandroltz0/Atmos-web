@@ -3,17 +3,10 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 import { SectionCardComponent } from '../section-card';
 
-type Star = {
-  cx: number;
-  cy: number;
-  r: number;
-  opacity: number;
-};
-
-const MOON_CENTER = 60;
-const MOON_RADIUS = 48;
-const FULL_MOON_PHASE = 0.5;
-const FULL_MOON_THRESHOLD = 0.001;
+const MOON_CENTER = 45;
+const MOON_RADIUS = 45;
+const MOON_DIAMETER = 90;
+let nextClipPathId = 0;
 
 @Component({
   selector: 'app-moon-phase',
@@ -32,42 +25,72 @@ export class MoonPhaseComponent {
 
   protected readonly moonCenter = MOON_CENTER;
   protected readonly moonRadius = MOON_RADIUS;
-
-  protected readonly stars: Star[] = [
-    { cx: 18, cy: 22, r: 1.6, opacity: 0.42 },
-    { cx: 101, cy: 18, r: 1.4, opacity: 0.36 },
-    { cx: 24, cy: 92, r: 1.5, opacity: 0.44 },
-    { cx: 92, cy: 97, r: 1.5, opacity: 0.4 },
-    { cx: 108, cy: 73, r: 1.3, opacity: 0.34 }
-  ];
+  protected readonly clipPathId = `moon-phase-clip-${nextClipPathId++}`;
 
   protected get normalizedPhase(): number {
     return this.clamp(this.phase, 0, 1);
   }
 
-  protected get normalizedIllumination(): number {
-    return this.clamp(this.illumination, 0, 100);
-  }
+  protected get illuminationPath(): string {
+    const illumination = this.normalizedIllumination;
 
-  protected get overlayCx(): number {
-    const radians = this.normalizedPhase * Math.PI * 2;
-
-    return MOON_CENTER + Math.sin(radians) * MOON_RADIUS;
-  }
-
-  protected get overlayOpacity(): number {
-    if (Math.abs(this.normalizedPhase - FULL_MOON_PHASE) <= FULL_MOON_THRESHOLD) {
-      return 0;
+    if (illumination <= 0) {
+      return '';
     }
 
-    return 1 - this.normalizedIllumination / 100;
+    if (illumination >= 1) {
+      return this.fullMoonPath;
+    }
+
+    const terminatorX = MOON_CENTER + this.terminatorOffset;
+    const topY = MOON_CENTER - MOON_RADIUS;
+    const bottomY = MOON_CENTER + MOON_RADIUS;
+    const controlY = MOON_RADIUS * 0.78;
+    const outerArcSweep = this.isWaningPhase ? 0 : 1;
+
+    return [
+      `M ${MOON_CENTER} ${topY}`,
+      `A ${MOON_RADIUS} ${MOON_RADIUS} 0 0 ${outerArcSweep} ${MOON_CENTER} ${bottomY}`,
+      `C ${terminatorX} ${MOON_CENTER + controlY} ${terminatorX} ${MOON_CENTER - controlY} ${MOON_CENTER} ${topY}`,
+      'Z'
+    ].join(' ');
+  }
+
+  protected get hasVisibleIllumination(): boolean {
+    return this.normalizedIllumination > 0;
+  }
+
+  protected get normalizedIllumination(): number {
+    return this.clamp(this.illumination, 0, 100) / 100;
   }
 
   protected get illuminationLabel(): string {
-    return `${Math.round(this.normalizedIllumination)}%`;
+    return `${Math.round(this.normalizedIllumination * 100)}%`;
   }
 
   private clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max);
+  }
+
+  private get isWaningPhase(): boolean {
+    return this.normalizedPhase > 0.5;
+  }
+
+  private get terminatorOffset(): number {
+    const polarity = this.isWaningPhase ? 1 : -1;
+
+    return (this.normalizedIllumination - 0.5) * 2 * MOON_RADIUS * polarity;
+  }
+
+  private get fullMoonPath(): string {
+    const topY = MOON_CENTER - MOON_RADIUS;
+    const bottomY = MOON_CENTER + MOON_RADIUS;
+
+    return [
+      `M ${MOON_CENTER} ${topY}`,
+      `A ${MOON_RADIUS} ${MOON_RADIUS} 0 1 1 ${MOON_CENTER} ${bottomY}`,
+      `A ${MOON_RADIUS} ${MOON_RADIUS} 0 1 1 ${MOON_CENTER} ${topY}`,
+      'Z'
+    ].join(' ');
   }
 }

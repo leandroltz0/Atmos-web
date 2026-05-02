@@ -1,37 +1,32 @@
 <app-section-card title="FASE LUNAR">
   <div class="moon-phase">
     <div class="moon-phase__graphic">
-      <div class="moon-phase__halo"></div>
-
       <svg
         class="moon-phase__svg"
-        viewBox="0 0 120 120"
+        viewBox="0 0 90 90"
         role="img"
         [attr.aria-label]="'Fase lunar: ' + phaseName"
       >
-        @for (star of stars; track star.cx + '-' + star.cy) {
-          <circle
-            class="moon-phase__star"
-            [attr.cx]="star.cx"
-            [attr.cy]="star.cy"
-            [attr.r]="star.r"
-            [attr.opacity]="star.opacity"
-          />
-        }
+        <defs>
+          <clipPath [attr.id]="clipPathId">
+            <path [attr.d]="illuminationPath" />
+          </clipPath>
+        </defs>
 
         <circle
-          class="moon-phase__moon"
+          class="moon-phase__moon-base"
           [attr.cx]="moonCenter"
           [attr.cy]="moonCenter"
           [attr.r]="moonRadius"
         />
 
         <circle
-          class="moon-phase__shadow"
-          [attr.cx]="overlayCx"
+          class="moon-phase__moon-light"
+          [attr.cx]="moonCenter"
           [attr.cy]="moonCenter"
           [attr.r]="moonRadius"
-          [attr.opacity]="overlayOpacity"
+          [attr.clip-path]="'url(#' + clipPathId + ')'"
+          [attr.opacity]="hasVisibleIllumination ? 1 : 0"
         />
       </svg>
     </div>
@@ -41,17 +36,14 @@
         <span class="moon-phase__label">Fase</span>
         <div class="moon-phase__value moon-phase__value--phase">{{ phaseName }}</div>
       </div>
-
       <div class="moon-phase__stat">
         <span class="moon-phase__label">Iluminación</span>
         <div class="moon-phase__value moon-phase__value--illumination">{{ illuminationLabel }}</div>
       </div>
-
       <div class="moon-phase__stat">
         <span class="moon-phase__label">Salida</span>
         <div class="moon-phase__value moon-phase__value--time">{{ moonrise }}</div>
       </div>
-
       <div class="moon-phase__stat">
         <span class="moon-phase__label">Ocaso</span>
         <div class="moon-phase__value moon-phase__value--time">{{ moonset }}</div>

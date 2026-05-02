@@ -2,9 +2,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { AqiDotComponent } from '../../shared/components/aqi-dot';
+import { MoonPhaseComponent } from '../../shared/components/moon-phase';
 import { RainBarsChartComponent } from '../../shared/components/rain-bars-chart';
 import { SectionCardComponent } from '../../shared/components/section-card';
 import { StatCellComponent } from '../../shared/components/stat-cell';
+import { SunTimelineComponent } from '../../shared/components/sun-timeline';
 import { UvBadgeComponent } from '../../shared/components/uv-badge';
 import { UvTimelineComponent } from '../../shared/components/uv-timeline';
 import { WeatherTabsComponent } from '../../shared/components/weather-tabs';
@@ -17,6 +19,8 @@ import { WindRoseComponent } from '../../shared/components/wind-rose';
     CommonModule,
     SectionCardComponent,
     WeatherTabsComponent,
+    SunTimelineComponent,
+    MoonPhaseComponent,
     UvBadgeComponent,
     UvTimelineComponent,
     AqiDotComponent,
