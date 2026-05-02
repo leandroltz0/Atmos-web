@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SectionCardComponent } from '../../shared/components/section-card';
+import { UvBadgeComponent } from '../../shared/components/uv-badge';
 import { WeatherTabsComponent } from '../../shared/components/weather-tabs';
 
 @Component({
   selector: 'app-detail-page',
   standalone: true,
-  imports: [CommonModule, SectionCardComponent, WeatherTabsComponent],
+  imports: [CommonModule, SectionCardComponent, WeatherTabsComponent, UvBadgeComponent],
   templateUrl: './detail.page.html',
   styleUrl: './detail.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
