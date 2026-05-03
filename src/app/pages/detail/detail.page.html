@@ -12,64 +12,76 @@
 
   <section class="detail-content">
     <div class="detail-tabs-shell">
-      <app-weather-tabs />
+      <app-weather-tabs [selectedIndex]="selectedTabIndex" (selectedIndexChange)="setSelectedTab($event)" />
     </div>
 
-    <app-temperature-chart />
-    <app-rain-bars-chart />
-    <app-wind-rose />
-    <app-uv-timeline />
-    <app-aqi-panel
-      [aqi]="airQuality.aqi"
-      [pm25]="airQuality.pm25"
-      [pm10]="airQuality.pm10"
-      [o3]="airQuality.o3"
-      [no2]="airQuality.no2"
-    />
-    <app-sun-timeline />
-    <app-moon-phase />
-
-    <app-section-card title="Overview">
-      <div class="metrics-grid">
-        @for (item of highlights; track item.label) {
-          <app-stat-cell [label]="item.label" [value]="item.value" [unit]="item.unit" />
-        }
+    @if (selectedTabIndex === 1) {
+      <div class="detail-weekly-shell">
+        <app-weekly-tab [weeklyData]="weeklyForecast" />
       </div>
-    </app-section-card>
+    }
 
-    <app-section-card title="Next Hours">
-      <div class="forecast-list">
-        @for (item of hourlyForecast; track item.hour) {
-          <article class="forecast-row">
-            <div>
-              <p class="forecast-row__hour">{{ item.hour }}</p>
-              <p class="forecast-row__state">{{ item.state }}</p>
-            </div>
-            <strong class="forecast-row__temp">{{ item.temp }}</strong>
-          </article>
-        }
-      </div>
-    </app-section-card>
+    @if (selectedTabIndex === 2) {
+      <app-detail-tab />
+    }
 
-    <app-section-card title="Air Conditions">
-      <div class="conditions-grid">
-        <div class="condition-chip">
-          <span>UV</span>
-          <app-uv-badge level="moderate" />
+    @if (selectedTabIndex === 0) {
+      <app-temperature-chart />
+      <app-rain-bars-chart />
+      <app-wind-rose />
+      <app-uv-timeline />
+      <app-aqi-panel
+        [aqi]="airQuality.aqi"
+        [pm25]="airQuality.pm25"
+        [pm10]="airQuality.pm10"
+        [o3]="airQuality.o3"
+        [no2]="airQuality.no2"
+      />
+      <app-sun-timeline />
+      <app-moon-phase />
+
+      <app-section-card title="Overview">
+        <div class="metrics-grid">
+          @for (item of highlights; track item.label) {
+            <app-stat-cell [label]="item.label" [value]="item.value" [unit]="item.unit" />
+          }
         </div>
-        <div class="condition-chip">
-          <span>Presion</span>
-          <strong>1014 hPa</strong>
+      </app-section-card>
+
+      <app-section-card title="Next Hours">
+        <div class="forecast-list">
+          @for (item of hourlyForecast; track item.hour) {
+            <article class="forecast-row">
+              <div>
+                <p class="forecast-row__hour">{{ item.hour }}</p>
+                <p class="forecast-row__state">{{ item.state }}</p>
+              </div>
+              <strong class="forecast-row__temp">{{ item.temp }}</strong>
+            </article>
+          }
         </div>
-        <div class="condition-chip">
-          <span>Visibilidad</span>
-          <strong>10 km</strong>
+      </app-section-card>
+
+      <app-section-card title="Air Conditions">
+        <div class="conditions-grid">
+          <div class="condition-chip">
+            <span>UV</span>
+            <app-uv-badge level="moderate" />
+          </div>
+          <div class="condition-chip">
+            <span>Presion</span>
+            <strong>1014 hPa</strong>
+          </div>
+          <div class="condition-chip">
+            <span>Visibilidad</span>
+            <strong>10 km</strong>
+          </div>
+          <div class="condition-chip">
+            <span>Lluvia</span>
+            <strong>0 mm</strong>
+          </div>
         </div>
-        <div class="condition-chip">
-          <span>Lluvia</span>
-          <strong>0 mm</strong>
-        </div>
-      </div>
-    </app-section-card>
+      </app-section-card>
+    }
   </section>
 </main>

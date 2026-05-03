@@ -1,0 +1,25 @@
+<section class="weekly-tab" aria-label="7-day forecast">
+  <div class="weekly-tab__shell">
+    @if (showHeader) {
+      <app-weekly-header class="weekly-tab__header" />
+    }
+
+    @if (forecastDays.length) {
+      <div class="weekly-tab__list" role="list" aria-label="7-day forecast">
+        @for (item of forecastDays; track item.day) {
+          <div class="weekly-tab__list-item" role="listitem">
+            <app-weekly-item
+              [day]="item.day"
+              [icon]="item.icon"
+              [min]="item.min"
+              [max]="item.max"
+              [rain]="item.rain"
+            />
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="weekly-tab__empty">{{ emptyStateText }}</p>
+    }
+  </div>
+</section>

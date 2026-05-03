@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
@@ -9,4 +9,11 @@ import { MatTabsModule } from '@angular/material/tabs';
   styleUrl: './weather-tabs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class WeatherTabsComponent {}
+export class WeatherTabsComponent {
+  @Input() selectedIndex = 0;
+  @Output() readonly selectedIndexChange = new EventEmitter<number>();
+
+  protected onSelectedIndexChange(index: number): void {
+    this.selectedIndexChange.emit(index);
+  }
+}

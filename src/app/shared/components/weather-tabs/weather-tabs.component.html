@@ -1,19 +1,10 @@
-<mat-tab-group class="weather-tabs" [disableRipple]="true">
-  <mat-tab label="Hoy">
-    <div class="weather-tabs__panel">
-      <p>Contenido Hoy</p>
-    </div>
-  </mat-tab>
-
-  <mat-tab label="Esta semana">
-    <div class="weather-tabs__panel">
-      <p>Contenido Esta semana</p>
-    </div>
-  </mat-tab>
-
-  <mat-tab label="Detalle">
-    <div class="weather-tabs__panel">
-      <p>Contenido Detalle</p>
-    </div>
-  </mat-tab>
+<mat-tab-group
+  class="weather-tabs"
+  [disableRipple]="true"
+  [selectedIndex]="selectedIndex"
+  (selectedIndexChange)="onSelectedIndexChange($event)"
+>
+  <mat-tab label="Hoy"></mat-tab>
+  <mat-tab label="Esta semana"></mat-tab>
+  <mat-tab label="Detalle"></mat-tab>
 </mat-tab-group>

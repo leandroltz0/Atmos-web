@@ -1,0 +1,21 @@
+<section class="detail-tab" aria-label="Detalle del clima">
+  <header class="detail-tab__header">
+    <p class="detail-tab__eyebrow">Detalle</p>
+    <h2 class="detail-tab__title">Weather breakdown</h2>
+    <p class="detail-tab__intro">
+      Aca van a vivir los modulos con el detalle fino del clima para esta ubicacion.
+    </p>
+  </header>
+
+  <div class="detail-tab__sections">
+    @for (section of sections; track section.title) {
+      <article class="section">
+        <div class="section__glow" aria-hidden="true"></div>
+        <div class="section__content">
+          <h3 class="section__title">{{ section.title }}</h3>
+          <p class="section__description">{{ section.description }}</p>
+        </div>
+      </article>
+    }
+  </div>
+</section>

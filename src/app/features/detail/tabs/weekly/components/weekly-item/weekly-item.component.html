@@ -1,0 +1,18 @@
+<article class="weekly-item">
+  <div class="weekly-item__day-group">
+    <p class="weekly-item__day">{{ day }}</p>
+    <p class="weekly-item__meta">Rain {{ rain }}%</p>
+  </div>
+
+  <div class="weekly-item__icon-shell" aria-hidden="true">
+    <img class="weekly-item__icon" [src]="icon" [alt]="''" />
+  </div>
+
+  <div class="weekly-item__temps" aria-label="Temperature range">
+    <span class="weekly-item__temp weekly-item__temp--min">{{ min }}&deg;</span>
+    <div class="weekly-item__range" aria-hidden="true">
+      <span class="weekly-item__range-fill"></span>
+    </div>
+    <span class="weekly-item__temp weekly-item__temp--max">{{ max }}&deg;</span>
+  </div>
+</article>

@@ -12,6 +12,8 @@ import { UvBadgeComponent } from '../../shared/components/uv-badge';
 import { UvTimelineComponent } from '../../shared/components/uv-timeline';
 import { WeatherTabsComponent } from '../../shared/components/weather-tabs';
 import { WindRoseComponent } from '../../shared/components/wind-rose';
+import { DetailTabComponent } from '../../features/detail/tabs/detail/detail-tab.component';
+import { WeeklyTabComponent } from '../../features/detail/tabs/weekly/weekly-tab.component';
 
 @Component({
   selector: 'app-detail-page',
@@ -28,17 +30,31 @@ import { WindRoseComponent } from '../../shared/components/wind-rose';
     AqiPanelComponent,
     StatCellComponent,
     RainBarsChartComponent,
-    WindRoseComponent
+    WindRoseComponent,
+    DetailTabComponent,
+    WeeklyTabComponent
   ],
   templateUrl: './detail.page.html',
   styleUrl: './detail.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetailPage {
+  protected selectedTabIndex = 0;
+
   protected readonly highlights = [
     { label: 'Sensacion termica', value: '29°' },
     { label: 'Humedad', value: '64%' },
     { label: 'Viento', value: '18', unit: 'km/h' }
+  ];
+
+  protected readonly weeklyForecast = [
+    { day: 'Hoy', icon: '/assets/icons/weather/partly-cloudy-day.svg', min: 18, max: 29, rain: 18 },
+    { day: 'Lun', icon: '/assets/icons/weather/sun.svg', min: 17, max: 28, rain: 8 },
+    { day: 'Mar', icon: '/assets/icons/weather/cloudy.svg', min: 16, max: 25, rain: 22 },
+    { day: 'Mie', icon: '/assets/icons/weather/rain.svg', min: 15, max: 23, rain: 54 },
+    { day: 'Jue', icon: '/assets/icons/weather/thunderstorms-rain.svg', min: 14, max: 21, rain: 68 },
+    { day: 'Vie', icon: '/assets/icons/weather/cloudy.svg', min: 15, max: 22, rain: 26 },
+    { day: 'Sab', icon: '/assets/icons/weather/sun.svg', min: 16, max: 27, rain: 10 }
   ];
 
   protected readonly hourlyForecast = [
@@ -55,4 +71,8 @@ export class DetailPage {
     o3: 31,
     no2: 8
   };
+
+  protected setSelectedTab(index: number): void {
+    this.selectedTabIndex = index;
+  }
 }
