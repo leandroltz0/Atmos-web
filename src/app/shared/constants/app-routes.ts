@@ -3,7 +3,8 @@ export const APP_ROUTE_PATHS = {
   onboarding: 'onboarding',
   allowLocation: 'allow-location',
   home: 'home',
-  dashboard: 'dashboard'
+  dashboard: 'dashboard',
+  search: 'search'
 } as const;
 
 export const DEFAULT_APP_ROUTE = APP_ROUTE_PATHS.detail;

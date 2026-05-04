@@ -29,6 +29,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: DEFAULT_APP_ROUTE
+    redirectTo: APP_ROUTE_PATHS.search
   }
 ];
