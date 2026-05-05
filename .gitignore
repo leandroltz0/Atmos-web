@@ -42,7 +42,9 @@ testem.log
 Thumbs.db
 
 #skill
-.agents/*
+.agents/
+
+
 
 
 

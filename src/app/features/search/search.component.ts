@@ -5,13 +5,18 @@ import {
   OnDestroy,
   OnInit,
   computed,
-  signal
+  signal,
+  effect,
+  afterNextRender,
+  ElementRef
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRippleModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+
+import { gsap } from 'gsap';
 
 import { MatInputModule } from '@angular/material/input';
 
@@ -107,7 +112,52 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.status.set('offline');
   };
 
-  constructor(private readonly router: Router) {}
+  constructor(private readonly router: Router, private el: ElementRef) {
+    afterNextRender(() => {
+      // Animación de entrada inicial "Impeccable"
+      const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+      tl.fromTo(this.el.nativeElement.querySelector('.search-header'), 
+        { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 })
+        .fromTo(this.el.nativeElement.querySelector('.search-input-wrap'), 
+        { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 }, "-=1.05")
+        .fromTo(this.el.nativeElement.querySelectorAll('.recent-section'), 
+        { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, "-=1.0")
+        .fromTo(this.el.nativeElement.querySelectorAll('.recent-chip'), 
+        { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.04 }, "-=0.8");
+    });
+
+    // Reaccionar a cambios de estado para animar la entrada de elementos en el DOM
+    effect(() => {
+      const currentStatus = this.status();
+      const currentResults = this.results(); // Leer para trackear
+
+      setTimeout(() => {
+        if (!this.el?.nativeElement) return;
+        
+        if (currentStatus === 'results') {
+          gsap.fromTo(this.el.nativeElement.querySelectorAll('.result-item'), 
+            { y: 24, opacity: 0 }, 
+            { y: 0, opacity: 1, duration: 0.8, ease: 'expo.out', stagger: 0.05, clearProps: 'all' }
+          );
+        } else if (currentStatus === 'loading') {
+          gsap.fromTo(this.el.nativeElement.querySelectorAll('.skeleton-item'), 
+            { y: 15, opacity: 0 }, 
+            { y: 0, opacity: 1, duration: 0.6, ease: 'expo.out', stagger: 0.05, clearProps: 'all' }
+          );
+        } else if (currentStatus === 'initial') {
+           gsap.fromTo(this.el.nativeElement.querySelectorAll('.recent-chip, .empty-state'), 
+            { y: 15, opacity: 0 }, 
+            { y: 0, opacity: 1, duration: 0.7, ease: 'expo.out', stagger: 0.04, clearProps: 'all' }
+          );
+        } else if (currentStatus === 'no-results' || currentStatus === 'error' || currentStatus === 'offline') {
+           gsap.fromTo(this.el.nativeElement.querySelector('.empty-state'), 
+            { y: 15, opacity: 0 }, 
+            { y: 0, opacity: 1, duration: 0.8, ease: 'expo.out', clearProps: 'all' }
+          );
+        }
+      }, 20); // Ligero delay para asegurar render de @if / @for
+    });
+  }
 
   ngOnInit(): void {
     this.recent.set(this.readRecent());
