@@ -15,6 +15,18 @@ html {
   ));
 }
 
+:root {
+  --color-bg-primary: #0D1B2A;
+  --color-bg-card: #1B3A5C;
+  --color-accent: #3A86FF;
+  --color-info: #48CAE4;
+  --color-sun: #FFD166;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #8BAEC8;
+  --color-danger: #EF4444;
+  --color-success: #10B981;
+}
+
 app-dashboard {
   display: block;
   min-height: 100dvh;
