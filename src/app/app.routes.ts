@@ -24,6 +24,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent)
   },
   {
+    path: APP_ROUTE_PATHS.search,
+    loadComponent: () => import('./features/search/search.component').then((m) => m.SearchComponent)
+  },
+  {
     path: APP_ROUTE_PATHS.onboarding,
     loadComponent: () => import('./pages/onboarding/onboarding.page').then((m) => m.OnboardingPage)
   },
