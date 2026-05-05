@@ -1,0 +1,282 @@
+<main class="search-shell font-body" role="main" [attr.aria-busy]="status() === 'loading'">
+
+  <!-- Fondo atmosférico (consistencia con Dashboard) -->
+  <div class="search-bg" aria-hidden="true">
+    <div class="search-bg__orb search-bg__orb--1"></div>
+    <div class="search-bg__orb search-bg__orb--2"></div>
+  </div>
+
+  <div class="search-container">
+
+    <!-- Header -->
+    <header class="search-header">
+      <div class="search-header__icon-wrap" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" class="search-header__icon">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="search-header__title">Buscar ciudad</h1>
+        <p class="search-header__subtitle">{{ subtitle }}</p>
+      </div>
+    </header>
+
+    <!-- Banner offline -->
+    @if (isOffline()) {
+      <div class="state-banner state-banner--offline" role="alert" aria-live="assertive">
+        <svg viewBox="0 0 24 24" fill="none" class="state-banner__icon" aria-hidden="true">
+          <path d="M3 8.5C8.6 4.2 15.4 4.2 21 8.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M6.5 12.3C10.1 9.6 13.9 9.6 17.5 12.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M10.2 16.1C11.4 15.2 12.6 15.2 13.8 16.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          <circle cx="12" cy="19" r="1.4" fill="currentColor"/>
+          <path d="M4 4L20 20" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+        </svg>
+        Sin conexión — la búsqueda no está disponible ahora
+      </div>
+    }
+
+    <!-- Input de búsqueda -->
+    <div class="search-input-wrap">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+        <mat-label>Ciudad o país</mat-label>
+
+        <!-- Ícono lupa como prefix -->
+        <span matPrefix class="search-prefix" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" class="search-prefix__icon">
+            <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M16 16L20.5 20.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="search-prefix-spacer" aria-hidden="true"></span>
+
+        <input
+          matInput
+          id="search-city-input"
+          type="search"
+          autocomplete="off"
+          [formControl]="queryControl"
+          placeholder="Ej: Buenos Aires, Madrid, Tokyo"
+          aria-describedby="search-hint"
+        />
+
+        @if (hasQuery()) {
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="clearQuery()"
+            aria-label="Limpiar búsqueda"
+            class="search-clear-btn"
+          >
+            <svg viewBox="0 0 24 24" fill="none" class="search-clear-btn__icon" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        }
+      </mat-form-field>
+
+      <p id="search-hint" class="search-hint">
+        Escribí al menos 2 caracteres para buscar.
+      </p>
+    </div>
+
+    <!-- ─── ESTADO: INITIAL — búsquedas recientes ─── -->
+    @if (status() === 'initial' || (status() === 'writing' && query().length === 0)) {
+      <section class="recent-section" aria-label="Búsquedas recientes">
+        <div class="section-heading">
+          <span class="section-heading__label">Recientes</span>
+          @if (recent().length > 0) {
+            <button
+              mat-button
+              type="button"
+              class="section-heading__action"
+              (click)="clearRecent()"
+            >
+              Limpiar
+            </button>
+          }
+        </div>
+
+        @if (recent().length > 0) {
+          <div class="recent-chips" role="list" aria-label="Ciudades buscadas recientemente">
+            @for (item of recent(); track item.id) {
+              <button
+                type="button"
+                class="recent-chip"
+                role="listitem"
+                (click)="selectRecent(item)"
+                [attr.aria-label]="'Buscar de nuevo: ' + item.label"
+              >
+                <svg viewBox="0 0 24 24" fill="none" class="recent-chip__icon" aria-hidden="true">
+                  <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>
+                <span>{{ item.label }}</span>
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="empty-state" aria-live="polite">
+            <svg viewBox="0 0 64 64" fill="none" class="empty-state__icon" aria-hidden="true">
+              <circle cx="30" cy="30" r="18" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+              <path d="M44 44L56 56" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+              <circle cx="30" cy="30" r="10" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+            </svg>
+            <p class="empty-state__title">Sin búsquedas recientes</p>
+            <p class="empty-state__body">Empezá escribiendo el nombre de una ciudad arriba.</p>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- ─── ESTADO: WRITING (< 2 chars) ─── -->
+    @if (status() === 'writing' && query().length > 0 && query().length < 2) {
+      <div class="status-message" aria-live="polite">
+        <svg viewBox="0 0 24 24" fill="none" class="status-message__icon" aria-hidden="true">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        Seguí escribiendo para iniciar la búsqueda…
+      </div>
+    }
+
+    <!-- ─── ESTADO: LOADING — skeletons ─── -->
+    @if (status() === 'loading') {
+      <div class="skeleton-list" aria-live="polite" aria-label="Buscando ciudades">
+        @for (item of [1, 2, 3]; track item) {
+          <div class="skeleton-item glass-card pulse" aria-hidden="true">
+            <div class="skeleton-item__pin"></div>
+            <div class="skeleton-item__lines">
+              <div class="skeleton-item__line skeleton-item__line--title"></div>
+              <div class="skeleton-item__line skeleton-item__line--sub"></div>
+            </div>
+          </div>
+        }
+        <p class="sr-only">Buscando ciudades…</p>
+      </div>
+    }
+
+    <!-- ─── ESTADO: RESULTS ─── -->
+    @if (status() === 'results') {
+      <section
+        class="results-section"
+        aria-live="polite"
+        [attr.aria-label]="results().length + ' resultados para ' + query()"
+      >
+        <div class="section-heading">
+          <span class="section-heading__label">
+            {{ results().length }} {{ results().length === 1 ? 'resultado' : 'resultados' }}
+          </span>
+        </div>
+
+        <ul class="results-list" role="list">
+          @for (city of results(); track city.id) {
+            <li
+              class="result-item glass-card"
+              role="listitem"
+              matRipple
+              [matRippleColor]="'rgba(58,134,255,0.08)'"
+              tabindex="0"
+              (click)="selectCity(city)"
+              (keydown.enter)="selectCity(city)"
+              (keydown.space)="selectCity(city)"
+              [attr.aria-label]="'Ver clima de ' + city.name + ', ' + city.country"
+            >
+              <!-- Pin ícono -->
+              <div class="result-item__pin" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" class="result-item__pin-icon">
+                  <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z"
+                    fill="currentColor" fill-opacity="0.15"
+                    stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  <circle cx="12" cy="10" r="2.2" fill="currentColor"/>
+                </svg>
+              </div>
+
+              <!-- Texto -->
+              <div class="result-item__text">
+                <strong class="result-item__name">{{ city.name }}</strong>
+                <span class="result-item__location">
+                  {{ city.region ? city.region + ', ' : '' }}{{ city.country }}
+                  <span class="result-item__code">{{ city.countryCode }}</span>
+                </span>
+              </div>
+
+              <!-- Botón favorito -->
+              <button
+                mat-icon-button
+                type="button"
+                class="result-item__fav-btn"
+                [class.result-item__fav-btn--active]="isFavorite(city)"
+                (click)="toggleFavorite(city, $event)"
+                [attr.aria-label]="isFavorite(city) ? 'Quitar ' + city.name + ' de favoritos' : 'Agregar ' + city.name + ' a favoritos'"
+              >
+                @if (isFavorite(city)) {
+                  <!-- Estrella llena -->
+                  <svg viewBox="0 0 24 24" fill="currentColor" class="fav-icon" aria-hidden="true">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                } @else {
+                  <!-- Estrella vacía -->
+                  <svg viewBox="0 0 24 24" fill="none" class="fav-icon" aria-hidden="true">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                  </svg>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <!-- ─── ESTADO: NO-RESULTS ─── -->
+    @if (status() === 'no-results') {
+      <div class="empty-state empty-state--padded" aria-live="polite">
+        <svg viewBox="0 0 64 64" fill="none" class="empty-state__icon" aria-hidden="true">
+          <circle cx="30" cy="30" r="18" stroke="currentColor" stroke-width="2" opacity="0.25"/>
+          <path d="M44 44L56 56" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>
+          <path d="M24 36s2-4 6-4 6 4 6 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+          <circle cx="26" cy="27" r="2" fill="currentColor" opacity="0.5"/>
+          <circle cx="34" cy="27" r="2" fill="currentColor" opacity="0.5"/>
+        </svg>
+        <p class="empty-state__title">No encontramos "{{ query() }}"</p>
+        <p class="empty-state__body">
+          Revisá el nombre o probá con ciudad y país,<br>por ejemplo: <em>Lima, Peru</em>
+        </p>
+      </div>
+    }
+
+    <!-- ─── ESTADO: ERROR ─── -->
+    @if (status() === 'error') {
+      <div class="empty-state empty-state--padded state-banner--error" role="alert" aria-live="assertive">
+        <svg viewBox="0 0 64 64" fill="none" class="empty-state__icon" aria-hidden="true">
+          <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+          <path d="M32 20v16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="32" cy="43" r="2" fill="currentColor"/>
+        </svg>
+        <p class="empty-state__title">Ocurrió un error</p>
+        <p class="empty-state__body">No pudimos completar la búsqueda. Verificá tu conexión e intentá de nuevo.</p>
+        <button
+          mat-stroked-button
+          type="button"
+          class="retry-btn"
+          (click)="retrySearch()"
+        >
+          <svg viewBox="0 0 24 24" fill="none" class="retry-btn__icon" aria-hidden="true">
+            <path d="M20 12A8 8 0 1 1 17.7 6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M20 4.5V10H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Reintentar
+        </button>
+      </div>
+    }
+
+    <!-- ─── ESTADO: OFFLINE + query activo ─── -->
+    @if (status() === 'offline' && query().length > 0) {
+      <div class="empty-state empty-state--padded" aria-live="polite">
+        <p class="empty-state__title">Sin conexión</p>
+        <p class="empty-state__body">Podés usar tus búsquedas recientes mientras volvés a conectarte.</p>
+      </div>
+    }
+
+  </div>
+</main>
