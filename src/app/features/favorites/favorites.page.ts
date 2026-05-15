@@ -63,10 +63,8 @@ type ComparisonResult = {
 
 type ComparisonOverview = {
   reference: FavoriteCity;
-  warmest: string;
-  rainiest: string;
-  windiest: string;
-  spread: string;
+  heroHeadline: string;
+  heroBadge: string;
 };
 
 const INITIAL_FAVORITES: FavoriteCity[] = [
@@ -219,19 +217,16 @@ export class FavoritesPage implements OnInit, OnDestroy {
 
     const warmest = cities.reduce((current, city) => (city.temp > current.temp ? city : current));
     const coldest = cities.reduce((current, city) => (city.temp < current.temp ? city : current));
-    const rainiest = cities.reduce((current, city) =>
-      city.precipChance > current.precipChance ? city : current
-    );
-    const windiest = cities.reduce((current, city) => (city.windSpeed > current.windSpeed ? city : current));
+    const tempDelta = warmest.temp - coldest.temp;
 
     return {
       reference: cities[0],
-      warmest: `${warmest.name} es la más cálida con ${warmest.temp}°`,
-      rainiest: hasRainRisk(rainiest)
-        ? `${rainiest.name} concentra la mayor probabilidad de lluvia, ${rainiest.precipChance}%`
-        : 'Ninguna ciudad muestra lluvia probable en esta selección',
-      windiest: `${windiest.name} tiene el viento más intenso, ${windiest.windSpeed} km/h`,
-      spread: `La brecha térmica total es de ${warmest.temp - coldest.temp}° entre ${warmest.name} y ${coldest.name}`
+      heroHeadline: tempDelta === 0
+        ? `${cities[0].name} y ${cities[1].name} tienen la misma temperatura`
+        : `${warmest.name} está ${tempDelta}° más cálida que ${coldest.name}`,
+      heroBadge: tempDelta === 0
+        ? 'Igual'
+        : `+${tempDelta}° vs ${coldest.name}`
     };
   });
 

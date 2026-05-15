@@ -283,137 +283,72 @@
       </div>
 
       @if (compareOverview(); as overview) {
-        <div class="compare-overview">
-          <article class="compare-reference">
-            <div class="compare-reference__header">
-              <div>
-                <p class="compare-reference__eyebrow">Ciudad base</p>
-                <h3 class="compare-reference__title">{{ overview.reference.name }}</h3>
-                <p class="compare-reference__region">
-                  {{ overview.reference.country }} · {{ overview.reference.countryCode }}
-                </p>
-              </div>
+        @for (comparison of comparisonResults(); track comparison.city.id) {
+          <!-- ① HEADLINE HERO -->
+          <div class="compare-hero">
+            <h3 class="compare-hero__headline">{{ comparison.headline }}</h3>
+            <span class="compare-hero__badge">{{ comparison.differenceLabel }}</span>
+          </div>
 
-              <div class="compare-reference__badge">
-                <span class="compare-reference__badge-value font-mono">{{ overview.reference.temp }}°</span>
-                <span class="compare-reference__badge-copy">{{ overview.reference.conditionLabel }}</span>
-              </div>
-            </div>
+          <div class="compare-divider" aria-hidden="true"></div>
 
-            <div class="compare-reference__hero">
-              <div class="compare-reference__icon-shell" [style.background]="overview.reference.accent">
-                <img
-                  [src]="overview.reference.icon"
-                  [alt]="overview.reference.conditionLabel"
-                  class="compare-reference__icon"
-                />
-              </div>
-
-              <div class="compare-reference__stats">
-                <div>
-                  <span class="compare-reference__stat-label">Sensación</span>
-                  <strong class="compare-reference__stat-value font-mono">{{ overview.reference.feelsLike }}°</strong>
-                </div>
-                <div>
-                  <span class="compare-reference__stat-label">Lluvia</span>
-                  <strong class="compare-reference__stat-value font-mono">{{ overview.reference.precipChance }}%</strong>
-                </div>
-                <div>
-                  <span class="compare-reference__stat-label">Viento</span>
-                  <strong class="compare-reference__stat-value font-mono">{{ overview.reference.windSpeed }} km/h</strong>
-                </div>
-                <div>
-                  <span class="compare-reference__stat-label">Humedad</span>
-                  <strong class="compare-reference__stat-value font-mono">{{ overview.reference.humidity }}%</strong>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <div class="compare-overview__cards">
-            <article class="compare-overview-card">
-              <span class="compare-overview-card__label">Más cálida</span>
-              <p class="compare-overview-card__value">{{ overview.warmest }}</p>
+          <!-- ② FACE-OFF -->
+          <div class="compare-faceoff">
+            <article class="compare-faceoff__city compare-faceoff__city--reference">
+              <p class="compare-faceoff__name">{{ overview.reference.name }}</p>
+              <p class="compare-faceoff__region">{{ overview.reference.country }} · {{ overview.reference.countryCode }}</p>
+              <span class="compare-faceoff__temp font-display">{{ overview.reference.temp }}°</span>
+              <p class="compare-faceoff__condition">{{ overview.reference.conditionLabel }}</p>
             </article>
 
-            <article class="compare-overview-card">
-              <span class="compare-overview-card__label">Lluvia</span>
-              <p class="compare-overview-card__value">{{ overview.rainiest }}</p>
-            </article>
+            <span class="compare-faceoff__versus">VS</span>
 
-            <article class="compare-overview-card">
-              <span class="compare-overview-card__label">Viento</span>
-              <p class="compare-overview-card__value">{{ overview.windiest }}</p>
-            </article>
-
-            <article class="compare-overview-card">
-              <span class="compare-overview-card__label">Brecha térmica</span>
-              <p class="compare-overview-card__value">{{ overview.spread }}</p>
+            <article class="compare-faceoff__city">
+              <p class="compare-faceoff__name">{{ comparison.city.name }}</p>
+              <p class="compare-faceoff__region">{{ comparison.city.country }} · {{ comparison.city.countryCode }}</p>
+              <span class="compare-faceoff__temp font-display">{{ comparison.city.temp }}°</span>
+              <p class="compare-faceoff__condition">{{ comparison.city.conditionLabel }}</p>
             </article>
           </div>
-        </div>
 
-        <div class="comparison-list">
-          @for (comparison of comparisonResults(); track comparison.city.id) {
-            <article class="comparison-result">
-              <div class="comparison-result__header">
-                <div>
-                  <p class="comparison-result__eyebrow">{{ overview.reference.name }} vs {{ comparison.city.name }}</p>
-                  <h3 class="comparison-result__title">{{ comparison.headline }}</h3>
-                </div>
-                <span class="comparison-result__delta">{{ comparison.differenceLabel }}</span>
-              </div>
+          <div class="compare-divider" aria-hidden="true"></div>
 
-              <div class="comparison-result__cities">
-                <article class="comparison-city comparison-city--reference">
-                  <div class="comparison-city__top">
-                    <div>
-                      <p class="comparison-city__name">{{ overview.reference.name }}</p>
-                      <p class="comparison-city__region">{{ overview.reference.country }} · {{ overview.reference.countryCode }}</p>
-                    </div>
-                    <span class="comparison-city__temp font-display">{{ overview.reference.temp }}°</span>
-                  </div>
-                  <p class="comparison-city__condition">{{ overview.reference.conditionLabel }}</p>
+          <!-- ③ DIFERENCIAS CLAVE -->
+          <div class="compare-insights">
+            <p class="compare-insights__label">Diferencias clave</p>
+            <ul class="compare-insights__list">
+              @for (item of comparison.summary; track item) {
+                <li class="compare-insights__item">{{ item }}</li>
+              }
+            </ul>
+          </div>
+
+          <div class="compare-divider" aria-hidden="true"></div>
+
+          <!-- ④ DETALLES NUMÉRICOS -->
+          <div class="compare-metrics">
+            <p class="compare-metrics__label">Detalles numéricos</p>
+            <div class="compare-metrics__grid">
+              @for (metric of comparison.metrics; track metric.label) {
+                <article
+                  class="compare-metric-card"
+                  [class.compare-metric-card--accent]="metric.tone === 'accent'"
+                  [class.compare-metric-card--info]="metric.tone === 'info'"
+                  [class.compare-metric-card--sun]="metric.tone === 'sun'"
+                  [class.compare-metric-card--success]="metric.tone === 'success'"
+                >
+                  <span class="compare-metric-card__label">{{ metric.label }}</span>
+                  <strong class="compare-metric-card__value font-mono">{{ metric.value }}</strong>
+                  <span class="compare-metric-card__helper">{{ metric.helper }}</span>
                 </article>
+              }
+            </div>
+          </div>
 
-                <span class="comparison-result__versus">VS</span>
-
-                <article class="comparison-city">
-                  <div class="comparison-city__top">
-                    <div>
-                      <p class="comparison-city__name">{{ comparison.city.name }}</p>
-                      <p class="comparison-city__region">{{ comparison.city.country }} · {{ comparison.city.countryCode }}</p>
-                    </div>
-                    <span class="comparison-city__temp font-display">{{ comparison.city.temp }}°</span>
-                  </div>
-                  <p class="comparison-city__condition">{{ comparison.city.conditionLabel }}</p>
-                </article>
-              </div>
-
-              <ul class="comparison-result__insights">
-                @for (item of comparison.summary; track item) {
-                  <li class="comparison-result__insight">{{ item }}</li>
-                }
-              </ul>
-
-              <div class="comparison-result__metrics">
-                @for (metric of comparison.metrics; track metric.label) {
-                  <article
-                    class="comparison-metric"
-                    [class.comparison-metric--accent]="metric.tone === 'accent'"
-                    [class.comparison-metric--info]="metric.tone === 'info'"
-                    [class.comparison-metric--sun]="metric.tone === 'sun'"
-                    [class.comparison-metric--success]="metric.tone === 'success'"
-                  >
-                    <span class="comparison-metric__label">{{ metric.label }}</span>
-                    <strong class="comparison-metric__value font-mono">{{ metric.value }}</strong>
-                    <span class="comparison-metric__helper">{{ metric.helper }}</span>
-                  </article>
-                }
-              </div>
-            </article>
+          @if (!$last) {
+            <div class="compare-section-break" aria-hidden="true"></div>
           }
-        </div>
+        }
       } @else {
         <div class="compare-empty">
           <p class="compare-empty__title">Elegí al menos dos ciudades para activar la comparación.</p>
