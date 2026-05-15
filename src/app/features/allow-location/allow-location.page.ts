@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { gsap } from 'gsap';
 import * as THREE from 'three';
 
-import { APP_ROUTE_PATHS } from '../../shared/constants/app-routes';
+import { APP_ROUTE_PATHS } from '../../core/routing/app-route-paths';
 import { createStarfieldState, drawStarfieldFrame, StarfieldState } from '../../shared/utils/canvas-starfield';
 import { DisposableResource, disposeSceneResources, SceneResourceRoot } from '../../shared/utils/three-disposal';
 

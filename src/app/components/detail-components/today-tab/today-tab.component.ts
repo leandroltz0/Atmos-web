@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { SectionCardComponent } from '../../../../shared/components/section-card';
-import { StatCellComponent } from '../../../../shared/components/stat-cell';
-import { UvBadgeComponent, type UvLevel } from '../../../../shared/components/uv-badge';
+import { SectionCardComponent } from '../section-card';
+import { StatCellComponent } from '../stat-cell';
+import { UvBadgeComponent, type UvLevel } from '../uv-badge';
 
 export interface TodayHighlight {
   label: string;

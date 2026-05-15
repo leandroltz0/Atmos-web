@@ -40,14 +40,14 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('es-AR', {
 });
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-dashboard-page',
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatTooltipModule, ScrollingModule, WeatherIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+  templateUrl: './dashboard.page.html',
+  styleUrl: './dashboard.page.scss'
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardPage implements OnInit, OnDestroy {
   protected readonly currentWeather = signal<CurrentWeather>({ ...MOCK_CURRENT });
   protected readonly hourlyForecast = signal<HourlyForecast[]>([...MOCK_HOURLY]);
   protected readonly dailyForecast = signal<DailyForecast[]>([...MOCK_DAILY]);

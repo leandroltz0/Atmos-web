@@ -12,7 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import * as THREE from 'three';
 
-import { APP_ROUTE_PATHS } from '../../shared/constants/app-routes';
+import { APP_ROUTE_PATHS } from '../../core/routing/app-route-paths';
 import { createStarfieldState, drawStarfieldFrame, StarfieldState } from '../../shared/utils/canvas-starfield';
 import { DisposableResource, disposeMaterial } from '../../shared/utils/three-disposal';
 

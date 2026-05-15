@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
 
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
-import { APP_ROUTE_PATHS } from '../../shared/constants/app-routes';
+import { APP_ROUTE_PATHS } from '../../core/routing/app-route-paths';
 
 type SearchStatus = 'initial' | 'writing' | 'loading' | 'results' | 'no-results' | 'error' | 'offline';
 
@@ -69,7 +69,7 @@ const MOCK_CITIES: CityItem[] = [
 ];
 
 @Component({
-  selector: 'app-search',
+  selector: 'app-search-page',
   standalone: true,
   imports: [
     CommonModule,
@@ -80,11 +80,11 @@ const MOCK_CITIES: CityItem[] = [
     MatProgressSpinnerModule,
     MatRippleModule
   ],
-  templateUrl: './search.component.html',
-  styleUrl: './search.component.scss',
+  templateUrl: './search.page.html',
+  styleUrl: './search.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchComponent implements OnInit, OnDestroy {
+export class SearchPage implements OnInit, OnDestroy {
   protected readonly queryControl = new FormControl('', { nonNullable: true });
   protected readonly status = signal<SearchStatus>('initial');
   protected readonly results = signal<CityItem[]>([]);

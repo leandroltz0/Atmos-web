@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { AqiPanelComponent } from '../../../../shared/components/aqi-panel';
-import { MoonPhaseComponent } from '../../../../shared/components/moon-phase';
-import { RainBarsChartComponent } from '../../../../shared/components/rain-bars-chart';
-import { SectionCardComponent } from '../../../../shared/components/section-card';
-import { StatCellComponent } from '../../../../shared/components/stat-cell';
-import { SunTimelineComponent } from '../../../../shared/components/sun-timeline';
-import { UvTimelineComponent } from '../../../../shared/components/uv-timeline';
-import { WindRoseComponent } from '../../../../shared/components/wind-rose';
+import { AqiPanelComponent } from '../aqi-panel';
+import { MoonPhaseComponent } from '../moon-phase';
+import { RainBarsChartComponent } from '../rain-bars-chart';
+import { SectionCardComponent } from '../section-card';
+import { StatCellComponent } from '../stat-cell';
+import { SunTimelineComponent } from '../sun-timeline';
+import { UvTimelineComponent } from '../uv-timeline';
+import { WindRoseComponent } from '../wind-rose';
 import {
   HourlyChartComponent,
   type HourlyChartDatum

@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { WeatherTabsComponent } from '../../shared/components/weather-tabs';
-import { DetailTabComponent } from '../../features/detail/tabs/detail/detail-tab.component';
-import type { HourlyChartDatum } from '../../features/detail/tabs/detail/components/hourly-chart/hourly-chart.component';
+import { WeatherTabsComponent } from '../../components/detail-components/weather-tabs';
+import { DetailTabComponent } from '../../components/detail-components/detail-tab/detail-tab.component';
+import type { HourlyChartDatum } from '../../components/detail-components/detail-tab/components/hourly-chart/hourly-chart.component';
 import {
   TodayTabComponent,
   type TodayForecastItem,
   type TodayHighlight
-} from '../../features/detail/tabs/today/today-tab.component';
-import { WeeklyTabComponent } from '../../features/detail/tabs/weekly/weekly-tab.component';
+} from '../../components/detail-components/today-tab/today-tab.component';
+import { WeeklyTabComponent } from '../../components/detail-components/weekly-tab/weekly-tab.component';
 
 @Component({
   selector: 'app-detail-page',
