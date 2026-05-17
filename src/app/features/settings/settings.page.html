@@ -1,0 +1,128 @@
+<main class="settings-shell font-body" role="main" [attr.aria-busy]="false">
+  <div class="settings-bg" aria-hidden="true">
+    <div class="settings-bg__orb settings-bg__orb--1"></div>
+    <div class="settings-bg__orb settings-bg__orb--2"></div>
+    <div class="settings-bg__orb settings-bg__orb--3"></div>
+  </div>
+
+  <div class="settings-container">
+    <header class="settings-header">
+      <button
+        mat-icon-button
+        type="button"
+        class="settings-back-btn"
+        aria-label="Volver"
+        (click)="onGoBack()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" class="settings-back-icon" aria-hidden="true">
+          <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="settings-header__copy">
+        <p class="settings-eyebrow">Preferencias</p>
+        <h1 class="settings-title">Ajustes</h1>
+      </div>
+
+      <span class="settings-version-badge" aria-label="Versión de la app">
+        v{{ appVersion() }}
+      </span>
+    </header>
+
+    <div class="settings-groups">
+      @for (group of groups(); track group.id) {
+        <section class="settings-group" [attr.aria-label]="group.label">
+          <div class="settings-group__header">
+            <div class="settings-group__icon-shell">
+              @switch (group.icon) {
+                @case ('ruler') {
+                  <svg viewBox="0 0 24 24" fill="none" class="settings-group__icon" aria-hidden="true">
+                    <path d="M2 12h4m2 0h2m2 0h2m2 0h2m2 0h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M6 8v8M10 10v4M14 10v4M18 8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                }
+                @case ('palette') {
+                  <svg viewBox="0 0 24 24" fill="none" class="settings-group__icon" aria-hidden="true">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.1 0 2-.9 2-2 0-.49-.18-.96-.51-1.34A1.98 1.98 0 0113 17.5c0-1.1.9-2 2-2h2.34C19.89 15.5 22 13.39 22 10.84 22 5.94 17.52 2 12 2Z" stroke="currentColor" stroke-width="1.6"/>
+                    <circle cx="7.5" cy="11.5" r="1.5" fill="currentColor"/>
+                    <circle cx="10.5" cy="7.5" r="1.5" fill="currentColor"/>
+                    <circle cx="15" cy="7.5" r="1.5" fill="currentColor"/>
+                  </svg>
+                }
+                @case ('bell') {
+                  <svg viewBox="0 0 24 24" fill="none" class="settings-group__icon" aria-hidden="true">
+                    <path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9ZM13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
+                @case ('cloud') {
+                  <svg viewBox="0 0 24 24" fill="none" class="settings-group__icon" aria-hidden="true">
+                    <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                }
+              }
+            </div>
+            <h2 class="settings-group__label">{{ group.label }}</h2>
+          </div>
+
+          <div class="settings-group__items">
+            @for (item of group.items; track item.id) {
+              <div class="settings-item" [attr.id]="'setting-' + item.id">
+                <div class="settings-item__content">
+                  <span class="settings-item__label">{{ item.label }}</span>
+                  <span class="settings-item__description">{{ item.description }}</span>
+                </div>
+
+                <div class="settings-item__control">
+                  @if (isToggle(item)) {
+                    <mat-slide-toggle
+                      [checked]="item.value"
+                      (change)="onToggleChanged(group.id, item.id, $event.checked)"
+                      [attr.aria-label]="item.label"
+                      color="primary"
+                    ></mat-slide-toggle>
+                  }
+
+                  @if (isSelect(item)) {
+                    <div class="settings-select-wrap">
+                      <select
+                        class="settings-select"
+                        [value]="item.value"
+                        (change)="onSelectChanged(group.id, item.id, $any($event.target).value)"
+                        [attr.aria-label]="item.label"
+                      >
+                        @for (opt of item.options; track opt.value) {
+                          <option [value]="opt.value" [selected]="opt.value === item.value">
+                            {{ opt.label }}
+                          </option>
+                        }
+                      </select>
+                      <svg viewBox="0 0 24 24" fill="none" class="settings-select__chevron" aria-hidden="true">
+                        <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  }
+
+                  @if (isAction(item)) {
+                    <button
+                      mat-stroked-button
+                      type="button"
+                      class="settings-action-btn"
+                      (click)="onActionTriggered(group.id, item.id)"
+                    >
+                      {{ item.actionLabel }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    </div>
+
+    <footer class="settings-footer">
+      <p class="settings-footer__text">ATMOS Weather App · v{{ appVersion() }}</p>
+      <p class="settings-footer__sub">Datos de Open-Meteo · Sin conexión a la nube</p>
+    </footer>
+  </div>
+</main>

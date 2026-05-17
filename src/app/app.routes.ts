@@ -5,7 +5,11 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: APP_ROUTE_PATHS.favorites,
+    redirectTo: APP_ROUTE_PATHS.settings,
+  },
+  {
+    path: APP_ROUTE_PATHS.settings,
+    loadComponent: () => import('./features/settings/settings.page').then((m) => m.SettingsPage)
   },
   {
     path: APP_ROUTE_PATHS.favorites,

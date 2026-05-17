@@ -1,0 +1,388 @@
+// ─── Settings Shell ───
+.settings-shell {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  overflow-x: clip;
+}
+
+// ─── Background Orbs ───
+.settings-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.settings-bg__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+}
+
+.settings-bg__orb--1 {
+  width: 55vw;
+  height: 55vw;
+  max-width: 440px;
+  max-height: 440px;
+  top: -10%;
+  left: -8%;
+  background: radial-gradient(circle, rgba(58, 134, 255, 0.14) 0%, transparent 72%);
+}
+
+.settings-bg__orb--2 {
+  width: 40vw;
+  height: 40vw;
+  max-width: 320px;
+  max-height: 320px;
+  bottom: 8%;
+  right: -6%;
+  background: radial-gradient(circle, rgba(72, 202, 228, 0.10) 0%, transparent 72%);
+}
+
+.settings-bg__orb--3 {
+  width: 24vw;
+  height: 24vw;
+  max-width: 200px;
+  max-height: 200px;
+  top: 55%;
+  left: 45%;
+  background: radial-gradient(circle, rgba(255, 209, 102, 0.09) 0%, transparent 72%);
+}
+
+// ─── Container ───
+.settings-container {
+  position: relative;
+  z-index: 1;
+  width: min(680px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.25rem 0 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ─── Header ───
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.settings-back-btn {
+  display: grid !important;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-primary);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 180ms ease, background 180ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.settings-back-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.settings-header__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-eyebrow {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+
+.settings-title {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.settings-version-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+// ─── Groups ───
+.settings-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-group {
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+    rgba(12, 24, 38, 0.56);
+  backdrop-filter: blur(18px) saturate(125%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 16px 32px rgba(4, 10, 18, 0.14);
+  overflow: hidden;
+}
+
+.settings-group__header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 1.15rem 0.6rem;
+}
+
+.settings-group__icon-shell {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: rgba(58, 134, 255, 0.12);
+  border: 1px solid rgba(58, 134, 255, 0.18);
+  color: var(--color-accent);
+}
+
+.settings-group__icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.settings-group__label {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+// ─── Items ───
+.settings-group__items {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 62px;
+  padding: 0.65rem 1.15rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 150ms ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  &:last-child {
+    padding-bottom: 0.85rem;
+  }
+}
+
+.settings-item__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.settings-item__label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.settings-item__description {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.settings-item__control {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+// ─── Select Control ───
+.settings-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.settings-select {
+  appearance: none;
+  min-height: 38px;
+  padding: 0.4rem 2rem 0.4rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 180ms ease, background 180ms ease;
+
+  &:hover {
+    border-color: rgba(58, 134, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &:focus-visible {
+    border-color: rgba(58, 134, 255, 0.5);
+    box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.15);
+  }
+
+  option {
+    background: #1B3A5C;
+    color: #fff;
+  }
+}
+
+.settings-select__chevron {
+  position: absolute;
+  right: 0.55rem;
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+// ─── Action Button ───
+.settings-action-btn {
+  min-height: 38px !important;
+  border-radius: 12px !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: var(--color-text-primary) !important;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  padding: 0 1rem !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 180ms ease, background 180ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+// ─── Mat Slide Toggle Override ───
+.settings-item .mat-mdc-slide-toggle {
+  --mdc-switch-selected-track-color: var(--color-accent);
+  --mdc-switch-selected-handle-color: #fff;
+  --mdc-switch-selected-hover-track-color: var(--color-accent);
+  --mdc-switch-selected-focus-track-color: var(--color-accent);
+  --mdc-switch-selected-pressed-track-color: var(--color-accent);
+  --mdc-switch-unselected-track-color: rgba(255, 255, 255, 0.12);
+  --mdc-switch-unselected-handle-color: rgba(255, 255, 255, 0.5);
+  --mdc-switch-unselected-hover-track-color: rgba(255, 255, 255, 0.16);
+  --mdc-switch-unselected-focus-track-color: rgba(255, 255, 255, 0.14);
+  --mdc-switch-unselected-pressed-track-color: rgba(255, 255, 255, 0.18);
+}
+
+// ─── Footer ───
+.settings-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.5rem 0 0.5rem;
+}
+
+.settings-footer__text {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: -0.01em;
+}
+
+.settings-footer__sub {
+  margin: 0;
+  font-size: 0.72rem;
+  color: rgba(139, 174, 200, 0.6);
+}
+
+// ─── Focus visible ───
+.settings-back-btn:focus-visible,
+.settings-action-btn:focus-visible {
+  outline: 2px solid rgba(58, 134, 255, 0.45);
+  outline-offset: 2px;
+}
+
+// ─── Responsive: Tablet (≥768px) ───
+@media (min-width: 768px) {
+  .settings-container {
+    padding: 2rem 0 3.5rem;
+    gap: 1.75rem;
+  }
+
+  .settings-group__header {
+    padding: 1.15rem 1.35rem 0.7rem;
+  }
+
+  .settings-item {
+    min-height: 68px;
+    padding: 0.75rem 1.35rem;
+  }
+}
+
+// ─── Responsive: Desktop (≥1200px) ───
+@media (min-width: 1200px) {
+  .settings-container {
+    padding: 2.5rem 0 4rem;
+  }
+}
+
+// ─── Reduced motion ───
+@media (prefers-reduced-motion: reduce) {
+  .settings-back-btn,
+  .settings-action-btn,
+  .settings-select {
+    transition: none;
+  }
+}

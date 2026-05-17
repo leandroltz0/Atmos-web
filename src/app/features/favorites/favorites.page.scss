@@ -334,6 +334,9 @@
 
 .favorite-card__accent {
   position: absolute;
+  width: 96%;           /* O un ancho fijo como 300px */
+  margin-left: auto;
+  margin-right: auto;
   inset: 0 0 auto 0;
   height: 2px;
   border-radius: 24px 24px 0 0;
