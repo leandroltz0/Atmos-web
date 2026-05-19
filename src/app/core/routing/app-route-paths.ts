@@ -1,4 +1,5 @@
 export const APP_ROUTE_PATHS = {
+  auth: 'auth',
   favorites: 'favorites',
   detail: 'detail',
   onboarding: 'onboarding',

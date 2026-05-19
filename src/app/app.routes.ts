@@ -5,7 +5,11 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: APP_ROUTE_PATHS.profile,
+    redirectTo: APP_ROUTE_PATHS.auth,
+  },
+  {
+    path: APP_ROUTE_PATHS.auth,
+    loadComponent: () => import('./features/auth/auth.page').then((m) => m.AuthPage)
   },
   {
     path: APP_ROUTE_PATHS.settings,

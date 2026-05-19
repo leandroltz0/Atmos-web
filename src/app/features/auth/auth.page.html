@@ -1,0 +1,307 @@
+<main class="auth-shell" #shell>
+  <div class="auth-background" aria-hidden="true">
+    <div class="auth-background__orb auth-background__orb--primary"></div>
+    <div class="auth-background__orb auth-background__orb--info"></div>
+    <div class="auth-background__grid"></div>
+  </div>
+
+  <section class="auth-stage">
+    <header class="auth-topbar auth-reveal">
+      <div class="auth-brand" aria-label="ATMOS">
+        <span class="auth-brand__mark">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span class="auth-brand__name">ATMOS</span>
+      </div>
+
+      <div class="auth-topbar__chips" aria-hidden="true">
+        <span>Forecasts</span>
+        <span>Favorites</span>
+        <span>Alerts</span>
+      </div>
+    </header>
+
+    <div class="auth-layout">
+      <section class="auth-panel auth-panel--form auth-reveal" aria-labelledby="auth-heading">
+        <div class="auth-panel__inner">
+          <p class="auth-kicker">Private weather access</p>
+          <h1 class="auth-title" id="auth-heading">
+            {{ mode() === 'signin' ? 'Enter your weather desk.' : 'Create your weather space.' }}
+          </h1>
+          <p class="auth-copy">
+            {{ mode() === 'signin'
+              ? 'Resume your saved cities, comparisons, and alert preferences from one calm workspace.'
+              : 'Set up your account to sync favorite cities, comparisons, and location-aware alerts across devices.' }}
+          </p>
+
+          <mat-button-toggle-group
+            class="auth-mode-toggle"
+            [value]="mode()"
+            (valueChange)="setMode($event)"
+            aria-label="Authentication mode"
+            hideSingleSelectionIndicator="true"
+          >
+            <mat-button-toggle value="signin">Sign in</mat-button-toggle>
+            <mat-button-toggle value="signup">Create account</mat-button-toggle>
+          </mat-button-toggle-group>
+
+          <button
+            mat-stroked-button
+            type="button"
+            class="auth-google-btn"
+            (click)="continueWithGoogle()"
+            [disabled]="isSubmitting()"
+          >
+            <span class="auth-google-btn__content">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.2-.9 2.2-1.9 2.9l3 2.3c1.8-1.7 2.9-4.2 2.9-7.2 0-.7-.1-1.3-.2-1.9H12z" />
+                <path fill="#34A853" d="M12 21c2.6 0 4.9-.9 6.5-2.4l-3-2.3c-.8.6-1.9 1-3.5 1-2.7 0-5-1.8-5.8-4.3l-3.1 2.4C4.7 18.8 8.1 21 12 21z" />
+                <path fill="#4A90E2" d="M6.2 13c-.2-.6-.3-1.2-.3-1.9s.1-1.3.3-1.9L3.1 6.8C2.4 8.2 2 9.6 2 11.1s.4 2.9 1.1 4.2L6.2 13z" />
+                <path fill="#FBBC05" d="M12 4.8c1.4 0 2.6.5 3.6 1.4l2.7-2.7C16.7 1.9 14.5 1 12 1 8.1 1 4.7 3.2 3.1 6.8l3.1 2.4C7 6.6 9.3 4.8 12 4.8z" />
+              </svg>
+              <span>Continue with Google</span>
+            </span>
+          </button>
+
+          <div class="auth-divider" aria-hidden="true">
+            <span></span>
+            <small>or continue with email</small>
+            <span></span>
+          </div>
+
+          @if (mode() === 'signin') {
+            <form
+              class="auth-form auth-form--signin"
+              [formGroup]="signInForm"
+              (ngSubmit)="submit()"
+              novalidate
+            >
+              <mat-form-field appearance="outline" class="auth-field">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="email" autocomplete="email" />
+                @if (shouldShowControlError(signInForm.controls.email)) {
+                  <mat-error>Enter a valid email address.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="auth-field">
+                <mat-label>Password</mat-label>
+                <input
+                  matInput
+                  [type]="hideSignInPassword() ? 'password' : 'text'"
+                  formControlName="password"
+                  autocomplete="current-password"
+                />
+                <button
+                  mat-icon-button
+                  matSuffix
+                  type="button"
+                  class="auth-visibility-btn"
+                  [attr.aria-label]="hideSignInPassword() ? 'Show password' : 'Hide password'"
+                  (click)="toggleSignInPasswordVisibility()"
+                >
+                  <mat-icon>{{ hideSignInPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+                </button>
+                @if (shouldShowControlError(signInForm.controls.password)) {
+                  <mat-error>Password must be at least 8 characters.</mat-error>
+                }
+              </mat-form-field>
+
+              <div class="auth-row">
+                <mat-checkbox formControlName="remember" class="auth-checkbox">
+                  Keep me signed in
+                </mat-checkbox>
+                <button type="button" mat-button class="auth-link-btn">Forgot password?</button>
+              </div>
+
+              <button
+                mat-flat-button
+                type="submit"
+                class="auth-submit-btn"
+                [disabled]="isSubmitting()"
+              >
+                @if (isSubmitting()) {
+                  <mat-progress-spinner
+                    mode="indeterminate"
+                    diameter="18"
+                    strokeWidth="2.5"
+                  ></mat-progress-spinner>
+                } @else {
+                  <span>Sign in</span>
+                }
+              </button>
+            </form>
+          } @else {
+            <form
+              class="auth-form auth-form--signup"
+              [formGroup]="signUpForm"
+              (ngSubmit)="submit()"
+              novalidate
+            >
+              <mat-form-field appearance="outline" class="auth-field">
+                <mat-label>Full name</mat-label>
+                <input matInput type="text" formControlName="fullName" autocomplete="name" />
+                @if (shouldShowControlError(signUpForm.controls.fullName)) {
+                  <mat-error>Enter your full name.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="auth-field">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" formControlName="email" autocomplete="email" />
+                @if (shouldShowControlError(signUpForm.controls.email)) {
+                  <mat-error>Enter a valid email address.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="auth-field">
+                <mat-label>Password</mat-label>
+                <input
+                  matInput
+                  [type]="hideSignUpPassword() ? 'password' : 'text'"
+                  formControlName="password"
+                  autocomplete="new-password"
+                />
+                <button
+                  mat-icon-button
+                  matSuffix
+                  type="button"
+                  class="auth-visibility-btn"
+                  [attr.aria-label]="hideSignUpPassword() ? 'Show password' : 'Hide password'"
+                  (click)="toggleSignUpPasswordVisibility()"
+                >
+                  <mat-icon>{{ hideSignUpPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+                </button>
+                @if (shouldShowControlError(signUpForm.controls.password)) {
+                  <mat-error>Password must be at least 8 characters.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="auth-field">
+                <mat-label>Confirm password</mat-label>
+                <input
+                  matInput
+                  [type]="hideConfirmPassword() ? 'password' : 'text'"
+                  formControlName="confirmPassword"
+                  autocomplete="new-password"
+                />
+                <button
+                  mat-icon-button
+                  matSuffix
+                  type="button"
+                  class="auth-visibility-btn"
+                  [attr.aria-label]="hideConfirmPassword() ? 'Show password' : 'Hide password'"
+                  (click)="toggleConfirmPasswordVisibility()"
+                >
+                  <mat-icon>{{ hideConfirmPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+                </button>
+                @if (getPasswordMismatchError()) {
+                  <mat-error>Passwords must match.</mat-error>
+                } @else if (shouldShowControlError(signUpForm.controls.confirmPassword)) {
+                  <mat-error>Confirm your password.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-checkbox formControlName="termsAccepted" class="auth-checkbox">
+                I agree to the privacy terms and location-based weather permissions.
+              </mat-checkbox>
+              @if (shouldShowControlError(signUpForm.controls.termsAccepted)) {
+                <p class="auth-inline-error">You need to accept the terms to continue.</p>
+              }
+
+              <button
+                mat-flat-button
+                type="submit"
+                class="auth-submit-btn"
+                [disabled]="isSubmitting()"
+              >
+                @if (isSubmitting()) {
+                  <mat-progress-spinner
+                    mode="indeterminate"
+                    diameter="18"
+                    strokeWidth="2.5"
+                  ></mat-progress-spinner>
+                } @else {
+                  <span>Create account</span>
+                }
+              </button>
+            </form>
+          }
+
+          <p class="auth-footnote">
+            {{ mode() === 'signin'
+              ? 'New to ATMOS?'
+              : 'Already have an account?' }}
+            <button
+              type="button"
+              mat-button
+              class="auth-link-btn auth-link-btn--inline"
+              (click)="setMode(mode() === 'signin' ? 'signup' : 'signin')"
+            >
+              {{ mode() === 'signin' ? 'Create account' : 'Sign in' }}
+            </button>
+          </p>
+        </div>
+      </section>
+
+      <aside class="auth-panel auth-panel--preview auth-reveal" aria-label="Atmos preview">
+        <div class="preview-shell">
+          <div class="preview-shell__header">
+            <div>
+              <p class="preview-eyebrow">Tonight in Buenos Aires</p>
+              <h2 class="preview-title">17° and clearing after light rain.</h2>
+            </div>
+            <span class="preview-status">Live sync</span>
+          </div>
+
+          <div class="preview-hero">
+            <div class="preview-temp">
+              <span class="preview-temp__value">17°</span>
+              <span class="preview-temp__meta">Feels like 15°</span>
+            </div>
+            <div class="preview-summary">
+              <p>Saved cities, personalized alerts, and smart comparisons stay in one account-aware workspace.</p>
+            </div>
+          </div>
+
+          <div class="preview-grid">
+            <section class="preview-metric">
+              <span class="preview-metric__label">Favorites synced</span>
+              <strong class="preview-metric__value">08 cities</strong>
+            </section>
+            <section class="preview-metric">
+              <span class="preview-metric__label">Rain probability</span>
+              <strong class="preview-metric__value">24%</strong>
+            </section>
+            <section class="preview-metric">
+              <span class="preview-metric__label">Air quality</span>
+              <strong class="preview-metric__value">AQI 29</strong>
+            </section>
+            <section class="preview-metric">
+              <span class="preview-metric__label">Wind</span>
+              <strong class="preview-metric__value">18 km/h SE</strong>
+            </section>
+          </div>
+
+          <div class="preview-footer">
+            <div class="preview-footer__item">
+              <span class="preview-footer__dot preview-footer__dot--primary"></span>
+              <span>Cross-device favorites</span>
+            </div>
+            <div class="preview-footer__item">
+              <span class="preview-footer__dot preview-footer__dot--info"></span>
+              <span>Location-aware alerts</span>
+            </div>
+            <div class="preview-footer__item">
+              <span class="preview-footer__dot preview-footer__dot--sun"></span>
+              <span>Comparison ready</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
