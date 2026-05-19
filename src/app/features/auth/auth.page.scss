@@ -337,6 +337,7 @@
 
 .auth-form--signup {
   @media (min-width: 980px) {
+    margin-top: 1rem;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -355,7 +356,6 @@
 .auth-field {
   width: 100%;
   display: block;
-  overflow: hidden;
   border-radius: 18px;
   --mat-form-field-container-height: 50px;
   --mat-form-field-container-vertical-padding: 12px;
@@ -372,13 +372,11 @@
 
 :host ::ng-deep .auth-field .mat-mdc-form-field-flex {
   border-radius: 18px;
-  overflow: hidden;
 }
 
 :host ::ng-deep .auth-field .mat-mdc-text-field-wrapper {
   position: relative;
   border-radius: 18px;
-  overflow: hidden;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
   background-clip: padding-box;
   backdrop-filter: blur(12px);

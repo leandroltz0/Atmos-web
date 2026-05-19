@@ -142,7 +142,7 @@
               novalidate
             >
               <mat-form-field appearance="outline" class="auth-field">
-                <mat-label>Full name</mat-label>
+                <mat-label>name</mat-label>
                 <input matInput type="text" formControlName="fullName" autocomplete="name" />
                 @if (shouldShowControlError(signUpForm.controls.fullName)) {
                   <mat-error>Enter your full name.</mat-error>
@@ -150,7 +150,7 @@
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="auth-field">
-                <mat-label>Email</mat-label>
+                <mat-label>example&#64;gmail.com</mat-label>
                 <input matInput type="email" formControlName="email" autocomplete="email" />
                 @if (shouldShowControlError(signUpForm.controls.email)) {
                   <mat-error>Enter a valid email address.</mat-error>
