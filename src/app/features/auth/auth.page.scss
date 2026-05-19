@@ -368,20 +368,8 @@
 }
 
 :host ::ng-deep .auth-field .mat-mdc-text-field-wrapper {
-  border-radius: 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
-  background-clip: padding-box;
   backdrop-filter: blur(12px);
-  overflow: hidden;
-}
-
-:host ::ng-deep .auth-field .mdc-text-field--outlined {
-  border-radius: 18px;
-  overflow: hidden;
-}
-
-:host ::ng-deep .auth-field .mdc-notched-outline {
-  border-radius: 18px;
 }
 
 :host ::ng-deep .auth-field .mat-mdc-form-field-subscript-wrapper {
@@ -408,11 +396,15 @@
   --mdc-checkbox-selected-pressed-icon-color: var(--color-info);
   color: var(--color-text-secondary);
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
 
   @media (min-width: 980px) {
     font-size: 0.84rem;
   }
+}
+
+:host ::ng-deep .auth-checkbox .mdc-label {
+  color: rgba(226, 238, 250, 0.92);
 }
 
 .auth-link-btn {
