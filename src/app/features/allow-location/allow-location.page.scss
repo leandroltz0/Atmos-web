@@ -58,20 +58,7 @@
   pointer-events: none;
 }
 
-.desktop-chrome {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 26px;
-  display: none;
-  align-items: center;
-  gap: 8px;
-  padding-inline: 12px;
-  background: rgba(255, 255, 255, 0.025);
-  border-bottom: 0.5px solid rgba(255, 255, 255, 0.04);
-  z-index: 12;
-}
+
 
 .hero-stage {
   position: relative;
@@ -114,12 +101,6 @@
   }
 }
 
-.chrome-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-}
 
 .globe-wrap {
   position: relative;
@@ -335,11 +316,7 @@
   color: var(--atmos-text-secondary);
 }
 
-@media (min-width: 1024px) {
-  .desktop-chrome {
-    display: flex;
-  }
-}
+
 
 @keyframes ripple {
   0% {
