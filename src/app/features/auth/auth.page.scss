@@ -368,8 +368,20 @@
 }
 
 :host ::ng-deep .auth-field .mat-mdc-text-field-wrapper {
+  border-radius: 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
+  background-clip: padding-box;
   backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+:host ::ng-deep .auth-field .mdc-text-field--outlined {
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+:host ::ng-deep .auth-field .mdc-notched-outline {
+  border-radius: 18px;
 }
 
 :host ::ng-deep .auth-field .mat-mdc-form-field-subscript-wrapper {
