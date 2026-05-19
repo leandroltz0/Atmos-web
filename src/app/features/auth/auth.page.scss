@@ -463,6 +463,12 @@
   }
 }
 
+.auth-panel--preview-signup {
+  @media (min-width: 980px) {
+    height: 52rem;
+  }
+}
+
 .preview-shell {
   display: flex;
   flex: 1;

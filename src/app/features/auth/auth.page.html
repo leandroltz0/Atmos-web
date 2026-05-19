@@ -251,7 +251,11 @@
         </div>
       </section>
 
-      <aside class="auth-panel auth-panel--preview auth-reveal" aria-label="Atmos preview">
+      <aside
+        class="auth-panel auth-panel--preview auth-reveal"
+        [class.auth-panel--preview-signup]="mode() === 'signup'"
+        aria-label="Atmos preview"
+      >
         <div class="preview-shell">
           <div class="preview-shell__header">
             <div>
