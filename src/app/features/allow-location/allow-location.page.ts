@@ -346,10 +346,10 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     globeGroup.add(new THREE.Mesh(
       new THREE.SphereGeometry(GLOBE_RADIUS + 0.01, 64, 64),
       new THREE.MeshPhongMaterial({
-        color: 0xffffff,
+        color: 0x38bdf8,
         transparent: true,
-        opacity: 0.035,
-        shininess: 100,
+        opacity: 0.012,
+        shininess: 32,
         depthWrite: false
       })
     ));
@@ -360,7 +360,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
         color: 0x38bdf8,
         side: THREE.BackSide,
         transparent: true,
-        opacity: 0.18
+        opacity: 0.12
       })
     ));
 
