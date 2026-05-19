@@ -251,65 +251,7 @@
         </div>
       </section>
 
-      <aside
-        class="auth-panel auth-panel--preview auth-reveal"
-        [class.auth-panel--preview-signup]="mode() === 'signup'"
-        aria-label="Atmos preview"
-      >
-        <div class="preview-shell">
-          <div class="preview-shell__header">
-            <div>
-              <p class="preview-eyebrow">Tonight in Buenos Aires</p>
-              <h2 class="preview-title">17° and clearing after light rain.</h2>
-            </div>
-            <span class="preview-status">Live sync</span>
-          </div>
-
-          <div class="preview-hero">
-            <div class="preview-temp">
-              <span class="preview-temp__value">17°</span>
-              <span class="preview-temp__meta">Feels like 15°</span>
-            </div>
-            <div class="preview-summary">
-              <p>Saved cities, personalized alerts, and smart comparisons stay in one account-aware workspace.</p>
-            </div>
-          </div>
-
-          <div class="preview-grid">
-            <section class="preview-metric">
-              <span class="preview-metric__label">Favorites synced</span>
-              <strong class="preview-metric__value">08 cities</strong>
-            </section>
-            <section class="preview-metric">
-              <span class="preview-metric__label">Rain probability</span>
-              <strong class="preview-metric__value">24%</strong>
-            </section>
-            <section class="preview-metric">
-              <span class="preview-metric__label">Air quality</span>
-              <strong class="preview-metric__value">AQI 29</strong>
-            </section>
-            <section class="preview-metric">
-              <span class="preview-metric__label">Wind</span>
-              <strong class="preview-metric__value">18 km/h SE</strong>
-            </section>
-          </div>
-
-          <div class="preview-footer">
-            <div class="preview-footer__item">
-              <span class="preview-footer__dot preview-footer__dot--primary"></span>
-              <span>Cross-device favorites</span>
-            </div>
-            <div class="preview-footer__item">
-              <span class="preview-footer__dot preview-footer__dot--info"></span>
-              <span>Location-aware alerts</span>
-            </div>
-            <div class="preview-footer__item">
-              <span class="preview-footer__dot preview-footer__dot--sun"></span>
-              <span>Comparison ready</span>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <app-auth-preview-panel [mode]="mode()"></app-auth-preview-panel>
     </div>
   </section>
 </main>

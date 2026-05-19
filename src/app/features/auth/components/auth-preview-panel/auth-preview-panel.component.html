@@ -1,0 +1,52 @@
+<aside
+  class="preview-panel"
+  [class.preview-panel--signup]="mode() === 'signup'"
+  aria-label="Atmos preview"
+>
+  <div class="preview-shell">
+    <header class="preview-header">
+      <div class="preview-header__copy">
+        <p class="preview-eyebrow">Tonight in Buenos Aires</p>
+        <h2 class="preview-title">17° and clearing after light rain.</h2>
+        <p class="preview-lead">
+          Hyperlocal conditions stay readable at a glance, while your saved context and synced
+          weather habits remain close at hand.
+        </p>
+      </div>
+
+      <span class="preview-status">Live sync</span>
+    </header>
+
+    <section class="preview-hero" aria-label="Current weather summary">
+      <div class="preview-temp">
+        <span class="preview-temp__value">17°</span>
+        <span class="preview-temp__meta">Feels like 15°</span>
+      </div>
+
+      <div class="preview-summary">
+        <p>
+          Saved cities, personalized alerts, and smart comparisons stay in one account-aware
+          workspace.
+        </p>
+      </div>
+    </section>
+
+    <div class="preview-grid" aria-label="Weather account highlights">
+      @for (metric of metrics; track metric.label) {
+        <section class="preview-metric">
+          <span class="preview-metric__label">{{ metric.label }}</span>
+          <strong class="preview-metric__value">{{ metric.value }}</strong>
+        </section>
+      }
+    </div>
+
+    <footer class="preview-footer" aria-label="Feature highlights">
+      @for (feature of features; track feature.label) {
+        <div class="preview-footer__item">
+          <span class="preview-footer__dot" [class]="'preview-footer__dot--' + feature.tone"></span>
+          <span>{{ feature.label }}</span>
+        </div>
+      }
+    </footer>
+  </div>
+</aside>

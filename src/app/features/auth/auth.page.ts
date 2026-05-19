@@ -27,6 +27,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { gsap } from 'gsap';
 
 import { APP_ROUTE_PATHS } from '../../core/routing/app-route-paths';
+import { AuthPreviewPanelComponent } from './components/auth-preview-panel/auth-preview-panel.component';
 
 type AuthMode = 'signin' | 'signup';
 
@@ -53,7 +54,8 @@ const passwordMatchValidator: ValidatorFn = (control: AbstractControl): Validati
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    AuthPreviewPanelComponent
   ],
   templateUrl: './auth.page.html',
   styleUrl: './auth.page.scss',
