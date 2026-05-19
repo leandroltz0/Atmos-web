@@ -33,9 +33,31 @@
 
     <div class="preview-grid" aria-label="Weather account highlights">
       @for (metric of metrics; track metric.label) {
-        <section class="preview-metric">
-          <span class="preview-metric__label">{{ metric.label }}</span>
-          <strong class="preview-metric__value">{{ metric.value }}</strong>
+        <section class="preview-metric" [class]="'preview-metric--' + metric.tone">
+          <div class="preview-metric__accent" aria-hidden="true"></div>
+
+          <div class="preview-metric__top">
+            <div class="preview-metric__meta">
+              <div class="preview-metric__icon-shell" aria-hidden="true">
+                <mat-icon class="preview-metric__icon">{{ metric.icon }}</mat-icon>
+              </div>
+
+              <div class="preview-metric__copy">
+                <span class="preview-metric__label">{{ metric.label }}</span>
+                <strong class="preview-metric__value">{{ metric.value }}</strong>
+              </div>
+            </div>
+
+            <span class="preview-metric__badge">{{ metric.badge }}</span>
+          </div>
+
+          <div class="preview-metric__bottom">
+            <div class="preview-metric__track" aria-hidden="true">
+              <span class="preview-metric__track-fill" [style.width.%]="metric.meter"></span>
+            </div>
+
+            <span class="preview-metric__detail">{{ metric.detail }}</span>
+          </div>
         </section>
       }
     </div>
