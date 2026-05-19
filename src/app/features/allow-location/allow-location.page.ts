@@ -17,14 +17,10 @@ import { APP_ROUTE_PATHS } from '../../core/routing/app-route-paths';
 import { createStarfieldState, drawStarfieldFrame, StarfieldState } from '../../shared/utils/canvas-starfield';
 import { DisposableResource, disposeSceneResources, SceneResourceRoot } from '../../shared/utils/three-disposal';
 
-type LayoutMode = 'mobile' | 'tablet' | 'desktop';
 
-type BreakpointConfig = {
-  globeSize: number;
-  layout: LayoutMode;
-};
 
 type CameraLike = {
+  aspect: number;
   position: { z: number };
   updateProjectionMatrix: () => void;
 };
@@ -38,7 +34,7 @@ type RendererLike = DisposableResource & {
   render: (scene: unknown, camera: unknown) => void;
   setClearColor: (color: number, alpha?: number) => void;
   setPixelRatio: (value: number) => void;
-  setSize: (width: number, height: number) => void;
+  setSize: (width: number, height: number, updateStyle?: boolean) => void;
 };
 
 type SceneLike = SceneResourceRoot & {
@@ -56,8 +52,6 @@ type Vector3Like = {
   z: number;
 };
 
-const TABLET_BREAKPOINT = 768;
-const DESKTOP_BREAKPOINT = 1024;
 const HOME_NAVIGATION_DELAY_MS = 1200;
 const PARTICLE_COUNT = 12;
 const GLOBE_RADIUS = 1;
@@ -123,7 +117,6 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     this.setupBackground();
     this.setupGlobe();
     this.setupParticles();
-    this.positionGlobe();
     this.playEntryAnimation();
   }
 
@@ -152,7 +145,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
   @HostListener('window:resize')
   protected onResize(): void {
     this.resizeBackground();
-    this.positionGlobe();
+    this.updateRendererSize();
   }
 
   protected onAllowLocation(): void {
@@ -199,19 +192,7 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       .to(this.allowBtn.nativeElement, { scale: 1, duration: 0.2, ease: 'back.out(2)' });
   }
 
-  private getBreakpointConfig(): BreakpointConfig {
-    const viewportWidth = window.innerWidth;
 
-    if (viewportWidth >= DESKTOP_BREAKPOINT) {
-      return { globeSize: 600, layout: 'desktop' };
-    }
-
-    if (viewportWidth >= TABLET_BREAKPOINT) {
-      return { globeSize: 380, layout: 'tablet' };
-    }
-
-    return { globeSize: 300, layout: 'mobile' };
-  }
 
   // Background: static gradients plus animated starfield.
   private setupBackground(): void {
@@ -243,12 +224,11 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
 
   // Globe: procedural surface + Three.js lighting + slow drift.
   private setupGlobe(): void {
-    const { globeSize } = this.getBreakpointConfig();
     const canvas = this.globeCanvas.nativeElement;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-    camera.position.z = 2.25;
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 1000);
+    camera.position.set(0, 0.08, 4.1);
 
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -256,7 +236,6 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
       antialias: true
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(globeSize, globeSize);
     renderer.setClearColor(0x000000, 0);
 
     const globeGroup = new THREE.Group();
@@ -271,6 +250,8 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
 
     this.addGlobeLights();
     this.addGlobeMeshes();
+
+    this.updateRendererSize();
 
     this.ngZone.runOutsideAngular(() => {
       const tick = () => {
@@ -525,18 +506,21 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     return particle;
   }
 
-  // Layout: CSS Flexbox handles position; JS only syncs canvas size to breakpoint.
-  private positionGlobe(): void {
-    const { globeSize } = this.getBreakpointConfig();
-    const wrap = this.globeWrap.nativeElement;
+  private updateRendererSize(): void {
+    const renderer = this.renderer;
+    const camera = this.camera;
+    const container = this.globeWrap?.nativeElement;
 
-    wrap.style.width = `${globeSize}px`;
-    wrap.style.height = `${globeSize}px`;
-
-    if (this.renderer && this.camera) {
-      this.renderer.setSize(globeSize, globeSize);
-      this.camera.updateProjectionMatrix();
+    if (!renderer || !camera || !container) {
+      return;
     }
+
+    const width = Math.max(container.clientWidth, 1);
+    const height = Math.max(container.clientHeight, 1);
+
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
   }
 
   // Entry sequence: globe first, then pin, then copy and actions.
