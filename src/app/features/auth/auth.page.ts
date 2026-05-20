@@ -124,7 +124,8 @@ export class AuthPage implements AfterViewInit {
 
     window.setTimeout(() => {
       this.isSubmitting.set(false);
-      void this.router.navigate([`/${APP_ROUTE_PATHS.allowLocation}`]);
+      const targetRoute = this.mode() === 'signup' ? APP_ROUTE_PATHS.dashboard : APP_ROUTE_PATHS.allowLocation;
+      void this.router.navigate([`/${targetRoute}`]);
     }, 900);
   }
 
