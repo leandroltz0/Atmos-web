@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 
 import { WeatherTabsComponent } from '../../components/detail-components/weather-tabs';
 import { DetailTabComponent } from '../../components/detail-components/detail-tab/detail-tab.component';
@@ -21,6 +21,12 @@ import { WeeklyTabComponent } from '../../components/detail-components/weekly-ta
 })
 export class DetailPage {
   protected selectedTabIndex = 0;
+
+  constructor(private readonly location: Location) {}
+
+  protected goBack(): void {
+    this.location.back();
+  }
 
   protected readonly highlights: TodayHighlight[] = [
     { label: 'Sensacion termica', value: '29°' },

@@ -10,9 +10,10 @@ import {
   viewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MatRippleModule } from '@angular/material/core';
 import { gsap } from 'gsap';
 
 import { WeatherIconComponent } from '../../shared/components/weather-icon/weather-icon.component';
@@ -42,7 +43,14 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('es-AR', {
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatTooltipModule, ScrollingModule, WeatherIconComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatButtonModule,
+    MatTooltipModule,
+    MatRippleModule,
+    WeatherIconComponent
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.scss'
@@ -74,8 +82,7 @@ export class DashboardPage implements OnInit, OnDestroy {
 
   protected readonly tempRange = computed(() => getTempRange(this.dailyForecast()));
 
-  protected readonly weatherIconSize = computed(() => this.isMobile() ? 96 : 120);
-  protected readonly hourlyItemSize = computed(() => this.isDesktop() ? 84 : 80);
+  protected readonly weatherIconSize = computed(() => this.isMobile() ? 88 : 112);
 
   private readonly dashboardRootEl = viewChild<ElementRef<HTMLElement>>('dashboardRoot');
   private readonly heroTempEl = viewChild<ElementRef<HTMLElement>>('heroTemp');
@@ -86,6 +93,8 @@ export class DashboardPage implements OnInit, OnDestroy {
 
   private readonly handleOnline = () => this.isOffline.set(false);
   private readonly handleOffline = () => this.isOffline.set(true);
+
+  constructor(private readonly router: Router) {}
 
   ngOnInit(): void {
     this.startClock();
@@ -119,10 +128,12 @@ export class DashboardPage implements OnInit, OnDestroy {
     return item.hour;
   }
 
+  protected trackByDate(_index: number, item: DailyForecast): string {
+    return item.date;
+  }
+
   protected onRefresh(): void {
-    if (this.isLoading()) {
-      return;
-    }
+    if (this.isLoading()) return;
 
     this.ctx?.revert();
     this.isLoading.set(true);
@@ -136,8 +147,13 @@ export class DashboardPage implements OnInit, OnDestroy {
   protected getTempBarWidth(day: DailyForecast): number {
     const { min, max } = this.tempRange();
     const total = Math.max(max - min, 1);
-
     return ((day.tempMax - day.tempMin) / total) * 100;
+  }
+
+  protected getTempBarOffset(day: DailyForecast): number {
+    const { min, max } = this.tempRange();
+    const total = Math.max(max - min, 1);
+    return ((day.tempMin - min) / total) * 100;
   }
 
   protected isCurrentHour(hourStr: string): boolean {
@@ -150,20 +166,40 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
   protected isDesktop(): boolean {
-    return this.viewportWidth() >= 1200;
+    return this.viewportWidth() >= 1024;
   }
 
   protected visibilityActive(segment: number): boolean {
     return this.currentWeather().visibility >= segment * 4;
   }
 
+  // ── Navigation ─────────────────────────────────────────
+  protected goToDetail(): void {
+    this.router.navigate(['/detail']);
+  }
+
+  protected goToFavorites(): void {
+    this.router.navigate(['/favorites']);
+  }
+
+  protected goToSearch(): void {
+    this.router.navigate(['/search']);
+  }
+
+  protected goToProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+
+  protected goToSettings(): void {
+    this.router.navigate(['/settings']);
+  }
+
+  // ── Private ─────────────────────────────────────────────
   private finishLoading(): void {
     this.now.set(new Date());
     this.isLoading.set(false);
 
-    if (this.prefersReducedMotion()) {
-      return;
-    }
+    if (this.prefersReducedMotion()) return;
 
     window.setTimeout(() => this.initAnimations(), 0);
   }
@@ -172,16 +208,14 @@ export class DashboardPage implements OnInit, OnDestroy {
     const root = this.dashboardRootEl()?.nativeElement;
     const heroTemp = this.heroTempEl()?.nativeElement;
 
-    if (!root) {
-      return;
-    }
+    if (!root) return;
 
     this.ctx?.revert();
     this.ctx = gsap.context(() => {
       gsap.from(root, {
         opacity: 0,
-        y: 12,
-        duration: 0.4,
+        y: 16,
+        duration: 0.45,
         ease: 'power2.out'
       });
 
@@ -190,9 +224,10 @@ export class DashboardPage implements OnInit, OnDestroy {
         const counter = { val: 0 };
         gsap.fromTo(
           counter,
-          { val: target },
+          { val: target * 0.6 },
           {
-            duration: 1.1,
+            val: target,
+            duration: 0.9,
             ease: 'power2.out',
             onUpdate: () => {
               heroTemp.textContent = Math.round(counter.val).toString();
@@ -201,14 +236,14 @@ export class DashboardPage implements OnInit, OnDestroy {
         );
       }
 
-      gsap.from('.glass-card', {
+      gsap.from('.dash-card', {
         opacity: 0,
-        y: 24,
-        scale: 0.98,
+        y: 20,
+        scale: 0.97,
         duration: 0.5,
         ease: 'power3.out',
-        stagger: 0.07,
-        delay: 0.05
+        stagger: 0.06,
+        delay: 0.08
       });
     }, root);
   }
@@ -218,9 +253,7 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
   private bindNetworkEvents(): void {
-    if (typeof window === 'undefined') {
-      return;
-    }
+    if (typeof window === 'undefined') return;
 
     this.isOffline.set(!navigator.onLine);
     window.addEventListener('online', this.handleOnline);
