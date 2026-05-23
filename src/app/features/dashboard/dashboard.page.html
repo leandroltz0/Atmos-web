@@ -26,68 +26,72 @@
   <!-- ─── CONTENT ──────────────────────────────────── -->
   @if (!isLoading()) {
     <div class="db-container" #dashboardRoot>
+      <div class="db-stage">
 
-      <!-- HEADER -->
-      <header class="db-header">
-        <div class="db-header__left">
-          <h1 class="db-city">
-            <svg class="db-city__pin" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-              <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z"
-                fill="currentColor" fill-opacity="0.18" stroke="currentColor"
-                stroke-width="1.5" stroke-linejoin="round"/>
-              <circle cx="12" cy="10" r="2.4" fill="currentColor"/>
-            </svg>
-            <span>{{ currentWeather().cityName }}</span>
-            <span class="db-city__country">{{ currentWeather().country }}</span>
-          </h1>
-          <p class="db-date">{{ formattedDate() }}</p>
-        </div>
-
-        <div class="db-header__right">
-          <div class="db-status" [class.db-status--offline]="isOffline()">
-            <span class="db-status__dot" aria-hidden="true"></span>
-            <span class="db-status__text">
-              @if (isOffline()) { Sin conexión }
-              @else { Actualizado hace {{ minutesAgo() }} min }
-            </span>
+        <!-- HEADER -->
+        <header class="db-header">
+          <div class="db-header__copy">
+            <p class="db-eyebrow">Panel local</p>
+            <div class="db-header__title-row">
+              <h1 class="db-city">
+                <svg class="db-city__pin" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z"
+                    fill="currentColor" fill-opacity="0.18" stroke="currentColor"
+                    stroke-width="1.5" stroke-linejoin="round"/>
+                  <circle cx="12" cy="10" r="2.4" fill="currentColor"/>
+                </svg>
+                <span>{{ currentWeather().cityName }}</span>
+              </h1>
+              <span class="db-city__country">{{ currentWeather().country }}</span>
+            </div>
+            <p class="db-date">{{ formattedDate() }}</p>
           </div>
 
-          <button
-            mat-icon-button
-            type="button"
-            class="db-refresh-btn"
-            [class.spinning]="isLoading()"
-            (click)="onRefresh()"
-            matTooltip="Actualizar datos"
-            aria-label="Actualizar datos del clima"
-          >
-            <svg class="db-refresh-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-              <path d="M20 12A8 8 0 1 1 17.7 6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M20 4.5V10H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <div class="db-header__meta">
+            <div class="db-status" [class.db-status--offline]="isOffline()">
+              <span class="db-status__dot" aria-hidden="true"></span>
+              <span class="db-status__text">
+                @if (isOffline()) { Sin conexión }
+                @else { Actualizado hace {{ minutesAgo() }} min }
+              </span>
+            </div>
+
+            <button
+              mat-icon-button
+              type="button"
+              class="db-refresh-btn"
+              [class.spinning]="isLoading()"
+              (click)="onRefresh()"
+              matTooltip="Actualizar datos"
+              aria-label="Actualizar datos del clima"
+            >
+              <svg class="db-refresh-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                <path d="M20 12A8 8 0 1 1 17.7 6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M20 4.5V10H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Offline banner -->
+        @if (isOffline()) {
+          <div class="db-offline" role="alert" aria-live="assertive">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="M3 8.5C8.6 4.2 15.4 4.2 21 8.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="M6.5 12.3C10.1 9.6 13.9 9.6 17.5 12.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="M10.2 16.1C11.4 15.2 12.6 15.2 13.8 16.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+              <circle cx="12" cy="19" r="1.4" fill="currentColor"/>
+              <path d="M4 4L20 20" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
             </svg>
-          </button>
-        </div>
-      </header>
+            Sin conexión, mostrando datos cacheados de hace {{ minutesAgo() }} min
+          </div>
+        }
 
-      <!-- Offline banner -->
-      @if (isOffline()) {
-        <div class="db-offline" role="alert" aria-live="assertive">
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-            <path d="M3 8.5C8.6 4.2 15.4 4.2 21 8.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-            <path d="M6.5 12.3C10.1 9.6 13.9 9.6 17.5 12.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-            <path d="M10.2 16.1C11.4 15.2 12.6 15.2 13.8 16.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-            <circle cx="12" cy="19" r="1.4" fill="currentColor"/>
-            <path d="M4 4L20 20" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
-          </svg>
-          Sin conexión — datos cacheados de hace {{ minutesAgo() }} min
-        </div>
-      }
+        <!-- ─── MAIN GRID ────────────────────────────── -->
+        <div class="db-grid">
 
-      <!-- ─── MAIN GRID ────────────────────────────── -->
-      <div class="db-grid">
-
-        <!-- ── LEFT COLUMN ── -->
-        <div class="db-col-left">
+          <!-- ── LEFT COLUMN ── -->
+          <div class="db-col-left">
 
           <!-- HERO CARD -->
           <section
@@ -96,7 +100,7 @@
             tabindex="0"
             (click)="goToDetail()"
             (keydown.enter)="goToDetail()"
-            (keydown.space)="goToDetail()"
+            (keydown.space)="$event.preventDefault(); goToDetail()"
             [attr.aria-label]="'Ver detalle: ' + currentWeather().temp + '° en ' + currentWeather().cityName"
             matRipple
           >
@@ -138,13 +142,18 @@
 
             <div class="db-hero__stats" role="list" aria-label="Datos actuales">
               <div class="db-stat" role="listitem">
-                <span class="db-stat__icon" aria-hidden="true">💧</span>
+                <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2.5C12 2.5 5.5 10.5 5.5 14.5C5.5 18.1 8.4 21 12 21C15.6 21 18.5 18.1 18.5 14.5C18.5 10.5 12 2.5 12 2.5Z" stroke="currentColor" stroke-width="1.6" fill="currentColor" fill-opacity="0.15"/>
+                </svg>
                 <span class="db-stat__value">{{ currentWeather().humidity }}%</span>
                 <span class="db-stat__label">Humedad</span>
               </div>
               <div class="db-stat__sep" aria-hidden="true"></div>
               <div class="db-stat" role="listitem">
-                <span class="db-stat__icon" aria-hidden="true">💨</span>
+                <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M9.6 7A3.5 3.5 0 1 1 13 10.5H2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11.7 19A3.5 3.5 0 1 0 15 15.5H2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
                 <span class="db-stat__value">{{ currentWeather().windSpeed }} <small>km/h</small></span>
                 <div class="db-wind-dir" aria-hidden="true">
                   <svg width="11" height="11" viewBox="0 0 12 12"
@@ -156,7 +165,10 @@
               </div>
               <div class="db-stat__sep" aria-hidden="true"></div>
               <div class="db-stat" role="listitem">
-                <span class="db-stat__icon" aria-hidden="true">🌡️</span>
+                <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                  <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="11.5" cy="17.5" r="1.5" fill="currentColor"/>
+                </svg>
                 <span class="db-stat__value">{{ currentWeather().pressure }} <small>hPa</small></span>
                 <span class="db-stat__label">Presión</span>
               </div>
@@ -168,7 +180,7 @@
 
             <!-- AQI -->
             <article
-              class="db-data-card dash-card glass-card"
+              class="db-data-card db-data-card--aqi dash-card glass-card"
               [attr.aria-label]="'Calidad del aire AQI ' + currentWeather().aqi + ': ' + currentWeather().aqiLabel"
             >
               <div class="db-data-card__head">
@@ -199,7 +211,7 @@
 
             <!-- UV -->
             <article
-              class="db-data-card dash-card glass-card"
+              class="db-data-card db-data-card--uv dash-card glass-card"
               [attr.aria-label]="'Índice UV ' + currentWeather().uvIndex + ': ' + uvLabel()"
             >
               <div class="db-data-card__head">
@@ -223,9 +235,13 @@
 
             <!-- SUN TIMES -->
             <article
-              class="db-data-card dash-card glass-card"
+              class="db-data-card db-data-card--sun dash-card glass-card"
               [attr.aria-label]="'Amanecer ' + currentWeather().sunrise + ', Atardecer ' + currentWeather().sunset"
             >
+              <div class="db-data-card__head">
+                <span class="db-data-card__title">Luz del día</span>
+                <span class="db-data-card__chip db-data-card__chip--sun">Solar</span>
+              </div>
               <div class="db-sun-times">
                 <div class="db-sun-time">
                   <div class="db-icon-wrap db-icon-wrap--sun">
@@ -261,7 +277,7 @@
 
             <!-- VISIBILITY -->
             <article
-              class="db-data-card dash-card glass-card"
+              class="db-data-card db-data-card--visibility dash-card glass-card"
               [attr.aria-label]="'Visibilidad: ' + currentWeather().visibility + ' kilómetros'"
             >
               <div class="db-data-card__head">
@@ -287,84 +303,100 @@
 
           </div><!-- /db-data-grid -->
 
-        </div><!-- /db-col-left -->
+          </div><!-- /db-col-left -->
 
-        <!-- ── RIGHT COLUMN ── -->
-        <div class="db-col-right">
+          <!-- ── RIGHT COLUMN ── -->
+          <div class="db-col-right">
 
-          <!-- HOURLY FORECAST -->
-          <section class="db-section dash-card glass-card" aria-label="Pronóstico próximas 24 horas">
-            <h2 class="db-section__title">
-              <span class="db-section__accent" aria-hidden="true"></span>
-              Próximas 24 horas
-            </h2>
-            <div class="db-hourly-scroll" role="list">
-              @for (item of hourlyForecast(); track trackByHour($index, item)) {
-                <div
-                  class="db-hourly-item"
-                  [class.db-hourly-item--active]="isCurrentHour(item.hour)"
-                  role="listitem"
-                  [attr.aria-label]="'Pronóstico ' + item.hour + ': ' + item.temp + ' grados'"
-                  tabindex="0"
-                  (click)="goToDetail()"
-                  (keydown.enter)="goToDetail()"
-                  matRipple
-                >
-                  <span class="db-hourly-hour">{{ item.hour }}</span>
-                  <app-weather-icon [condition]="item.condition" [size]="28" [decorative]="true"/>
-                  <span class="db-hourly-temp">{{ item.temp }}°</span>
-                  @if (item.precipChance > 20) {
-                    <span class="db-hourly-precip">{{ item.precipChance }}%</span>
-                  }
+            <!-- HOURLY FORECAST -->
+            <section class="db-section db-section--hourly dash-card glass-card" aria-label="Pronóstico próximas 24 horas">
+              <div class="db-section__header">
+                <div class="db-section__intro">
+                  <p class="db-section__eyebrow">Ventana inmediata</p>
+                  <h2 class="db-section__title">Próximas 24 horas</h2>
                 </div>
-              }
-            </div>
-          </section>
+                <p class="db-section__meta">Deslizá o abrí el detalle</p>
+              </div>
 
-          <!-- DAILY FORECAST -->
-          <section class="db-section dash-card glass-card" aria-label="Pronóstico próximos 7 días">
-            <h2 class="db-section__title">
-              <span class="db-section__accent" aria-hidden="true"></span>
-              Próximos 7 días
-            </h2>
-            <div class="db-daily-list">
-              @for (day of dailyForecast(); track trackByDate($index, day)) {
-                <div
-                  class="db-daily-row"
-                  tabindex="0"
-                  role="button"
-                  [attr.aria-label]="day.day + ': máx ' + day.tempMax + '°, mín ' + day.tempMin + '°'"
-                  (click)="goToDetail()"
-                  (keydown.enter)="goToDetail()"
-                  matRipple
-                >
-                  <span class="db-daily-day">{{ day.day }}</span>
-                  <span class="db-daily-date">{{ day.date }}</span>
-                  <app-weather-icon [condition]="day.condition" [size]="24" [decorative]="true"/>
-                  @if (day.precipChance > 10) {
-                    <span class="db-daily-precip">💧 {{ day.precipChance }}%</span>
-                  } @else {
-                    <span class="db-daily-precip db-daily-precip--empty" aria-hidden="true">—</span>
-                  }
-                  <div class="db-temp-range">
-                    <span class="db-temp-min">{{ day.tempMin }}°</span>
-                    <div class="db-temp-bar">
-                      <div class="db-temp-bar__fill"
-                        [style.margin-left.%]="getTempBarOffset(day)"
-                        [style.width.%]="getTempBarWidth(day)">
-                      </div>
-                    </div>
-                    <span class="db-temp-max">{{ day.tempMax }}°</span>
+              <div class="db-hourly-scroll" role="list">
+                @for (item of hourlyForecast(); track trackByHour($index, item)) {
+                  <div
+                    class="db-hourly-item"
+                    [class.db-hourly-item--active]="isCurrentHour(item.hour)"
+                    role="listitem"
+                    [attr.aria-label]="'Pronóstico ' + item.hour + ': ' + item.temp + ' grados'"
+                    tabindex="0"
+                    (click)="goToDetail()"
+                    (keydown.enter)="goToDetail()"
+                    matRipple
+                  >
+                    <span class="db-hourly-hour">{{ item.hour }}</span>
+                    <app-weather-icon [condition]="item.condition" [size]="28" [decorative]="true"/>
+                    <span class="db-hourly-temp">{{ item.temp }}°</span>
+                    @if (item.precipChance > 20) {
+                      <span class="db-hourly-precip">{{ item.precipChance }}%</span>
+                    }
                   </div>
+                }
+              </div>
+            </section>
+
+            <!-- DAILY FORECAST -->
+            <section class="db-section db-section--daily dash-card glass-card" aria-label="Pronóstico próximos 7 días">
+              <div class="db-section__header">
+                <div class="db-section__intro">
+                  <p class="db-section__eyebrow">Ritmo semanal</p>
+                  <h2 class="db-section__title">Próximos 7 días</h2>
                 </div>
-              }
-            </div>
-          </section>
+                <p class="db-section__meta">Rango térmico y probabilidad de lluvia</p>
+              </div>
 
-        </div><!-- /db-col-right -->
+              <div class="db-daily-list">
+                @for (day of dailyForecast(); track trackByDate($index, day)) {
+                  <div
+                    class="db-daily-row"
+                    tabindex="0"
+                    role="button"
+                    [attr.aria-label]="day.day + ': máx ' + day.tempMax + '°, mín ' + day.tempMin + '°'"
+                    (click)="goToDetail()"
+                    (keydown.enter)="goToDetail()"
+                    (keydown.space)="$event.preventDefault(); goToDetail()"
+                    matRipple
+                  >
+                    <span class="db-daily-day">{{ day.day }}</span>
+                    <span class="db-daily-date">{{ day.date }}</span>
+                    <app-weather-icon [condition]="day.condition" [size]="24" [decorative]="true"/>
+                    @if (day.precipChance > 10) {
+                      <span class="db-daily-precip">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 3.6C12 3.6 7.2 9.3 7.2 12.6A4.8 4.8 0 1 0 16.8 12.6C16.8 9.3 12 3.6 12 3.6Z"
+                            fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        <span>{{ day.precipChance }}%</span>
+                      </span>
+                    } @else {
+                      <span class="db-daily-precip db-daily-precip--empty" aria-hidden="true">—</span>
+                    }
+                    <div class="db-temp-range">
+                      <span class="db-temp-min">{{ day.tempMin }}°</span>
+                      <div class="db-temp-bar">
+                        <div class="db-temp-bar__fill"
+                          [style.margin-left.%]="getTempBarOffset(day)"
+                          [style.width.%]="getTempBarWidth(day)">
+                        </div>
+                      </div>
+                      <span class="db-temp-max">{{ day.tempMax }}°</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
 
-      </div><!-- /db-grid -->
+          </div><!-- /db-col-right -->
 
+        </div><!-- /db-grid -->
+
+      </div><!-- /db-stage -->
     </div><!-- /db-container -->
   }
 
