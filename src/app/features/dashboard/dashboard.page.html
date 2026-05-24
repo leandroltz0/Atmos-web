@@ -363,20 +363,20 @@
                     (keydown.space)="$event.preventDefault(); goToDetail()"
                     matRipple
                   >
-                    <span class="db-daily-day">{{ day.day }}</span>
-                    <span class="db-daily-date">{{ day.date }}</span>
-                    <app-weather-icon [condition]="day.condition" [size]="24" [decorative]="true"/>
-                    @if (day.precipChance > 10) {
-                      <span class="db-daily-precip">
-                        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                          <path d="M12 3.6C12 3.6 7.2 9.3 7.2 12.6A4.8 4.8 0 1 0 16.8 12.6C16.8 9.3 12 3.6 12 3.6Z"
-                            fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                        <span>{{ day.precipChance }}%</span>
+                    <div class="db-daily-info">
+                      <span class="db-daily-day">{{ day.day }}</span>
+                      <span class="db-daily-date">{{ day.date }}</span>
+                    </div>
+                    <div class="db-daily-weather">
+                      <app-weather-icon [condition]="day.condition" [size]="24" [decorative]="true"/>
+                      <span class="db-daily-precip" [class.db-daily-precip--empty]="day.precipChance <= 10">
+                        @if (day.precipChance > 10) {
+                          {{ day.precipChance }}%
+                        } @else {
+                          &nbsp;
+                        }
                       </span>
-                    } @else {
-                      <span class="db-daily-precip db-daily-precip--empty" aria-hidden="true">—</span>
-                    }
+                    </div>
                     <div class="db-temp-range">
                       <span class="db-temp-min">{{ day.tempMin }}°</span>
                       <div class="db-temp-bar">

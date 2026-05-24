@@ -42,6 +42,11 @@ html, body {
    DASHBOARD
    ═══════════════════════════════════════════════════════ */
 
+app-dashboard-page {
+  display: block;
+  width: 100%;
+}
+
 .db-shell {
   position: relative;
   min-height: 100dvh;
@@ -497,7 +502,8 @@ html, body {
   border-radius: 24px;
 }
 
-.db-data-card--sun {
+.db-data-card--sun,
+.db-data-card--visibility {
   grid-column: 1 / -1;
 }
 
@@ -784,10 +790,10 @@ html, body {
 
 .db-daily-row {
   display: grid;
-  grid-template-columns: 48px 46px 28px 64px minmax(0, 1fr);
+  grid-template-columns: 56px 40px minmax(0, 1fr);
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.72rem 0.85rem;
+  gap: 1rem;
+  padding: 0.72rem 1rem;
   border-radius: 18px;
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.02);
@@ -806,34 +812,45 @@ html, body {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.db-daily-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
 .db-daily-day {
   color: var(--color-text-primary);
   font-size: 0.86rem;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .db-daily-date {
   color: var(--color-text-secondary);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.db-daily-weather {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .db-daily-precip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  min-width: 0;
   color: var(--color-info);
-  font-size: 0.76rem;
-}
-
-.db-daily-precip svg {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 500;
+  margin-top: 1px;
+  text-align: center;
+  line-height: 1.1;
+  min-height: 11px;
 }
 
 .db-daily-precip--empty {
-  color: rgba(255, 255, 255, 0.18);
+  opacity: 0;
 }
 
 .db-temp-range {
@@ -841,12 +858,14 @@ html, body {
   align-items: center;
   gap: 0.55rem;
   min-width: 0;
+  flex: 1;
 }
 
 .db-temp-min,
 .db-temp-max {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.74rem;
+  min-width: 28px;
 }
 
 .db-temp-min {
@@ -1047,37 +1066,15 @@ html, body {
 }
 
 @media (min-width: 1024px) {
-  .db-shell {
-    height: 100dvh;
-    overflow: hidden;
-  }
-
   .db-container {
-    height: 100%;
-    padding: clamp(1.25rem, 2vh, 2rem) 0 calc(6.4rem + env(safe-area-inset-bottom));
-    display: flex;
-    align-items: center;
-  }
-
-  .db-stage {
-    flex: 1;
-    min-height: 0;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    height: auto;
+    display: block;
+    padding: clamp(1.5rem, 3vh, 2.5rem) 0 calc(7.5rem + env(safe-area-inset-bottom));
   }
 
   .db-grid {
-    min-height: 0;
     grid-template-columns: minmax(360px, 420px) minmax(0, 1fr);
-    align-items: stretch;
-  }
-
-  .db-col-left,
-  .db-col-right {
-    min-height: 0;
-  }
-
-  .db-col-right {
-    grid-template-rows: auto minmax(0, 1fr);
+    align-items: start;
   }
 
   .db-hero__main {
@@ -1086,15 +1083,6 @@ html, body {
 
   .db-hourly-item {
     min-height: 116px;
-  }
-
-  .db-section--daily {
-    min-height: 0;
-  }
-
-  .db-daily-list {
-    flex: 1;
-    justify-content: space-between;
   }
 
   .db-quick-nav {
@@ -1184,23 +1172,15 @@ html, body {
     grid-template-columns: 1fr;
   }
 
-  .db-data-card--sun {
+  .db-data-card--sun,
+  .db-data-card--visibility {
     grid-column: auto;
   }
 
   .db-daily-row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.55rem;
-    align-items: flex-start;
-  }
-
-  .db-daily-precip,
-  .db-temp-range {
-    width: 100%;
-  }
-
-  .db-temp-range {
-    margin-top: 0.1rem;
+    grid-template-columns: 48px 36px minmax(0, 1fr);
+    gap: 0.65rem;
+    padding: 0.6rem 0.75rem;
   }
 }
 
