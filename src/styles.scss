@@ -1074,7 +1074,21 @@ app-dashboard-page {
 
   .db-grid {
     grid-template-columns: minmax(360px, 420px) minmax(0, 1fr);
-    align-items: start;
+    align-items: stretch;
+  }
+
+  .db-col-right {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .db-section--daily {
+    min-height: 0;
+    height: 95%;
+  }
+
+  .db-daily-list {
+    flex: 1;
+    justify-content: space-between;
   }
 
   .db-hero__main {
