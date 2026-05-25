@@ -1142,9 +1142,31 @@ app-dashboard-page {
 }
 
 @media (max-width: 639px) {
+
+  /* ── Container & Stage ─────────────────────── */
   .db-container {
-    width: calc(100% - 1.5rem);
-    padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+    width: calc(100% - 1.25rem);
+    padding-top: 0.75rem;
+    padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+  }
+
+  .db-stage {
+    gap: 0.75rem;
+  }
+
+  /* ── Header ────────────────────────────────── */
+  .db-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.13em;
+  }
+
+  .db-city {
+    font-size: clamp(2rem, 8vw, 2.6rem);
+  }
+
+  .db-date {
+    font-size: 0.88rem;
+    margin-top: 0.2rem;
   }
 
   .db-header__meta {
@@ -1156,45 +1178,151 @@ app-dashboard-page {
     justify-content: center;
   }
 
-  .db-hero__top,
-  .db-section__header {
-    flex-direction: column;
-    align-items: flex-start;
+  /* ── Hero Card ─────────────────────────────── */
+  .db-hero {
+    padding: 1.1rem 1.1rem 1.2rem;
+    border-radius: 24px;
   }
 
-  .db-section__meta {
-    max-width: none;
-    text-align: left;
+  .db-hero__top {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1rem;
   }
 
   .db-hero__main {
     grid-template-columns: 1fr;
     justify-items: center;
     text-align: center;
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
   }
 
   .db-temp {
-    font-size: clamp(4.5rem, 22vw, 5.8rem);
+    font-size: clamp(5rem, 26vw, 7rem);
+    letter-spacing: -0.1em;
+  }
+
+  .db-feels-like {
+    font-size: 0.85rem;
   }
 
   .db-hero__stats {
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
+    padding: 0.7rem 0.4rem;
+    gap: 0;
   }
 
+  .db-stat {
+    gap: 0.18rem;
+  }
+
+  .db-stat__icon-svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .db-stat__value {
+    font-size: 0.82rem;
+  }
+
+  /* ── Data Cards Grid — 2 columnas ─────────── */
   .db-data-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
   }
 
+  .db-data-card {
+    min-height: 120px;
+    padding: 0.85rem;
+    border-radius: 20px;
+  }
+
+  /* Sun y Visibility siguen full-width */
   .db-data-card--sun,
   .db-data-card--visibility {
-    grid-column: auto;
+    grid-column: 1 / -1;
+  }
+
+  .db-data-card__val {
+    font-size: 1.8rem;
+  }
+
+  .db-data-card__sub {
+    font-size: 0.78rem;
+  }
+
+  /* ── Sections ──────────────────────────────── */
+  .db-section {
+    padding: 0.9rem;
+    gap: 0.75rem;
+    border-radius: 24px;
+  }
+
+  .db-section__header {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .db-section__title {
+    font-size: 1rem;
+  }
+
+  .db-section__meta {
+    font-size: 0.74rem;
+    text-align: right;
+    max-width: 16ch;
+  }
+
+  /* ── Hourly Scroll ─────────────────────────── */
+  .db-hourly-scroll {
+    grid-auto-columns: minmax(60px, 68px);
+    gap: 0.4rem;
+  }
+
+  .db-hourly-item {
+    min-height: 100px;
+    padding: 0.7rem 0.35rem;
+    border-radius: 16px;
+  }
+
+  .db-hourly-temp {
+    font-size: 1rem;
+  }
+
+  .db-hourly-hour {
+    font-size: 0.65rem;
+  }
+
+  /* ── Daily Rows ────────────────────────────── */
+  .db-daily-list {
+    gap: 0.3rem;
   }
 
   .db-daily-row {
     grid-template-columns: 48px 36px minmax(0, 1fr);
     gap: 0.65rem;
-    padding: 0.6rem 0.75rem;
+    padding: 0.65rem 0.75rem;
+    min-height: 52px;
+    border-radius: 16px;
+  }
+
+  .db-daily-day {
+    font-size: 0.9rem;
+  }
+
+  .db-daily-date {
+    font-size: 0.68rem;
+  }
+
+  .db-temp-bar {
+    height: 5px;
+    border-radius: 999px;
+  }
+
+  .db-temp-min,
+  .db-temp-max {
+    font-size: 0.7rem;
+    min-width: 24px;
   }
 }
 
