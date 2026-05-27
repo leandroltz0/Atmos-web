@@ -1343,6 +1343,58 @@ app-dashboard-page {
 }
 
 
+/* ── No Location ──────────────────────────────── */
+.db-no-location {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 5rem 1.5rem;
+  min-height: 60dvh;
+}
+
+.db-no-location__icon {
+  color: var(--color-text-secondary);
+  opacity: 0.4;
+}
+
+.db-no-location__icon svg {
+  width: 64px;
+  height: 64px;
+}
+
+.db-no-location__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.db-no-location__desc {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  max-width: 24ch;
+}
+
+.db-no-location__btn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  background: linear-gradient(90deg, #2563EB 0%, #06B6D4 100%) !important;
+  color: #fff !important;
+  border-radius: 9999px !important;
+  padding: 0 1.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em;
+  box-shadow: 0 4px 15px rgba(58, 134, 255, 0.25) !important;
+}
+
+.db-no-location__btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 app-detail {
   display: block;
 

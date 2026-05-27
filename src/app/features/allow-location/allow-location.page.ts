@@ -164,7 +164,11 @@ export class AllowLocationPage implements AfterViewInit, OnDestroy {
     }
 
     navigator.geolocation.getCurrentPosition(
-      () => this.navigateAuthAfterDelay(),
+      (position) => {
+        localStorage.setItem('atmos_lat', position.coords.latitude.toString());
+        localStorage.setItem('atmos_lon', position.coords.longitude.toString());
+        this.navigateAuthAfterDelay();
+      },
       () => this.navigateAuthAfterDelay()
     );
   }

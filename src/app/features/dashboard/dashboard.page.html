@@ -7,8 +7,37 @@
     <div class="db-bg__orb db-bg__orb--3"></div>
   </div>
 
+  <!-- ─── NO LOCATION ──────────────────────────────── -->
+  @if (needsLocation()) {
+    <div class="db-container">
+      <div class="db-no-location">
+        <div class="db-no-location__icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+            <circle cx="24" cy="18" r="6" stroke="currentColor" stroke-width="2"/>
+            <path d="M14 36c0-5.5 4.5-10 10-10s10 4.5 10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2 class="db-no-location__title">Sin ubicación</h2>
+        <p class="db-no-location__desc">Buscá una ciudad para ver el clima</p>
+        <button
+          mat-raised-button
+          class="db-no-location__btn"
+          (click)="goToSearch()"
+          aria-label="Buscar ciudad"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+            <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Buscar ciudad
+        </button>
+      </div>
+    </div>
+  }
+
   <!-- ─── SKELETON ──────────────────────────────────── -->
-  @if (isLoading()) {
+  @if (isLoading() && !needsLocation()) {
     <div class="db-container">
       <div class="db-skeleton" aria-busy="true" aria-label="Cargando datos del clima">
         <div class="sk-hero glass-card pulse"></div>
@@ -24,7 +53,7 @@
   }
 
   <!-- ─── CONTENT ──────────────────────────────────── -->
-  @if (!isLoading()) {
+  @if (!isLoading() && !needsLocation()) {
     <div class="db-container" #dashboardRoot>
       <div class="db-stage">
 

@@ -6,14 +6,16 @@ import {
   OnDestroy,
   OnInit,
   computed,
+  inject,
   signal,
   viewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRippleModule } from '@angular/material/core';
+import { forkJoin } from 'rxjs';
 import { gsap } from 'gsap';
 
 import { WeatherIconComponent } from '../../shared/components/weather-icon/weather-icon.component';
@@ -27,13 +29,22 @@ import {
 } from './mock-weather.data';
 import {
   getAqiAppearance,
-  getRefreshedWeatherSnapshot,
   getTempRange,
   getUvAppearance
 } from './dashboard.utils';
+import { AuthService } from '../../core/services/auth.service';
+import { WeatherService } from '../../core/services/weather.service';
+import {
+  weatherCodeToCondition,
+  weatherCodeToLabel,
+  degreesToCardinal,
+  extractHour,
+  formatDayName,
+  formatDateShort,
+  formatHour
+} from '../../core/services/weather.utils';
 
 const INITIAL_LOADING_MS = 800;
-const REFRESH_LOADING_MS = 600;
 const DATE_FORMATTER = new Intl.DateTimeFormat('es-AR', {
   weekday: 'long',
   day: 'numeric',
@@ -65,6 +76,7 @@ export class DashboardPage implements OnInit, OnDestroy {
   protected readonly viewportWidth = signal(typeof window !== 'undefined' ? window.innerWidth : 1280);
   protected readonly segments = [1, 2, 3, 4, 5];
   protected readonly visibilityMarkers = [1, 2, 3];
+  protected readonly needsLocation = signal(false);
 
   protected readonly formattedDate = computed(() => DATE_FORMATTER.format(this.now()));
 
@@ -87,19 +99,39 @@ export class DashboardPage implements OnInit, OnDestroy {
   private readonly dashboardRootEl = viewChild<ElementRef<HTMLElement>>('dashboardRoot');
   private readonly heroTempEl = viewChild<ElementRef<HTMLElement>>('heroTemp');
 
+  private readonly router = inject(Router);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly authService = inject(AuthService);
+  private readonly weatherService = inject(WeatherService);
+
   private ctx?: gsap.Context;
   private loadTimer?: number;
   private clockTimer?: number;
+  private currentLat?: number;
+  private currentLon?: number;
 
   private readonly handleOnline = () => this.isOffline.set(false);
   private readonly handleOffline = () => this.isOffline.set(true);
 
-  constructor(private readonly router: Router) {}
-
   ngOnInit(): void {
     this.startClock();
     this.bindNetworkEvents();
-    this.loadTimer = window.setTimeout(() => this.finishLoading(), INITIAL_LOADING_MS);
+
+    const params = this.activatedRoute.snapshot.queryParams;
+    const lat = params['lat'] || localStorage.getItem('atmos_lat');
+    const lon = params['lon'] || localStorage.getItem('atmos_lon');
+    const city = params['city'] || 'Ubicación actual';
+    const country = params['country'] || '';
+
+    if (lat && lon) {
+      this.currentLat = Number(lat);
+      this.currentLon = Number(lon);
+      this.needsLocation.set(false);
+      this.loadWeatherData(city, country);
+    } else {
+      this.needsLocation.set(true);
+      this.isLoading.set(false);
+    }
   }
 
   ngOnDestroy(): void {
@@ -133,15 +165,12 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
   protected onRefresh(): void {
-    if (this.isLoading()) return;
+    if (this.isLoading() || !this.currentLat || !this.currentLon) return;
 
     this.ctx?.revert();
     this.isLoading.set(true);
 
-    this.loadTimer = window.setTimeout(() => {
-      this.applyRefreshSnapshot();
-      this.finishLoading();
-    }, REFRESH_LOADING_MS);
+    this.loadWeatherData(this.currentWeather().cityName, this.currentWeather().country);
   }
 
   protected getTempBarWidth(day: DailyForecast): number {
@@ -175,26 +204,105 @@ export class DashboardPage implements OnInit, OnDestroy {
 
   // ── Navigation ─────────────────────────────────────────
   protected goToDetail(): void {
-    this.router.navigate(['/detail']);
+    void this.router.navigate(['/detail']);
   }
 
   protected goToFavorites(): void {
-    this.router.navigate(['/favorites']);
+    void this.router.navigate(['/favorites']);
   }
 
   protected goToSearch(): void {
-    this.router.navigate(['/search']);
+    void this.router.navigate(['/search']);
   }
 
   protected goToProfile(): void {
-    this.router.navigate(['/profile']);
+    void this.router.navigate(['/profile']);
   }
 
   protected goToSettings(): void {
-    this.router.navigate(['/settings']);
+    void this.router.navigate(['/settings']);
   }
 
   // ── Private ─────────────────────────────────────────────
+  private loadWeatherData(city: string, country: string): void {
+    const lat = this.currentLat!;
+    const lon = this.currentLon!;
+
+    forkJoin({
+      current: this.weatherService.getCurrentWeather(lat, lon),
+      forecast: this.weatherService.getForecast(lat, lon)
+    }).subscribe({
+      next: ({ current: currentRes, forecast }) => {
+        const wmoCode = currentRes.current?.weatherCode ?? 0;
+        const isDay = currentRes.current?.isDay ?? 1;
+
+        let sunrise = '';
+        let sunset = '';
+        if (forecast.daily?.sunrise?.length) {
+          sunrise = formatHour(forecast.daily.sunrise[0]);
+        }
+        if (forecast.daily?.sunset?.length) {
+          sunset = formatHour(forecast.daily.sunset[0]);
+        }
+
+        const current: CurrentWeather = {
+          cityName: city,
+          country,
+          temp: Math.round(currentRes.current?.temperature ?? 0),
+          feelsLike: Math.round(currentRes.current?.apparentTemperature ?? 0),
+          condition: weatherCodeToCondition(wmoCode, isDay),
+          conditionLabel: weatherCodeToLabel(wmoCode),
+          humidity: currentRes.current?.humidity ?? 0,
+          windSpeed: Math.round(currentRes.current?.windSpeed ?? 0),
+          windDirection: degreesToCardinal(currentRes.current?.windDirection ?? 0),
+          windDegrees: currentRes.current?.windDirection ?? 0,
+          pressure: currentRes.current?.pressure ?? currentRes.current?.surfacePressure ?? 0,
+          aqi: 0,
+          aqiLabel: 'No disponible',
+          sunrise,
+          sunset,
+          visibility: 10,
+          uvIndex: 0,
+          lastUpdated: new Date()
+        };
+
+        this.currentWeather.set(current);
+
+        if (forecast.hourly) {
+          const hourly: HourlyForecast[] = forecast.hourly.time.map((t: string, i: number) => ({
+            hour: extractHour(t),
+            temp: Math.round(forecast.hourly.temperature_2m[i]),
+            condition: weatherCodeToCondition(forecast.hourly.weather_code[i], 1),
+            precipChance: forecast.hourly.precipitation_probability?.[i] ?? 0
+          }));
+          this.hourlyForecast.set(hourly);
+        }
+
+        if (forecast.daily) {
+          const daily: DailyForecast[] = forecast.daily.time.map((t: string, i: number) => ({
+            day: formatDayName(t, i),
+            date: formatDateShort(t),
+            tempMax: Math.round(forecast.daily.temperature_2m_max[i]),
+            tempMin: Math.round(forecast.daily.temperature_2m_min[i]),
+            condition: weatherCodeToCondition(forecast.daily.weather_code[i], 1),
+            precipChance: forecast.daily.precipitation_probability_max?.[i] ?? 0
+          }));
+          this.dailyForecast.set(daily);
+        }
+
+        this.loadTimer = window.setTimeout(() => this.finishLoading(), INITIAL_LOADING_MS);
+      },
+      error: () => {
+        this.currentWeather.set({
+          ...MOCK_CURRENT,
+          cityName: city,
+          country
+        });
+        this.loadTimer = window.setTimeout(() => this.finishLoading(), INITIAL_LOADING_MS);
+      }
+    });
+  }
+
   private finishLoading(): void {
     this.now.set(new Date());
     this.isLoading.set(false);
@@ -262,16 +370,5 @@ export class DashboardPage implements OnInit, OnDestroy {
 
   private startClock(): void {
     this.clockTimer = window.setInterval(() => this.now.set(new Date()), 60_000);
-  }
-
-  private applyRefreshSnapshot(): void {
-    const snapshot = getRefreshedWeatherSnapshot(
-      this.currentWeather(),
-      this.hourlyForecast(),
-      new Date()
-    );
-
-    this.currentWeather.set(snapshot.current);
-    this.hourlyForecast.set(snapshot.hourlyForecast);
   }
 }

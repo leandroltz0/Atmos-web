@@ -29,7 +29,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { gsap } from 'gsap';
 
 import { APP_ROUTE_PATHS } from '../../core/routing/app-route-paths';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService, LoginResponse } from '../../core/services/auth.service';
 import { AuthPreviewPanelComponent } from './components/auth-preview-panel/auth-preview-panel.component';
 
 type AuthMode = 'signin' | 'signup';
@@ -136,7 +136,8 @@ export class AuthPage implements AfterViewInit {
       }).pipe(
         finalize(() => this.isSubmitting.set(false))
       ).subscribe({
-        next: () => {
+        next: (res: LoginResponse) => {
+          this.authService.saveToken(res.token);
           void this.router.navigate([`/${APP_ROUTE_PATHS.dashboard}`]);
         },
         error: (error: unknown) => {
@@ -157,7 +158,8 @@ export class AuthPage implements AfterViewInit {
     }).pipe(
       finalize(() => this.isSubmitting.set(false))
     ).subscribe({
-      next: () => {
+      next: (res: LoginResponse) => {
+        this.authService.saveToken(res.token);
         void this.router.navigate([`/${APP_ROUTE_PATHS.dashboard}`]);
       },
       error: (error: unknown) => {
