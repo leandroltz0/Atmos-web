@@ -36,6 +36,7 @@ export interface HourlyForecast {
   temp: number;
   condition: WeatherCondition;
   precipChance: number;
+  isNow?: boolean;
 }
 
 export interface DailyForecast {
@@ -59,7 +60,7 @@ export const MOCK_CURRENT: CurrentWeather = {
   windDirection: 'SE',
   windDegrees: 135,
   pressure: 1016,
-  aqi: 2,
+  aqi: 1,
   aqiLabel: 'Buena',
   sunrise: '07:29',
   sunset: '18:09',

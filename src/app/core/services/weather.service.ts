@@ -17,4 +17,9 @@ export class WeatherService {
     const params = new HttpParams().set('lat', lat.toString()).set('lon', lon.toString());
     return this.http.get(`${this.apiUrl}/weather/forecast`, { params });
   }
+
+  getAirQuality(lat: number, lon: number): Observable<any> {
+    const params = new HttpParams().set('lat', lat.toString()).set('lon', lon.toString());
+    return this.http.get(`${this.apiUrl}/weather/air-quality`, { params });
+  }
 }

@@ -351,15 +351,21 @@
                 @for (item of hourlyForecast(); track trackByHour($index, item)) {
                   <div
                     class="db-hourly-item"
-                    [class.db-hourly-item--active]="isCurrentHour(item.hour)"
+                    [class.db-hourly-item--active]="item.isNow"
                     role="listitem"
-                    [attr.aria-label]="'Pronóstico ' + item.hour + ': ' + item.temp + ' grados'"
+                    [attr.aria-label]="item.isNow ? 'Ahora: ' + item.temp + ' grados' : 'Pronóstico ' + item.hour + ': ' + item.temp + ' grados'"
                     tabindex="0"
                     (click)="goToDetail()"
                     (keydown.enter)="goToDetail()"
                     matRipple
                   >
-                    <span class="db-hourly-hour">{{ item.hour }}</span>
+                    <span class="db-hourly-hour">
+                      @if (item.isNow) {
+                        <span class="db-hourly-now-badge">Ahora</span>
+                      } @else {
+                        {{ item.hour }}
+                      }
+                    </span>
                     <app-weather-icon [condition]="item.condition" [size]="28" [decorative]="true"/>
                     <span class="db-hourly-temp">{{ item.temp }}°</span>
                     @if (item.precipChance > 20) {

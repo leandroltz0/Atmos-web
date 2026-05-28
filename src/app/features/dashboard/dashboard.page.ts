@@ -15,7 +15,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRippleModule } from '@angular/material/core';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { gsap } from 'gsap';
 
 import { WeatherIconComponent } from '../../shared/components/weather-icon/weather-icon.component';
@@ -29,8 +29,10 @@ import {
 } from './mock-weather.data';
 import {
   getAqiAppearance,
+  getAqiLabel,
   getTempRange,
-  getUvAppearance
+  getUvAppearance,
+  usAqiToLevel
 } from './dashboard.utils';
 import { AuthService } from '../../core/services/auth.service';
 import { WeatherService } from '../../core/services/weather.service';
@@ -185,11 +187,6 @@ export class DashboardPage implements OnInit, OnDestroy {
     return ((day.tempMin - min) / total) * 100;
   }
 
-  protected isCurrentHour(hourStr: string): boolean {
-    const currentHour = this.now().getHours().toString().padStart(2, '0') + ':00';
-    return hourStr === currentHour;
-  }
-
   protected isMobile(): boolean {
     return this.viewportWidth() < 640;
   }
@@ -230,62 +227,62 @@ export class DashboardPage implements OnInit, OnDestroy {
 
     forkJoin({
       current: this.weatherService.getCurrentWeather(lat, lon),
-      forecast: this.weatherService.getForecast(lat, lon)
+      forecast: this.weatherService.getForecast(lat, lon),
+      airQuality: this.weatherService.getAirQuality(lat, lon).pipe(
+        catchError(() => of({ aqi: 0 }))
+      )
     }).subscribe({
-      next: ({ current: currentRes, forecast }) => {
-        const wmoCode = currentRes.current?.weatherCode ?? 0;
-        const isDay = currentRes.current?.isDay ?? 1;
+      next: ({ current: currentRes, forecast, airQuality }) => {
+        const currentData = currentRes.current ?? {};
+        const wmoCode = currentData.weatherCode ?? 0;
+        const isDay = currentData.isDay ?? 1;
+        const aqiValue = airQuality?.aqi != null ? usAqiToLevel(airQuality.aqi) : 0;
 
-        let sunrise = '';
-        let sunset = '';
-        if (forecast.daily?.sunrise?.length) {
-          sunrise = formatHour(forecast.daily.sunrise[0]);
-        }
-        if (forecast.daily?.sunset?.length) {
-          sunset = formatHour(forecast.daily.sunset[0]);
-        }
+        const dailyItems: any[] = forecast.forecast ?? [];
+        const todayItem = dailyItems[0] ?? {};
 
         const current: CurrentWeather = {
           cityName: city,
           country,
-          temp: Math.round(currentRes.current?.temperature ?? 0),
-          feelsLike: Math.round(currentRes.current?.apparentTemperature ?? 0),
+          temp: Math.round(currentData.temperature ?? 0),
+          feelsLike: Math.round(currentData.apparentTemperature ?? 0),
           condition: weatherCodeToCondition(wmoCode, isDay),
           conditionLabel: weatherCodeToLabel(wmoCode),
-          humidity: currentRes.current?.humidity ?? 0,
-          windSpeed: Math.round(currentRes.current?.windSpeed ?? 0),
-          windDirection: degreesToCardinal(currentRes.current?.windDirection ?? 0),
-          windDegrees: currentRes.current?.windDirection ?? 0,
-          pressure: currentRes.current?.pressure ?? currentRes.current?.surfacePressure ?? 0,
-          aqi: 0,
-          aqiLabel: 'No disponible',
-          sunrise,
-          sunset,
-          visibility: 10,
-          uvIndex: 0,
+          humidity: currentData.humidity ?? 0,
+          windSpeed: Math.round(currentData.windSpeed ?? 0),
+          windDirection: degreesToCardinal(currentData.windDirection ?? 0),
+          windDegrees: currentData.windDirection ?? 0,
+          pressure: currentData.pressure ?? currentData.surfacePressure ?? 0,
+          aqi: aqiValue,
+          aqiLabel: getAqiLabel(aqiValue),
+          sunrise: formatHour(todayItem.sunrise ?? ''),
+          sunset: formatHour(todayItem.sunset ?? ''),
+          visibility: currentData.visibility ?? 10,
+          uvIndex: currentData.uv_index ?? 0,
           lastUpdated: new Date()
         };
 
         this.currentWeather.set(current);
 
-        if (forecast.hourly) {
-          const hourly: HourlyForecast[] = forecast.hourly.time.map((t: string, i: number) => ({
-            hour: extractHour(t),
-            temp: Math.round(forecast.hourly.temperature_2m[i]),
-            condition: weatherCodeToCondition(forecast.hourly.weather_code[i], 1),
-            precipChance: forecast.hourly.precipitation_probability?.[i] ?? 0
+        const hourlyList: any[] = forecast.hourly ?? [];
+        if (hourlyList.length) {
+          const rawHourly: HourlyForecast[] = hourlyList.map((item: any) => ({
+            hour: extractHour(item.time),
+            temp: Math.round(item.temperature ?? 0),
+            condition: weatherCodeToCondition(item.weatherCode ?? 0, 1),
+            precipChance: item.precipitationProbability ?? 0
           }));
-          this.hourlyForecast.set(hourly);
+          this.hourlyForecast.set(this.getNext24Hours(rawHourly));
         }
 
-        if (forecast.daily) {
-          const daily: DailyForecast[] = forecast.daily.time.map((t: string, i: number) => ({
-            day: formatDayName(t, i),
-            date: formatDateShort(t),
-            tempMax: Math.round(forecast.daily.temperature_2m_max[i]),
-            tempMin: Math.round(forecast.daily.temperature_2m_min[i]),
-            condition: weatherCodeToCondition(forecast.daily.weather_code[i], 1),
-            precipChance: forecast.daily.precipitation_probability_max?.[i] ?? 0
+        if (dailyItems.length) {
+          const daily: DailyForecast[] = dailyItems.map((item: any, i: number) => ({
+            day: formatDayName(item.date, i),
+            date: formatDateShort(item.date),
+            tempMax: Math.round(item.temperatureMax ?? 0),
+            tempMin: Math.round(item.temperatureMin ?? 0),
+            condition: weatherCodeToCondition(item.weatherCode ?? 0, 1),
+            precipChance: item.precipitationProbabilityMax ?? 0
           }));
           this.dailyForecast.set(daily);
         }
@@ -301,6 +298,28 @@ export class DashboardPage implements OnInit, OnDestroy {
         this.loadTimer = window.setTimeout(() => this.finishLoading(), INITIAL_LOADING_MS);
       }
     });
+  }
+
+  private getNext24Hours(raw: HourlyForecast[]): HourlyForecast[] {
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const startIndex = raw.findIndex(item => {
+      const [h, m] = item.hour.split(':').map(Number);
+      return h * 60 + m >= currentMinutes;
+    });
+
+    let rotated: HourlyForecast[];
+    if (startIndex > 0) {
+      rotated = [...raw.slice(startIndex), ...raw.slice(0, startIndex)];
+    } else {
+      rotated = [...raw];
+    }
+
+    return rotated.slice(0, 24).map((item, i) => ({
+      ...item,
+      isNow: i === 0
+    }));
   }
 
   private finishLoading(): void {

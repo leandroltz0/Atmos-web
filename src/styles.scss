@@ -781,6 +781,32 @@ app-dashboard-page {
   font-size: 0.72rem;
 }
 
+.db-hourly-now-badge {
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    animation: db-pulse-dot 2s ease-in-out infinite;
+  }
+}
+
+@keyframes db-pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 .db-daily-list {
   display: flex;
   flex-direction: column;
@@ -1039,6 +1065,9 @@ app-dashboard-page {
   }
 
   .db-hero {
+    height: 18rem;
+    margin-top: -1.2rem;
+    margin-bottom: 0.5rem;
     padding: 1.4rem;
   }
 

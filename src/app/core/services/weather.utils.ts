@@ -67,6 +67,8 @@ export function formatDateShort(isoString: string): string {
 }
 
 export function formatHour(isoString: string): string {
+  if (!isoString) return '';
   const date = new Date(isoString);
+  if (isNaN(date.getTime())) return '';
   return date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
 }

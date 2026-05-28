@@ -10,11 +10,12 @@ type DashboardSignalPalette = {
 } & DashboardSignalTone;
 
 const AQI_PALETTE: DashboardSignalPalette[] = [
-  { label: 'Buena', color: '#10B981', background: 'rgba(16, 185, 129, 0.14)' },
-  { label: 'Moderada', color: '#FFD166', background: 'rgba(255, 209, 102, 0.14)' },
-  { label: 'Regular', color: '#F97316', background: 'rgba(249, 115, 22, 0.14)' },
-  { label: 'Mala', color: '#EF4444', background: 'rgba(239, 68, 68, 0.14)' },
-  { label: 'Muy mala', color: '#7C3AED', background: 'rgba(124, 58, 237, 0.14)' }
+  { label: 'Excelente', color: '#10B981', background: 'rgba(16, 185, 129, 0.14)' },
+  { label: 'Buena',     color: '#34D399', background: 'rgba(52, 211, 153, 0.14)' },
+  { label: 'Moderada',  color: '#FFD166', background: 'rgba(255, 209, 102, 0.14)' },
+  { label: 'Regular',   color: '#F97316', background: 'rgba(249, 115, 22, 0.14)' },
+  { label: 'Mala',      color: '#EF4444', background: 'rgba(239, 68, 68, 0.14)' },
+  { label: 'Muy mala',  color: '#7C3AED', background: 'rgba(124, 58, 237, 0.14)' }
 ];
 
 const UV_PALETTE: Array<DashboardSignalTone & { max: number }> = [
@@ -26,7 +27,36 @@ const UV_PALETTE: Array<DashboardSignalTone & { max: number }> = [
 ];
 
 export function getAqiAppearance(aqi: number): DashboardSignalPalette {
-  return AQI_PALETTE[clampValue(aqi, 1, AQI_PALETTE.length) - 1] ?? AQI_PALETTE[0];
+  const index = clampValue(aqi, 0, AQI_PALETTE.length - 1);
+  return AQI_PALETTE[index] ?? AQI_PALETTE[0];
+}
+
+const AQI_LABELS: string[] = [
+  'Excelente',
+  'Buena',
+  'Moderada',
+  'Regular',
+  'Mala',
+  'Muy mala'
+];
+
+export function getAqiLabel(aqi: number): string {
+  return AQI_LABELS[clampValue(aqi, 0, AQI_LABELS.length - 1)] ?? AQI_LABELS[0];
+}
+
+const US_AQI_BREAKPOINTS: Array<{ max: number; level: number }> = [
+  { max: 50, level: 1 },
+  { max: 100, level: 2 },
+  { max: 150, level: 3 },
+  { max: 200, level: 4 },
+  { max: Infinity, level: 5 }
+];
+
+export function usAqiToLevel(usAqi: number): number {
+  for (const bp of US_AQI_BREAKPOINTS) {
+    if (usAqi <= bp.max) return bp.level;
+  }
+  return 5;
 }
 
 export function getUvAppearance(uvIndex: number): DashboardSignalTone {
