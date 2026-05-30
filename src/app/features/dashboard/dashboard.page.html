@@ -1,55 +1,13 @@
 <main class="db-shell" role="main" [attr.aria-busy]="isLoading()">
 
-  <!-- Ambient background orbs -->
-  <div class="db-bg" aria-hidden="true">
-    <div class="db-bg__orb db-bg__orb--1"></div>
-    <div class="db-bg__orb db-bg__orb--2"></div>
-    <div class="db-bg__orb db-bg__orb--3"></div>
-  </div>
+  <app-dashboard-background />
 
-  <!-- ─── NO LOCATION ──────────────────────────────── -->
   @if (needsLocation()) {
-    <div class="db-container">
-      <div class="db-no-location">
-        <div class="db-no-location__icon" aria-hidden="true">
-          <svg viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
-            <circle cx="24" cy="18" r="6" stroke="currentColor" stroke-width="2"/>
-            <path d="M14 36c0-5.5 4.5-10 10-10s10 4.5 10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <h2 class="db-no-location__title">Sin ubicación</h2>
-        <p class="db-no-location__desc">Buscá una ciudad para ver el clima</p>
-        <button
-          mat-raised-button
-          class="db-no-location__btn"
-          (click)="goToSearch()"
-          aria-label="Buscar ciudad"
-        >
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
-            <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          Buscar ciudad
-        </button>
-      </div>
-    </div>
+    <app-dashboard-no-location (searchCity)="goToSearch()" />
   }
 
-  <!-- ─── SKELETON ──────────────────────────────────── -->
   @if (isLoading() && !needsLocation()) {
-    <div class="db-container">
-      <div class="db-skeleton" aria-busy="true" aria-label="Cargando datos del clima">
-        <div class="sk-hero glass-card pulse"></div>
-        <div class="sk-grid">
-          @for (i of [1,2,3,4]; track i) {
-            <div class="sk-stat glass-card pulse"></div>
-          }
-        </div>
-        <div class="sk-section glass-card pulse"></div>
-        <div class="sk-section glass-card pulse"></div>
-      </div>
-    </div>
+    <app-dashboard-skeleton />
   }
 
   <!-- ─── CONTENT ──────────────────────────────────── -->
@@ -57,52 +15,15 @@
     <div class="db-container" #dashboardRoot>
       <div class="db-stage">
 
-        <!-- HEADER -->
-        <header class="db-header">
-          <div class="db-header__copy">
-            <p class="db-eyebrow">Panel local</p>
-            <div class="db-header__title-row">
-              <h1 class="db-city">
-                <svg class="db-city__pin" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z"
-                    fill="currentColor" fill-opacity="0.18" stroke="currentColor"
-                    stroke-width="1.5" stroke-linejoin="round"/>
-                  <circle cx="12" cy="10" r="2.4" fill="currentColor"/>
-                </svg>
-                <span>{{ currentWeather().cityName }}</span>
-              </h1>
-              @if (currentWeather().country) {
-                <span class="db-city__country">{{ currentWeather().country }}</span>
-              }
-            </div>
-            <p class="db-date">{{ formattedDate() }}</p>
-          </div>
-
-          <div class="db-header__meta">
-            <div class="db-status" [class.db-status--offline]="isOffline()">
-              <span class="db-status__dot" aria-hidden="true"></span>
-              <span class="db-status__text">
-                @if (isOffline()) { Sin conexión }
-                @else { Actualizado hace {{ minutesAgo() }} min }
-              </span>
-            </div>
-
-            <button
-              mat-icon-button
-              type="button"
-              class="db-refresh-btn"
-              [class.spinning]="isLoading()"
-              (click)="onRefresh()"
-              matTooltip="Actualizar datos"
-              aria-label="Actualizar datos del clima"
-            >
-              <svg class="db-refresh-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                <path d="M20 12A8 8 0 1 1 17.7 6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                <path d="M20 4.5V10H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-        </header>
+        <app-dashboard-header
+          [cityName]="currentWeather().cityName"
+          [country]="currentWeather().country"
+          [formattedDate]="formattedDate()"
+          [minutesAgo]="minutesAgo()"
+          [isOffline]="isOffline()"
+          [isLoading]="isLoading()"
+          (refresh)="onRefresh()"
+        />
 
         <!-- Offline banner -->
         @if (isOffline()) {
@@ -124,87 +45,11 @@
           <!-- ── LEFT COLUMN ── -->
           <div class="db-col-left">
 
-          <!-- HERO CARD -->
-          <section
-            class="db-hero dash-card glass-card"
-            role="button"
-            tabindex="0"
-            (click)="goToDetail()"
-            (keydown.enter)="goToDetail()"
-            (keydown.space)="$event.preventDefault(); goToDetail()"
-            [attr.aria-label]="'Ver detalle: ' + currentWeather().temp + '° en ' + currentWeather().cityName"
-            matRipple
-          >
-            <div class="db-hero__top">
-              <span class="db-condition-pill">
-                <app-weather-icon [condition]="currentWeather().condition" [size]="14" [decorative]="true"/>
-                {{ currentWeather().conditionLabel }}
-              </span>
-              <span class="db-detail-hint">
-                Ver detalle
-                <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
-                  <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </div>
-
-            <div class="db-hero__main">
-              <app-weather-icon
-                [condition]="currentWeather().condition"
-                [size]="weatherIconSize()"
-                [decorative]="true"
-              />
-              <div class="db-hero__temp-block">
-                <div class="db-hero__temp-row">
-                  <span
-                    #heroTemp
-                    class="db-temp"
-                    [attr.aria-label]="currentWeather().temp + ' grados celsius'"
-                  >{{ currentWeather().temp }}</span>
-                  <span class="db-temp-unit">°</span>
-                </div>
-                <p class="db-feels-like">
-                  Sensación <strong>{{ currentWeather().feelsLike }}°C</strong>
-                </p>
-              </div>
-            </div>
-
-            <div class="db-hero__divider" aria-hidden="true"></div>
-
-            <div class="db-hero__stats" role="list" aria-label="Datos actuales">
-              <div class="db-stat" role="listitem">
-                <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2.5C12 2.5 5.5 10.5 5.5 14.5C5.5 18.1 8.4 21 12 21C15.6 21 18.5 18.1 18.5 14.5C18.5 10.5 12 2.5 12 2.5Z" stroke="currentColor" stroke-width="1.6" fill="currentColor" fill-opacity="0.15"/>
-                </svg>
-                <span class="db-stat__value">{{ currentWeather().humidity }}%</span>
-                <span class="db-stat__label">Humedad</span>
-              </div>
-              <div class="db-stat__sep" aria-hidden="true"></div>
-              <div class="db-stat" role="listitem">
-                <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                  <path d="M9.6 7A3.5 3.5 0 1 1 13 10.5H2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M11.7 19A3.5 3.5 0 1 0 15 15.5H2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span class="db-stat__value">{{ currentWeather().windSpeed }} <small>km/h</small></span>
-                <div class="db-wind-dir" aria-hidden="true">
-                  <svg width="11" height="11" viewBox="0 0 12 12"
-                    [style.transform]="'rotate(' + currentWeather().windDegrees + 'deg)'">
-                    <path d="M6 1L10 9H6V11H6L2 9L6 1Z" fill="currentColor" opacity="0.85"/>
-                  </svg>
-                  <span>{{ currentWeather().windDirection }}</span>
-                </div>
-              </div>
-              <div class="db-stat__sep" aria-hidden="true"></div>
-              <div class="db-stat" role="listitem">
-                <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
-                  <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                  <circle cx="11.5" cy="17.5" r="1.5" fill="currentColor"/>
-                </svg>
-                <span class="db-stat__value">{{ currentWeather().pressure }} <small>hPa</small></span>
-                <span class="db-stat__label">Presión</span>
-              </div>
-            </div>
-          </section>
+          <app-dashboard-hero-card
+            [currentWeather]="currentWeather()"
+            [weatherIconSize]="weatherIconSize()"
+            (goToDetail)="goToDetail()"
+          />
 
           <!-- DATA CARDS GRID -->
           <div class="db-data-grid">
@@ -339,95 +184,16 @@
           <!-- ── RIGHT COLUMN ── -->
           <div class="db-col-right">
 
-            <!-- HOURLY FORECAST -->
-            <section class="db-section db-section--hourly dash-card glass-card" aria-label="Pronóstico próximas 24 horas">
-              <div class="db-section__header">
-                <div class="db-section__intro">
-                  <p class="db-section__eyebrow">Ventana inmediata</p>
-                  <h2 class="db-section__title">Próximas 24 horas</h2>
-                </div>
-                <p class="db-section__meta">Deslizá o abrí el detalle</p>
-              </div>
+            <app-dashboard-hourly
+              [hourlyForecast]="hourlyForecast()"
+              (goToDetail)="goToDetail()"
+            />
 
-              <div class="db-hourly-scroll" role="list">
-                @for (item of hourlyForecast(); track trackByHour($index, item)) {
-                  <div
-                    class="db-hourly-item"
-                    [class.db-hourly-item--active]="item.isNow"
-                    role="listitem"
-                    [attr.aria-label]="item.isNow ? 'Ahora: ' + item.temp + ' grados' : 'Pronóstico ' + item.hour + ': ' + item.temp + ' grados'"
-                    tabindex="0"
-                    (click)="goToDetail()"
-                    (keydown.enter)="goToDetail()"
-                    matRipple
-                  >
-                    <span class="db-hourly-hour">
-                      @if (item.isNow) {
-                        <span class="db-hourly-now-badge">Ahora</span>
-                      } @else {
-                        {{ item.hour }}
-                      }
-                    </span>
-                    <app-weather-icon [condition]="item.condition" [size]="28" [decorative]="true"/>
-                    <span class="db-hourly-temp">{{ item.temp }}°</span>
-                    @if (item.precipChance > 20) {
-                      <span class="db-hourly-precip">{{ item.precipChance }}%</span>
-                    }
-                  </div>
-                }
-              </div>
-            </section>
-
-            <!-- DAILY FORECAST -->
-            <section class="db-section db-section--daily dash-card glass-card" aria-label="Pronóstico próximos 7 días">
-              <div class="db-section__header">
-                <div class="db-section__intro">
-                  <p class="db-section__eyebrow">Ritmo semanal</p>
-                  <h2 class="db-section__title">Próximos 7 días</h2>
-                </div>
-                <p class="db-section__meta">Rango térmico y probabilidad de lluvia</p>
-              </div>
-
-              <div class="db-daily-list">
-                @for (day of dailyForecast(); track trackByDate($index, day)) {
-                  <div
-                    class="db-daily-row"
-                    tabindex="0"
-                    role="button"
-                    [attr.aria-label]="day.day + ': máx ' + day.tempMax + '°, mín ' + day.tempMin + '°'"
-                    (click)="goToDetail()"
-                    (keydown.enter)="goToDetail()"
-                    (keydown.space)="$event.preventDefault(); goToDetail()"
-                    matRipple
-                  >
-                    <div class="db-daily-info">
-                      <span class="db-daily-day">{{ day.day }}</span>
-                      <span class="db-daily-date">{{ day.date }}</span>
-                    </div>
-                    <div class="db-daily-weather">
-                      <app-weather-icon [condition]="day.condition" [size]="24" [decorative]="true"/>
-                      <span class="db-daily-precip" [class.db-daily-precip--empty]="day.precipChance <= 10">
-                        @if (day.precipChance > 10) {
-                          {{ day.precipChance }}%
-                        } @else {
-                          &nbsp;
-                        }
-                      </span>
-                    </div>
-                    <div class="db-temp-range">
-                      <span class="db-temp-min">{{ day.tempMin }}°</span>
-                      <div class="db-temp-bar">
-                        <div class="db-temp-bar__fill"
-                          [style.margin-left.%]="getTempBarOffset(day)"
-                          [style.width.%]="getTempBarWidth(day)">
-                        </div>
-                      </div>
-                      <span class="db-temp-max">{{ day.tempMax }}°</span>
-                    </div>
-                  </div>
-                }
-              </div>
-            </section>
+            <app-dashboard-daily
+              [dailyForecast]="dailyForecast()"
+              [tempRange]="tempRange()"
+              (goToDetail)="goToDetail()"
+            />
 
           </div><!-- /db-col-right -->
 

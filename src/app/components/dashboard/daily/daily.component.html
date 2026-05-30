@@ -1,0 +1,49 @@
+<section class="db-section db-section--daily dash-card glass-card" aria-label="Pronóstico próximos 7 días">
+  <div class="db-section__header">
+    <div class="db-section__intro">
+      <p class="db-section__eyebrow">Ritmo semanal</p>
+      <h2 class="db-section__title">Próximos 7 días</h2>
+    </div>
+    <p class="db-section__meta">Rango térmico y probabilidad de lluvia</p>
+  </div>
+
+  <div class="db-daily-list">
+    @for (day of dailyForecast(); track trackByDate($index, day)) {
+      <div
+        class="db-daily-row"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="day.day + ': máx ' + day.tempMax + '°, mín ' + day.tempMin + '°'"
+        (click)="onGoToDetail()"
+        (keydown.enter)="onGoToDetail()"
+        (keydown.space)="$event.preventDefault(); onGoToDetail()"
+        matRipple
+      >
+        <div class="db-daily-info">
+          <span class="db-daily-day">{{ day.day }}</span>
+          <span class="db-daily-date">{{ day.date }}</span>
+        </div>
+        <div class="db-daily-weather">
+          <app-weather-icon [condition]="day.condition" [size]="24" [decorative]="true"/>
+          <span class="db-daily-precip" [class.db-daily-precip--empty]="day.precipChance <= 10">
+            @if (day.precipChance > 10) {
+              {{ day.precipChance }}%
+            } @else {
+              &nbsp;
+            }
+          </span>
+        </div>
+        <div class="db-temp-range">
+          <span class="db-temp-min">{{ day.tempMin }}°</span>
+          <div class="db-temp-bar">
+            <div class="db-temp-bar__fill"
+              [style.margin-left.%]="getTempBarOffset(day)"
+              [style.width.%]="getTempBarWidth(day)">
+            </div>
+          </div>
+          <span class="db-temp-max">{{ day.tempMax }}°</span>
+        </div>
+      </div>
+    }
+  </div>
+</section>

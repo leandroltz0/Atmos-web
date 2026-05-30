@@ -1,0 +1,37 @@
+<section class="db-section db-section--hourly dash-card glass-card" aria-label="Pronóstico próximas 24 horas">
+  <div class="db-section__header">
+    <div class="db-section__intro">
+      <p class="db-section__eyebrow">Ventana inmediata</p>
+      <h2 class="db-section__title">Próximas 24 horas</h2>
+    </div>
+    <p class="db-section__meta">Deslizá o abrí el detalle</p>
+  </div>
+
+  <div class="db-hourly-scroll" role="list">
+    @for (item of hourlyForecast(); track trackByHour($index, item)) {
+      <div
+        class="db-hourly-item"
+        [class.db-hourly-item--active]="item.isNow"
+        role="listitem"
+        [attr.aria-label]="item.isNow ? 'Ahora: ' + item.temp + ' grados' : 'Pronóstico ' + item.hour + ': ' + item.temp + ' grados'"
+        tabindex="0"
+        (click)="onGoToDetail()"
+        (keydown.enter)="onGoToDetail()"
+        matRipple
+      >
+        <span class="db-hourly-hour">
+          @if (item.isNow) {
+            <span class="db-hourly-now-badge">Ahora</span>
+          } @else {
+            {{ item.hour }}
+          }
+        </span>
+        <app-weather-icon [condition]="item.condition" [size]="28" [decorative]="true"/>
+        <span class="db-hourly-temp">{{ item.temp }}°</span>
+        @if (item.precipChance > 20) {
+          <span class="db-hourly-precip">{{ item.precipChance }}%</span>
+        }
+      </div>
+    }
+  </div>
+</section>

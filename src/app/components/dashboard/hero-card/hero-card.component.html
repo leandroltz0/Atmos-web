@@ -1,0 +1,80 @@
+<section
+  class="db-hero dash-card glass-card"
+  role="button"
+  tabindex="0"
+  (click)="onGoToDetail()"
+  (keydown.enter)="onGoToDetail()"
+  (keydown.space)="$event.preventDefault(); onGoToDetail()"
+  [attr.aria-label]="'Ver detalle: ' + currentWeather().temp + '° en ' + currentWeather().cityName"
+  matRipple
+>
+  <div class="db-hero__top">
+    <span class="db-condition-pill">
+      <app-weather-icon [condition]="currentWeather().condition" [size]="14" [decorative]="true"/>
+      {{ currentWeather().conditionLabel }}
+    </span>
+    <span class="db-detail-hint">
+      Ver detalle
+      <svg aria-hidden="true" viewBox="0 0 16 16" fill="none">
+        <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </div>
+
+  <div class="db-hero__main">
+    <app-weather-icon
+      [condition]="currentWeather().condition"
+      [size]="weatherIconSize()"
+      [decorative]="true"
+    />
+    <div class="db-hero__temp-block">
+      <div class="db-hero__temp-row">
+        <span
+          #heroTemp
+          class="db-temp"
+          [attr.aria-label]="currentWeather().temp + ' grados celsius'"
+        >{{ currentWeather().temp }}</span>
+        <span class="db-temp-unit">°</span>
+      </div>
+      <p class="db-feels-like">
+        Sensación <strong>{{ currentWeather().feelsLike }}°C</strong>
+      </p>
+    </div>
+  </div>
+
+  <div class="db-hero__divider" aria-hidden="true"></div>
+
+  <div class="db-hero__stats" role="list" aria-label="Datos actuales">
+    <div class="db-stat" role="listitem">
+      <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2.5C12 2.5 5.5 10.5 5.5 14.5C5.5 18.1 8.4 21 12 21C15.6 21 18.5 18.1 18.5 14.5C18.5 10.5 12 2.5 12 2.5Z" stroke="currentColor" stroke-width="1.6" fill="currentColor" fill-opacity="0.15"/>
+      </svg>
+      <span class="db-stat__value">{{ currentWeather().humidity }}%</span>
+      <span class="db-stat__label">Humedad</span>
+    </div>
+    <div class="db-stat__sep" aria-hidden="true"></div>
+    <div class="db-stat" role="listitem">
+      <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+        <path d="M9.6 7A3.5 3.5 0 1 1 13 10.5H2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11.7 19A3.5 3.5 0 1 0 15 15.5H2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="db-stat__value">{{ currentWeather().windSpeed }} <small>km/h</small></span>
+      <div class="db-wind-dir" aria-hidden="true">
+        <svg width="11" height="11" viewBox="0 0 12 12"
+          [style.transform]="'rotate(' + currentWeather().windDegrees + 'deg)'">
+          <path d="M6 1L10 9H6V11H6L2 9L6 1Z" fill="currentColor" opacity="0.85"/>
+        </svg>
+        <span>{{ currentWeather().windDirection }}</span>
+      </div>
+    </div>
+    <div class="db-stat__sep" aria-hidden="true"></div>
+    <div class="db-stat" role="listitem">
+      <svg class="db-stat__icon-svg" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="11.5" cy="17.5" r="1.5" fill="currentColor"/>
+      </svg>
+      <span class="db-stat__value">{{ currentWeather().pressure }} <small>hPa</small></span>
+      <span class="db-stat__label">Presión</span>
+    </div>
+  </div>
+</section>

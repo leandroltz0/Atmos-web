@@ -11,13 +11,17 @@ import {
   viewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router, ActivatedRoute } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { gsap } from 'gsap';
 
-import { WeatherIconComponent } from '../../shared/components/weather-icon/weather-icon.component';
+import { DashboardBackgroundComponent } from '../../components/dashboard/background/background.component';
+import { DashboardNoLocationComponent } from '../../components/dashboard/no-location/no-location.component';
+import { DashboardSkeletonComponent } from '../../components/dashboard/skeleton/skeleton.component';
+import { DashboardHeaderComponent } from '../../components/dashboard/header/header.component';
+import { DashboardHeroCardComponent } from '../../components/dashboard/hero-card/hero-card.component';
+import { DashboardHourlyComponent } from '../../components/dashboard/hourly/hourly.component';
+import { DashboardDailyComponent } from '../../components/dashboard/daily/daily.component';
 import {
   CurrentWeather,
   DailyForecast,
@@ -58,10 +62,13 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('es-AR', {
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
-    MatButtonModule,
-    MatTooltipModule,
-    WeatherIconComponent
+    DashboardBackgroundComponent,
+    DashboardNoLocationComponent,
+    DashboardSkeletonComponent,
+    DashboardHeaderComponent,
+    DashboardHeroCardComponent,
+    DashboardHourlyComponent,
+    DashboardDailyComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dashboard.page.html',
@@ -98,7 +105,7 @@ export class DashboardPage implements OnInit, OnDestroy {
   protected readonly weatherIconSize = computed(() => this.isMobile() ? 88 : 112);
 
   private readonly dashboardRootEl = viewChild<ElementRef<HTMLElement>>('dashboardRoot');
-  private readonly heroTempEl = viewChild<ElementRef<HTMLElement>>('heroTemp');
+  private readonly heroCard = viewChild(DashboardHeroCardComponent);
 
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
@@ -158,14 +165,6 @@ export class DashboardPage implements OnInit, OnDestroy {
     this.viewportWidth.set(window.innerWidth);
   }
 
-  protected trackByHour(_index: number, item: HourlyForecast): string {
-    return item.hour;
-  }
-
-  protected trackByDate(_index: number, item: DailyForecast): string {
-    return item.date;
-  }
-
   protected onRefresh(): void {
     if (this.isLoading() || !this.currentLat || !this.currentLon) return;
 
@@ -173,18 +172,6 @@ export class DashboardPage implements OnInit, OnDestroy {
     this.isLoading.set(true);
 
     this.loadWeatherData(this.currentWeather().cityName, this.currentWeather().country);
-  }
-
-  protected getTempBarWidth(day: DailyForecast): number {
-    const { min, max } = this.tempRange();
-    const total = Math.max(max - min, 1);
-    return ((day.tempMax - day.tempMin) / total) * 100;
-  }
-
-  protected getTempBarOffset(day: DailyForecast): number {
-    const { min, max } = this.tempRange();
-    const total = Math.max(max - min, 1);
-    return ((day.tempMin - min) / total) * 100;
   }
 
   protected isMobile(): boolean {
@@ -333,7 +320,7 @@ export class DashboardPage implements OnInit, OnDestroy {
 
   private initAnimations(): void {
     const root = this.dashboardRootEl()?.nativeElement;
-    const heroTemp = this.heroTempEl()?.nativeElement;
+    const heroTemp = this.heroCard()?.heroTemp.nativeElement;
 
     if (!root) return;
 

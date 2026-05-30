@@ -1,0 +1,45 @@
+<header class="db-header">
+  <div class="db-header__copy">
+    <p class="db-eyebrow">Panel local</p>
+    <div class="db-header__title-row">
+      <h1 class="db-city">
+        <svg class="db-city__pin" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z"
+            fill="currentColor" fill-opacity="0.18" stroke="currentColor"
+            stroke-width="1.5" stroke-linejoin="round"/>
+          <circle cx="12" cy="10" r="2.4" fill="currentColor"/>
+        </svg>
+        <span>{{ cityName() }}</span>
+      </h1>
+      @if (country()) {
+        <span class="db-city__country">{{ country() }}</span>
+      }
+    </div>
+    <p class="db-date">{{ formattedDate() }}</p>
+  </div>
+
+  <div class="db-header__meta">
+    <div class="db-status" [class.db-status--offline]="isOffline()">
+      <span class="db-status__dot" aria-hidden="true"></span>
+      <span class="db-status__text">
+        @if (isOffline()) { Sin conexión }
+        @else { Actualizado hace {{ minutesAgo() }} min }
+      </span>
+    </div>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="db-refresh-btn"
+      [class.spinning]="isLoading()"
+      (click)="onRefresh()"
+      matTooltip="Actualizar datos"
+      aria-label="Actualizar datos del clima"
+    >
+      <svg class="db-refresh-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+        <path d="M20 12A8 8 0 1 1 17.7 6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M20 4.5V10H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</header>
