@@ -33,6 +33,14 @@ import { FavoritesService } from '../../core/services/favorites.service';
 import { SearchHistoryService } from '../../core/services/search-history.service';
 import { FavoriteCity, SearchHistoryEntry } from '../../core/models/favorite.model';
 
+import { SearchBackgroundComponent } from '../../components/search/background/background.component';
+import { SearchHeaderComponent } from '../../components/search/header/header.component';
+import { SearchFieldComponent } from '../../components/search/search-field/search-field.component';
+import { SearchFavoritesSectionComponent } from '../../components/search/favorites-section/favorites-section.component';
+import { SearchRecentSectionComponent } from '../../components/search/recent-section/recent-section.component';
+import { SearchResultsComponent } from '../../components/search/search-results/search-results.component';
+import { SearchStatusStatesComponent } from '../../components/search/status-states/status-states.component';
+
 type SearchStatus = 'initial' | 'writing' | 'loading' | 'results' | 'no-results' | 'error' | 'offline';
 
 @Component({
@@ -45,7 +53,14 @@ type SearchStatus = 'initial' | 'writing' | 'loading' | 'results' | 'no-results'
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
-    MatRippleModule
+    MatRippleModule,
+    SearchBackgroundComponent,
+    SearchHeaderComponent,
+    SearchFieldComponent,
+    SearchFavoritesSectionComponent,
+    SearchRecentSectionComponent,
+    SearchResultsComponent,
+    SearchStatusStatesComponent
   ],
   templateUrl: './search.page.html',
   styleUrl: './search.page.scss',
@@ -64,9 +79,6 @@ export class SearchPage implements OnInit, OnDestroy {
 
   protected readonly hasQuery = computed(() => this.queryControl.value.trim().length > 0);
   protected readonly query = computed(() => this.queryControl.value.trim());
-
-  protected readonly title = 'Buscar ciudad';
-  protected readonly subtitle = 'Encontra el clima de cualquier lugar en segundos.';
 
   private searchSubscription?: Subscription;
   private retrySubscription?: Subscription;
@@ -191,10 +203,6 @@ export class SearchPage implements OnInit, OnDestroy {
         return EMPTY;
       })
     ).subscribe();
-  }
-
-  private favoriteKey(city: CityItem): string {
-    return `${city.name}|${city.country}|${city.lat}|${city.lon}`;
   }
 
   private loadFavorites(): void {
@@ -341,15 +349,8 @@ export class SearchPage implements OnInit, OnDestroy {
       });
   }
 
-  protected isFavorite(city: CityItem): boolean {
-    const key = this.favoriteKey(city);
-    return key in this.favoriteMap();
-  }
-
-  protected cityLabel(city: CityItem): string {
-    return city.region
-      ? `${city.name}, ${city.region}, ${city.country}`
-      : `${city.name}, ${city.country}`;
+  private favoriteKey(city: CityItem): string {
+    return `${city.name}|${city.country}|${city.lat}|${city.lon}`;
   }
 
   protected retrySearch(): void {

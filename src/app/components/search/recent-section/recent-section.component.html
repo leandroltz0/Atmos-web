@@ -1,0 +1,45 @@
+<section class="recent-section" aria-label="Búsquedas recientes">
+  <div class="section-heading">
+    <span class="section-heading__label">Recientes</span>
+    @if (recent().length > 0) {
+      <button
+        mat-button
+        type="button"
+        class="section-heading__action"
+        (click)="onClear()"
+      >
+        Limpiar
+      </button>
+    }
+  </div>
+
+  @if (recent().length > 0) {
+    <div class="recent-chips" role="list" aria-label="Ciudades buscadas recientemente">
+      @for (item of recent(); track item.cityId) {
+        <button
+          type="button"
+          class="recent-chip"
+          role="listitem"
+          (click)="onSelect(item)"
+          [attr.aria-label]="'Buscar de nuevo: ' + item.label"
+        >
+          <svg viewBox="0 0 24 24" fill="none" class="recent-chip__icon" aria-hidden="true">
+            <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+          <span>{{ item.label }}</span>
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="empty-state" aria-live="polite">
+      <svg viewBox="0 0 64 64" fill="none" class="empty-state__icon" aria-hidden="true">
+        <circle cx="30" cy="30" r="18" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+        <path d="M44 44L56 56" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.3"/>
+        <circle cx="30" cy="30" r="10" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+      </svg>
+      <p class="empty-state__title">Sin búsquedas recientes</p>
+      <p class="empty-state__body">Empezá escribiendo el nombre de una ciudad arriba.</p>
+    </div>
+  }
+</section>

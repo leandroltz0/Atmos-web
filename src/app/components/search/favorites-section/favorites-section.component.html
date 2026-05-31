@@ -1,0 +1,77 @@
+<section class="fav-section" aria-label="Ciudades favoritas">
+  <div class="section-heading">
+    <span class="section-heading__label">Favoritos</span>
+    @if (favorites().length > 0) {
+      <span class="section-heading__count">{{ favorites().length }}</span>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="fav-skeleton-list" aria-busy="true">
+      @for (_ of [1, 2]; track _) {
+        <div class="fav-skeleton-item glass-card pulse" aria-hidden="true">
+          <div class="fav-skeleton-item__pin"></div>
+          <div class="fav-skeleton-item__lines">
+            <div class="fav-skeleton-item__line fav-skeleton-item__line--title"></div>
+            <div class="fav-skeleton-item__line fav-skeleton-item__line--sub"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (error()) {
+    <div class="fav-error" role="alert">
+      <svg viewBox="0 0 24 24" fill="none" class="fav-error__icon" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6" opacity="0.3"/>
+        <path d="M12 8v5M12 16v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <p class="fav-error__text">{{ error() }}</p>
+      <button type="button" class="fav-error__retry" (click)="onRetry()">
+        <svg viewBox="0 0 24 24" fill="none" class="fav-error__retry-icon" aria-hidden="true">
+          <path d="M20 12A8 8 0 1 1 17.7 6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M20 4.5V10H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Reintentar
+      </button>
+    </div>
+  } @else if (favorites().length > 0) {
+    <div class="fav-list" role="list">
+      @for (fav of favorites(); track fav.cityId) {
+        <button
+          type="button"
+          class="fav-card glass-card"
+          role="listitem"
+          (click)="onSelect(fav)"
+          [attr.aria-label]="'Ver clima de ' + fav.name + ', ' + fav.country"
+        >
+          <div class="fav-card__pin" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" class="fav-card__pin-icon">
+              <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z"
+                fill="currentColor" fill-opacity="0.15"
+                stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <circle cx="12" cy="10" r="2.2" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="fav-card__text">
+            <strong class="fav-card__name">{{ fav.name }}</strong>
+            <span class="fav-card__location">
+              {{ fav.region ? fav.region + ', ' : '' }}{{ fav.country }}
+              <span class="fav-card__code">{{ fav.countryCode }}</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            class="fav-card__delete"
+            (click)="onRemove(fav, $event)"
+            [attr.aria-label]="'Quitar ' + fav.name + ' de favoritos'"
+            matRipple
+            [matRippleColor]="'rgba(239, 68, 68, 0.2)'"
+          >
+            <svg viewBox="0 0 24 24" fill="none" class="fav-card__delete-icon" aria-hidden="true">
+              <path d="M5 7h14M10 7V5.5A1.5 1.5 0 0111.5 4h1A1.5 1.5 0 0114 5.5V7m-5 0h6m-7 0l.5 12.5A1.5 1.5 0 0010 21h4a1.5 1.5 0 001.5-1.5L16 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </button>
+      }
+    </div>
+  }
+</section>

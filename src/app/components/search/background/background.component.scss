@@ -1,0 +1,55 @@
+@keyframes floatOrb1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(2%, 4%) scale(1.05); }
+}
+
+@keyframes floatOrb2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-3%, -5%) scale(1.08); }
+}
+
+.search-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.search-bg__orb {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.search-bg__orb--1 {
+  width: 60vw;
+  height: 60vw;
+  max-width: 420px;
+  max-height: 420px;
+  top: -10%;
+  left: -15%;
+  filter: blur(70px);
+  background: radial-gradient(circle, rgba(58, 134, 255, 0.13) 0%, transparent 70%);
+  animation: floatOrb1 18s ease-in-out infinite;
+}
+
+.search-bg__orb--2 {
+  width: 50vw;
+  height: 50vw;
+  max-width: 360px;
+  max-height: 360px;
+  bottom: 10%;
+  right: -10%;
+  filter: blur(80px);
+  background: radial-gradient(circle, rgba(72, 202, 228, 0.09) 0%, transparent 70%);
+  animation: floatOrb2 22s ease-in-out infinite;
+}
+
+@media (min-width: 768px) {
+  .search-bg__orb--1 {
+    width: 45vw;
+    height: 45vw;
+    top: -5%;
+    left: -8%;
+  }
+}

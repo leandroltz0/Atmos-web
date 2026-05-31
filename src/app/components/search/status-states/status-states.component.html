@@ -1,0 +1,75 @@
+<!-- Writing state (< 2 chars) -->
+@if (status() === 'writing' && query().length > 0 && query().length < 2) {
+  <div class="status-message" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="none" class="status-message__icon" aria-hidden="true">
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+    Seguí escribiendo para iniciar la búsqueda…
+  </div>
+}
+
+<!-- Loading skeletons -->
+@if (status() === 'loading') {
+  <div class="skeleton-list" aria-live="polite" aria-label="Buscando ciudades">
+    @for (item of [1, 2, 3]; track item) {
+      <div class="skeleton-item glass-card pulse" aria-hidden="true">
+        <div class="skeleton-item__pin"></div>
+        <div class="skeleton-item__lines">
+          <div class="skeleton-item__line skeleton-item__line--title"></div>
+          <div class="skeleton-item__line skeleton-item__line--sub"></div>
+        </div>
+      </div>
+    }
+    <p class="sr-only">Buscando ciudades…</p>
+  </div>
+}
+
+<!-- No results -->
+@if (status() === 'no-results') {
+  <div class="empty-state empty-state--padded" aria-live="polite">
+    <svg viewBox="0 0 64 64" fill="none" class="empty-state__icon" aria-hidden="true">
+      <circle cx="30" cy="30" r="18" stroke="currentColor" stroke-width="2" opacity="0.25"/>
+      <path d="M44 44L56 56" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.25"/>
+      <path d="M24 36s2-4 6-4 6 4 6 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+      <circle cx="26" cy="27" r="2" fill="currentColor" opacity="0.5"/>
+      <circle cx="34" cy="27" r="2" fill="currentColor" opacity="0.5"/>
+    </svg>
+    <p class="empty-state__title">No encontramos "{{ query() }}"</p>
+    <p class="empty-state__body">
+      Revisá el nombre o probá con ciudad y país,<br>por ejemplo: <em>Lima, Peru</em>
+    </p>
+  </div>
+}
+
+<!-- Error -->
+@if (status() === 'error') {
+  <div class="empty-state empty-state--padded state-banner--error" role="alert" aria-live="assertive">
+    <svg viewBox="0 0 64 64" fill="none" class="empty-state__icon" aria-hidden="true">
+      <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+      <path d="M32 20v16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="32" cy="43" r="2" fill="currentColor"/>
+    </svg>
+    <p class="empty-state__title">Ocurrió un error</p>
+    <p class="empty-state__body">No pudimos completar la búsqueda. Verificá tu conexión e intentá de nuevo.</p>
+    <button
+      mat-stroked-button
+      type="button"
+      class="retry-btn"
+      (click)="onRetry()"
+    >
+      <svg viewBox="0 0 24 24" fill="none" class="retry-btn__icon" aria-hidden="true">
+        <path d="M20 12A8 8 0 1 1 17.7 6.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M20 4.5V10H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Reintentar
+    </button>
+  </div>
+}
+
+<!-- Offline + query active -->
+@if (status() === 'offline' && query().length > 0) {
+  <div class="empty-state empty-state--padded" aria-live="polite">
+    <p class="empty-state__title">Sin conexión</p>
+    <p class="empty-state__body">Podés usar tus búsquedas recientes mientras volvés a conectarte.</p>
+  </div>
+}

@@ -1,0 +1,42 @@
+<div class="search-input-wrap">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+    <mat-label>Ciudad o país</mat-label>
+
+    <span matPrefix class="search-prefix" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" class="search-prefix__icon">
+        <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M16 16L20.5 20.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="search-prefix-spacer" aria-hidden="true"></span>
+
+    <input
+      matInput
+      id="search-city-input"
+      type="search"
+      autocomplete="off"
+      [formControl]="queryControl()"
+      placeholder="Ej: Buenos Aires, Madrid, Tokyo"
+      aria-describedby="search-hint"
+    />
+
+    @if (hasQuery()) {
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="onClear()"
+        aria-label="Limpiar búsqueda"
+        class="search-clear-btn"
+      >
+        <svg viewBox="0 0 24 24" fill="none" class="search-clear-btn__icon" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    }
+  </mat-form-field>
+
+  <p id="search-hint" class="search-hint">
+    Escribí al menos 2 caracteres para buscar.
+  </p>
+</div>

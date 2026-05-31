@@ -1,0 +1,63 @@
+<section
+  class="results-section"
+  aria-live="polite"
+  [attr.aria-label]="results().length + ' resultados'"
+>
+  <div class="section-heading">
+    <span class="section-heading__label">
+      {{ results().length }} {{ results().length === 1 ? 'resultado' : 'resultados' }}
+    </span>
+  </div>
+
+  <ul class="results-list" role="list">
+    @for (city of results(); track city.id) {
+      <li
+        class="result-item glass-card"
+        role="listitem"
+        matRipple
+        [matRippleColor]="'rgba(58,134,255,0.08)'"
+        tabindex="0"
+        (click)="onSelect(city)"
+        (keydown.enter)="onSelect(city)"
+        (keydown.space)="onSelect(city)"
+        [attr.aria-label]="'Ver clima de ' + city.name + ', ' + city.country"
+      >
+        <div class="result-item__pin" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" class="result-item__pin-icon">
+            <path d="M12 21C15.5 16.8 18 13.5 18 10A6 6 0 1 0 6 10C6 13.5 8.5 16.8 12 21Z"
+              fill="currentColor" fill-opacity="0.15"
+              stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="12" cy="10" r="2.2" fill="currentColor"/>
+          </svg>
+        </div>
+
+        <div class="result-item__text">
+          <strong class="result-item__name">{{ city.name }}</strong>
+          <span class="result-item__location">
+            {{ city.region ? city.region + ', ' : '' }}{{ city.country }}
+            <span class="result-item__code">{{ city.countryCode }}</span>
+          </span>
+        </div>
+
+        <button
+          mat-icon-button
+          type="button"
+          class="result-item__fav-btn"
+          [class.result-item__fav-btn--active]="isFavorite(city)"
+          (click)="onToggleFavorite(city, $event)"
+          [attr.aria-label]="isFavorite(city) ? 'Quitar ' + city.name + ' de favoritos' : 'Agregar ' + city.name + ' a favoritos'"
+        >
+          @if (isFavorite(city)) {
+            <svg viewBox="0 0 24 24" fill="currentColor" class="fav-icon" aria-hidden="true">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none" class="fav-icon" aria-hidden="true">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
+      </li>
+    }
+  </ul>
+</section>
