@@ -101,7 +101,7 @@ app-dashboard-page {
   z-index: 1;
   width: min(1220px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: 1rem 0 calc(6.85rem + env(safe-area-inset-bottom));
+  padding: calc(1rem + env(safe-area-inset-top)) 0 calc(6.85rem + env(safe-area-inset-bottom));
 }
 
 .db-stage {
