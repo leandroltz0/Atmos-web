@@ -41,7 +41,8 @@ testem.log
 .DS_Store
 Thumbs.db
 
-#skill
-
-
-
+# AI Agents
+.agents/
+.codex/
+.antigravity/
+skills-lock.json
