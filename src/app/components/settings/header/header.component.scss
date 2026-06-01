@@ -61,6 +61,20 @@
   line-height: 1.08;
 }
 
+.settings-header__logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  opacity: 0.6;
+  filter: drop-shadow(0 0 6px rgba(58, 134, 255, 0.2));
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
 .settings-version-badge {
   flex-shrink: 0;
   display: inline-flex;
